@@ -91,6 +91,17 @@ CI runs both on every PR.
 - Field name `owner` is **reserved** by Frappe (it's the user who created the
   doc). Use `franchisee`, `assigned_to`, or another domain term instead.
 
+## Documentation
+
+Documentation lives under [docs/](docs/) — start at [docs/README.md](docs/README.md)
+for the nav index. Every PR should answer the question *"which doc would have
+warned me about this change?"* and update it (or call out "no doc impact" in
+the PR description). The matrix of which change updates which doc is in
+[docs/development.md §9](docs/development.md#9-documentation-policy).
+
+User-visible changes also need an entry in [CHANGELOG.md](CHANGELOG.md) under
+`[Unreleased]`.
+
 ## Security
 
 - Never commit secrets (`.env`, DB passwords, signed agreement PDFs from real
