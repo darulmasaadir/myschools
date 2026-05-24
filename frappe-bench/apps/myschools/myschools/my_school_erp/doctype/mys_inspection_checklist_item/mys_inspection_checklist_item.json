@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-05-25 14:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "istable": 1,
+ "field_order": [
+  "item_text",
+  "category",
+  "severity",
+  "column_break_1",
+  "weight",
+  "max_score"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_text",
+   "fieldtype": "Small Text",
+   "label": "Item",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "Safety\nFacility\nCleanliness\nAcademic\nStaff\nCompliance\nFinancial\nOther",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "severity",
+   "fieldtype": "Select",
+   "label": "Severity",
+   "options": "Critical\nMajor\nMinor",
+   "default": "Minor",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "label": "Weight",
+   "default": 1,
+   "reqd": 1,
+   "description": "Used for weighted score: sum(score*weight) / sum(max_score*weight)"
+  },
+  {
+   "fieldname": "max_score",
+   "fieldtype": "Int",
+   "label": "Max Score",
+   "default": 1,
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-25 14:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Inspection Checklist Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}
