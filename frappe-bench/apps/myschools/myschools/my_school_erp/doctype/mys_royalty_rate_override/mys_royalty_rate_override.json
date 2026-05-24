@@ -1,0 +1,144 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:RRO-{####}",
+ "creation": "2026-05-25 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "agreement",
+  "branch",
+  "campus",
+  "column_break_1",
+  "rate_percent",
+  "effective_from",
+  "effective_to",
+  "is_active",
+  "section_break_meta",
+  "reason",
+  "approved_by"
+ ],
+ "fields": [
+  {
+   "fieldname": "agreement",
+   "fieldtype": "Link",
+   "label": "Franchise Agreement",
+   "options": "MYS Franchise Agreement",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "MYS Branch",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Branch this override applies to. Must match the agreement's branch."
+  },
+  {
+   "fieldname": "campus",
+   "fieldtype": "Link",
+   "label": "Campus (optional)",
+   "options": "MYS Campus",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Leave blank to override at branch level. Set a campus to override just that campus — campus override wins over branch override."
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_percent",
+   "fieldtype": "Percent",
+   "label": "Royalty Rate %",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Overrides the agreement's default rate for this branch/campus."
+  },
+  {
+   "fieldname": "effective_from",
+   "fieldtype": "Date",
+   "label": "Effective From",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "effective_to",
+   "fieldtype": "Date",
+   "label": "Effective To",
+   "description": "Leave blank for open-ended override."
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active",
+   "default": "1"
+  },
+  {
+   "fieldname": "section_break_meta",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason for Override",
+   "description": "e.g. promotional rate, hardship adjustment, new branch ramp-up"
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "Approved By",
+   "options": "User"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Royalty Rate Override",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Chief Executive",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HO Dept Head"
+  },
+  {
+   "read": 1,
+   "role": "Branch Director"
+  }
+ ],
+ "sort_field": "effective_from",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

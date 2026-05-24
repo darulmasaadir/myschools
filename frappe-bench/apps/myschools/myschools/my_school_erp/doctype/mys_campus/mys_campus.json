@@ -1,0 +1,149 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{branch}-{campus_type}",
+ "creation": "2026-05-25 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "campus_type",
+  "branch",
+  "column_break_1",
+  "is_active",
+  "section_break_details",
+  "campus_incharge",
+  "column_break_2",
+  "phone",
+  "email",
+  "section_break_capacity",
+  "max_students",
+  "current_strength"
+ ],
+ "fields": [
+  {
+   "fieldname": "campus_type",
+   "fieldtype": "Select",
+   "label": "Campus Type",
+   "options": "Kids\nJunior\nSenior",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "MYS Branch",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active",
+   "default": "1"
+  },
+  {
+   "fieldname": "section_break_details",
+   "fieldtype": "Section Break",
+   "label": "Campus Details"
+  },
+  {
+   "fieldname": "campus_incharge",
+   "fieldtype": "Link",
+   "label": "Campus Incharge",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "section_break_capacity",
+   "fieldtype": "Section Break",
+   "label": "Capacity"
+  },
+  {
+   "fieldname": "max_students",
+   "fieldtype": "Int",
+   "label": "Max Students"
+  },
+  {
+   "fieldname": "current_strength",
+   "fieldtype": "Int",
+   "label": "Current Strength",
+   "read_only": 1,
+   "description": "Auto-computed from enrolled students linked to this campus"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Campus",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Chief Executive",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "write": 1,
+   "role": "Branch Director"
+  },
+  {
+   "read": 1,
+   "write": 1,
+   "role": "Branch Principal"
+  },
+  {
+   "read": 1,
+   "write": 1,
+   "role": "Campus Incharge"
+  }
+ ],
+ "sort_field": "branch",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 1
+}

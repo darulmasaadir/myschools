@@ -1,0 +1,241 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:MYS-FA-{branch}-{YYYY}-{####}",
+ "creation": "2026-05-25 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "is_submittable": 1,
+ "field_order": [
+  "franchisee",
+  "branch",
+  "company",
+  "column_break_1",
+  "status",
+  "start_date",
+  "end_date",
+  "section_break_royalty",
+  "default_royalty_rate",
+  "royalty_base",
+  "column_break_royalty",
+  "billing_day",
+  "grace_days",
+  "section_break_financials",
+  "security_deposit",
+  "deposit_received",
+  "column_break_financials",
+  "franchise_fee",
+  "currency",
+  "section_break_terms",
+  "agreement_terms",
+  "section_break_attachments",
+  "agreement_document"
+ ],
+ "fields": [
+  {
+   "fieldname": "franchisee",
+   "fieldtype": "Link",
+   "label": "Franchise Owner",
+   "options": "MYS Franchise Owner",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "MYS Branch",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "description": "ERPNext Company for this franchise's books. Defaults from branch."
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nActive\nExpired\nTerminated\nRenewed",
+   "default": "Draft",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "section_break_royalty",
+   "fieldtype": "Section Break",
+   "label": "Royalty Terms"
+  },
+  {
+   "fieldname": "default_royalty_rate",
+   "fieldtype": "Percent",
+   "label": "Default Royalty Rate",
+   "reqd": 1,
+   "default": "7",
+   "in_list_view": 1,
+   "description": "Default rate applied to all campuses of this branch. Can be overridden per-campus via MYS Royalty Rate Override."
+  },
+  {
+   "fieldname": "royalty_base",
+   "fieldtype": "Select",
+   "label": "Royalty Calculation Base",
+   "options": "Gross Fee Collection\nNet Fee Collection\nTuition Only\nGross Revenue",
+   "default": "Gross Fee Collection",
+   "description": "What collection figure the royalty rate is applied to."
+  },
+  {
+   "fieldname": "column_break_royalty",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "billing_day",
+   "fieldtype": "Int",
+   "label": "Billing Day of Month",
+   "default": "5",
+   "description": "Day of the following month on which royalty invoice is generated."
+  },
+  {
+   "fieldname": "grace_days",
+   "fieldtype": "Int",
+   "label": "Grace Days",
+   "default": "10",
+   "description": "Days past invoice date before royalty is marked Overdue."
+  },
+  {
+   "fieldname": "section_break_financials",
+   "fieldtype": "Section Break",
+   "label": "Other Financials"
+  },
+  {
+   "fieldname": "security_deposit",
+   "fieldtype": "Currency",
+   "label": "Security Deposit",
+   "options": "currency"
+  },
+  {
+   "fieldname": "deposit_received",
+   "fieldtype": "Check",
+   "label": "Deposit Received",
+   "default": "0"
+  },
+  {
+   "fieldname": "column_break_financials",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "franchise_fee",
+   "fieldtype": "Currency",
+   "label": "One-Time Franchise Fee",
+   "options": "currency"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency",
+   "default": "PKR"
+  },
+  {
+   "fieldname": "section_break_terms",
+   "fieldtype": "Section Break",
+   "label": "Terms"
+  },
+  {
+   "fieldname": "agreement_terms",
+   "fieldtype": "Text Editor",
+   "label": "Agreement Terms"
+  },
+  {
+   "fieldname": "section_break_attachments",
+   "fieldtype": "Section Break",
+   "label": "Attachments"
+  },
+  {
+   "fieldname": "agreement_document",
+   "fieldtype": "Attach",
+   "label": "Signed Agreement (PDF)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "group": "Royalty",
+   "link_doctype": "MYS Royalty Invoice",
+   "link_fieldname": "agreement"
+  },
+  {
+   "group": "Royalty",
+   "link_doctype": "MYS Royalty Rate Override",
+   "link_fieldname": "agreement"
+  }
+ ],
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Franchise Agreement",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "submit": 1,
+   "cancel": 1,
+   "role": "Chief Executive",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HO Dept Head"
+  },
+  {
+   "read": 1,
+   "role": "Branch Director"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "creation": "2026-05-25 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "istable": 1,
+ "field_order": [
+  "campus",
+  "campus_type",
+  "collection_amount",
+  "rate_percent",
+  "royalty_amount",
+  "rate_source"
+ ],
+ "fields": [
+  {
+   "fieldname": "campus",
+   "fieldtype": "Link",
+   "label": "Campus",
+   "options": "MYS Campus",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "campus_type",
+   "fieldtype": "Data",
+   "label": "Type",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "collection_amount",
+   "fieldtype": "Currency",
+   "label": "Collection",
+   "in_list_view": 1,
+   "columns": 2,
+   "options": "currency"
+  },
+  {
+   "fieldname": "rate_percent",
+   "fieldtype": "Percent",
+   "label": "Rate %",
+   "in_list_view": 1,
+   "columns": 1
+  },
+  {
+   "fieldname": "royalty_amount",
+   "fieldtype": "Currency",
+   "label": "Royalty",
+   "in_list_view": 1,
+   "columns": 2,
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rate_source",
+   "fieldtype": "Data",
+   "label": "Rate Source",
+   "in_list_view": 1,
+   "columns": 2,
+   "read_only": 1,
+   "description": "campus override / branch override / agreement default"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Royalty Invoice Campus Line",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": [],
+ "track_changes": 0
+}

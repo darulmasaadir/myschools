@@ -1,0 +1,21 @@
+# MY School ERP — code owners
+# Lines later in the file take precedence.
+
+# Default owner for everything in the repo
+*                                               @alisufyan
+
+# App code
+/frappe-bench/apps/myschools/                   @alisufyan
+
+# Royalty and franchise economics — review carefully (financial impact)
+/frappe-bench/apps/myschools/myschools/api/royalty.py                       @alisufyan
+/frappe-bench/apps/myschools/myschools/my_school_erp/doctype/mys_franchise_agreement/   @alisufyan
+/frappe-bench/apps/myschools/myschools/my_school_erp/doctype/mys_royalty_*/             @alisufyan
+
+# Permission / access control — sensitive
+/frappe-bench/apps/myschools/myschools/api/permissions.py                   @alisufyan
+/frappe-bench/apps/myschools/myschools/setup/install.py                     @alisufyan
+
+# CI / engineering config
+/.github/                                       @alisufyan
+/CONTRIBUTING.md                                @alisufyan
