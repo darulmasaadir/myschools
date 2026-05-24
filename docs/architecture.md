@@ -1,91 +1,238 @@
-# MY School ERP — Architecture Notes
+# Architecture
 
-Source of truth for design decisions while we build the custom `myschools` Frappe app on top of `frappe/education` v15.
+System architecture for **MY School ERP** (myschools.pk) — a multi-tier school franchise
+management system built on Frappe.
+
+> **Status legend** — ✅ shipped & tested · 🟡 partial · ⬜ planned
+
+For high-level "what is this and who uses it" see [overview.md](overview.md).
+For doctype-level field reference see [data-model.md](data-model.md).
+
+---
 
 ## 1. Stack
 
-- **Framework:** Frappe v15 (Python 3.12, Node 20, MariaDB 10.6+, Redis)
-- **Base apps installed:** `frappe`, `erpnext` (Education's hard dependency), `education`
-- **Our custom app:** `myschools` (lives in `frappe-bench/apps/myschools/`) — all customisation goes here, upstream apps stay untouched so we can `git pull` them later.
-- **Optional later:** `hrms` (richer payroll), `lms` (digital learning), `payments` (Razorpay / JazzCash gateway).
-
-## 2. Franchise hierarchy
-
-```
-Head Office (Chief Executive + Dept Heads)
-   └── Cluster (MYS-CL01, MYS-CL02, ...)
-         └── Branch (BR001, BR014, ...)
-               └── Campus (Junior / Kids / Senior)
-                     └── Student / Teacher / Admin staff
-                           └── Parent (Guardian) — read-only via portal
-```
-
-## 3. Custom DocTypes (in `myschools` app, module `MY School Franchise`)
-
-| DocType | Naming | Key fields |
+| Layer | Choice | Why |
 |---|---|---|
-| `MYS Cluster` | `MYS-CL{##}` | cluster_code, cluster_name, region, cluster_director (Link Employee), academic_monitor, audit_officer |
-| `MYS Branch` | `MYS-{cluster_code}-BR{###}` | branch_code, branch_name, cluster (Link), address, city, branch_director, branch_principal, branch_admin, branch_accountant |
-| `MYS Campus` | `{branch}-{campus_type}` | campus_type (Junior/Kids/Senior), branch (Link), campus_incharge (Link Employee) |
-| `MYS Department` | autoname field:dept_name | dept_name (Monitoring/Academic/Finance/Training/Admin), head_of_department |
-| `MYS Inspection Visit` | `INSP-.YYYY.-.####` | branch, visit_date, inspector, scorecard (Table), summary, status |
-| `MYS Communication Log` | `COMM-.YYYY.-.######` | sender, recipient_role, channel (SMS/Email/Push/In-App), subject, body, status, sent_at |
+| Framework | Frappe v15 (Python 3.12) | Mature low-code metadata-driven ERP, MIT-licensed |
+| Database | MariaDB 10.6+ | Frappe's primary supported DB |
+| Cache / queue | Redis 7 | Frappe's default |
+| Front-end | Frappe Desk (built-in) + Education SPA | No custom front-end yet |
+| Base apps | `frappe`, `erpnext`, `education` | Education has ERPNext as a hard dep |
+| Custom app | `myschools` (this repo) | All customisations live here; upstream apps stay clean for `bench update` |
 
-## 4. Custom fields on upstream DocTypes (via Customize Form / fixtures)
+**Optional later:** `hrms` (richer payroll), `lms` (digital learning), `payments` (Pakistani gateways).
 
-- `Student`: mys_cluster (Link), mys_branch (Link, fetch from cluster), mys_campus (Link), mys_student_id (Data, auto-generated as `MYS-{cluster_code}-{branch_code}-STU{######}`)
-- `Employee`: mys_branch, mys_campus, mys_role_tier (Select: Head Office / Cluster / Branch / Campus), mys_staff_id (`MYS-{branch_code}-{role_code}{####}`)
-- `Guardian`: mys_branch (so parent portal only sees their branch's students)
+---
 
-## 5. Role model
+## 2. Hierarchy
 
-New roles (in addition to upstream Student / Instructor / Guardian / Education Manager):
-
-- **Chief Executive** — global read on everything
-- **HO Dept Head** — global read on their dept's reports
-- **Cluster Director** — read/write within their cluster only
-- **Academic Monitor**, **Audit Officer** — cluster-scoped, monitoring DocTypes only
-- **Branch Director**, **Branch Principal**, **Branch Admin**, **Branch Accountant** — branch-scoped, role-specific perms
-- **Campus Incharge** — campus-scoped
-- **Parent (Guardian)** — existing role, scoped to own students
-
-### Permission strategy
-Branch / campus scoping is enforced with **Permission Query Conditions** (Python hooks in `myschools/permissions.py`). Each scoped role gets a filter like `student.mys_branch IN (current_user_branches())`.
-
-## 6. ID generation logic
-
-Implemented as a `before_insert` hook on Student / Employee:
-
-```python
-def set_mys_student_id(doc, method):
-    cluster = frappe.get_doc("MYS Cluster", doc.mys_cluster)
-    branch  = frappe.get_doc("MYS Branch",  doc.mys_branch)
-    seq = frappe.db.count("Student", {"mys_branch": doc.mys_branch}) + 1
-    doc.mys_student_id = f"MYS-{cluster.cluster_code}-{branch.branch_code}-STU{seq:06d}"
+```
+Head Office (Company, is_group=1)
+   ├── Cluster Company (Northern Punjab, Central Punjab, Sindh, ...)
+   │     │ ← ERPNext Company; each cluster gets its own books
+   │     │
+   │     └── MYS Cluster (cluster_code, region, director, monitor, audit officer)
+   │           └── MYS Branch (branch_code, city, principal, accountant, admin)
+   │                 │ ← linked to its cluster Company for financial isolation
+   │                 │
+   │                 └── MYS Campus (Junior / Kids / Senior)
+   │                       └── Student / Teacher / Admin staff
+   │                             └── Guardian (read-only via portal)
+   │
+   └── (Other clusters …)
 ```
 
-## 7. Modules-to-coverage map (PDF's 22 modules)
+**Two parallel hierarchies, intentional:**
 
-| # | Module | Coverage |
+- **ERPNext Company tree** — for accounting consolidation. Head Office is a group company; each
+  cluster is a sub-company under HO. Royalty invoices post to the cluster company's books.
+- **MYS Cluster / Branch / Campus tree** — for operational scoping. A user assigned to a branch
+  sees data only for that branch; a Cluster Director sees their whole cluster.
+
+The MYS Branch doctype carries a `company` Link that bridges the two.
+
+---
+
+## 3. Modules shipped so far
+
+| Module | Status | DocTypes | Notes |
+|---|---|---|---|
+| Franchise hierarchy | ✅ | `MYS Cluster`, `MYS Branch`, `MYS Campus`, `MYS Department` | [data-model](data-model.md#1-franchise-hierarchy) |
+| Royalty | ✅ | `MYS Franchise Owner`, `MYS Franchise Agreement`, `MYS Royalty Rate Override`, `MYS Royalty Invoice` (+ `Campus Line` child), `MYS Royalty Payment` | [process](processes/royalty-billing.md) · [API](api/royalty.md) |
+| Inspection workflow | ✅ | `MYS Inspection Checklist Template` (+ `Item` child), `MYS Inspection Visit` (+ `Result` child), `MYS Inspection Finding`, `MYS Corrective Action` | [process](processes/inspection-workflow.md) · [API](api/inspection.md) |
+| Communication | 🟡 | `MYS Communication Log` | Schema only; no SMS/email integration yet |
+| Permissions | ✅ | (no doctypes — pure Python in `api/permissions.py`) | Branch / cluster scoping via `permission_query_conditions` |
+| SIS (Student Info System) | ⬜ | upstream `education.Student` extended with `mys_cluster`/`mys_branch`/`mys_campus` custom fields | Not yet exercised end-to-end |
+| Fees | ⬜ | upstream `education.Fees` | Royalty pipeline assumes it but no fee records seeded yet |
+
+Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
+
+---
+
+## 4. Royalty — rate resolution
+
+Configurable royalty rate (not fixed at 7%). Resolution order, highest priority first:
+
+1. **Campus override** — a `MYS Royalty Rate Override` row for this (agreement, branch, campus) effective on the billing date
+2. **Branch override** — a row for this (agreement, branch, campus=None)
+3. **Agreement default** — `MYS Franchise Agreement.default_royalty_rate`
+
+Implementation: [`api/royalty.py`](../frappe-bench/apps/myschools/myschools/api/royalty.py) `resolve_royalty_rate(agreement, branch, campus, on_date)`.
+
+Each override has `effective_from` / `effective_to` / `is_active` — so rates can be scheduled
+ahead of time, retired, or temporarily disabled without losing history. Past invoices are
+unaffected because they store the resolved rate on each campus line at submission.
+
+```
+                  ┌──────────────────────────────┐
+billing date ───→ │ campus override (matching     │ ─ found ──→ campus_override
+                  │  agreement+branch+campus,     │
+                  │  effective range, is_active)? │
+                  └──────────┬───────────────────┘
+                             │ not found
+                             ↓
+                  ┌──────────────────────────────┐
+                  │ branch override (campus=null) │ ─ found ──→ branch_override
+                  └──────────┬───────────────────┘
+                             │ not found
+                             ↓
+                  ┌──────────────────────────────┐
+                  │ agreement.default_royalty_rate│ ────────→ agreement_default
+                  └──────────────────────────────┘
+```
+
+Monthly scheduled job (`0 3 1 * *` in [hooks.py](../frappe-bench/apps/myschools/myschools/hooks.py))
+generates invoices for the previous month. Per-campus collection comes from
+`tabFees` filtered by `student.mys_branch` and `posting_date`.
+
+---
+
+## 5. Inspection — workflow
+
+Decomposed from a single submittable doc into a five-doctype workflow:
+
+```
+Checklist Template (versioned, per visit type)
+   │
+   │ apply_template_to_visit() snapshots items
+   ↓
+Inspection Visit (draft → submitted)
+   │  ├── checklist_results[]  (snapshot of items + Pass/Fail/N/A + score)
+   │  └── auto-computed: total_items, items_passed, items_failed, items_na,
+   │                     score_percent, weighted_score
+   │
+   │ on submit → auto-create one Finding per failed Critical/Major item
+   ↓
+Inspection Finding (submittable: Open → In Progress → Resolved → Verified)
+   │
+   │ (one or many)
+   ↓
+Corrective Action (Planned → In Progress → Completed → Verified)
+   │
+   └─ when all corrective actions are Verified, finding auto-flips to Verified
+```
+
+Design notes:
+
+- **Template items are snapshotted** into the visit's checklist_results — a later template
+  revision doesn't rewrite historical visits.
+- **Auto-findings cover Critical + Major only** — Minor failures need a manual finding from
+  the inspector's summary. Critical findings get a 7-day due date; Major get 21.
+- **Corrective Action is intentionally not submittable** — the workflow needs status edits
+  (Planned → In Progress → Completed → Verified) that a submittable lifecycle would block.
+
+Implementation: [`api/inspection.py`](../frappe-bench/apps/myschools/myschools/api/inspection.py).
+
+---
+
+## 6. Permissions (branch/cluster scoping)
+
+Frappe's `permission_query_conditions` hook is used to scope list/report queries per role tier:
+
+| Tier | Roles | Scope |
 |---|---|---|
-| 1 | Master Setup | Frappe core (Settings, DocType, Workspace) |
-| 2 | Franchise Management | **Custom** — Cluster/Branch/Campus DocTypes |
-| 3 | Student Information System | `education` Student + custom fields |
-| 4 | HR / Staff Management | `erpnext` Employee + `hrms` (optional) |
-| 5 | Campus Management | **Custom** — MYS Campus |
-| 6 | Academic Management | `education` Program / Course / Topic |
-| 7 | Examination System | `education` Assessment Plan / Result |
-| 8 | Attendance System | `education` Student Attendance + `erpnext` Employee Attendance |
-| 9 | Finance / Fee Management | `education` Fees + `erpnext` Accounts |
-| 10 | Parent Portal | `education` Student Portal extended for guardians |
-| 11 | Teacher Portal | `education` Instructor portal |
-| 12 | Communication System | **Custom** — MYS Communication Log + Frappe email/SMS |
-| 13 | Monitoring & Inspection | **Custom** — MYS Inspection Visit |
-| 15 | Transport | `erpnext` Vehicle + Frappe Geo (or custom later) |
-| 16 | Library | `erpnext` Stock or custom Library Member/Loan |
-| 17 | LMS / Digital Learning | `frappe/lms` (install separately) |
-| 18 | Document Management | Frappe File + folders per branch |
-| 19 | Security / Role Control | Frappe Roles + Permission Query Conditions |
-| 20 | Mobile App | `education` already has a frontend SPA; PWA-ready |
-| 21 | Unique ID System | **Custom** — hook on Student/Employee |
-| 22 | Reporting System | Frappe Report Builder + Frappe Insights (optional) |
+| Global | System Manager, Administrator, Chief Executive, HO Dept Head | All branches |
+| Cluster | Cluster Director, Academic Monitor, Audit Officer | Branches in the user's cluster |
+| Branch | Branch Director, Branch Principal, Branch Admin, Branch Accountant, Campus Incharge | The user's branch only |
+| None | Other | `branch = '__none__'` (returns no rows) |
+
+The user's branch is resolved via `Employee.mys_branch`. Cluster is derived by joining up
+through `MYS Branch.cluster`.
+
+Implementation:
+
+- [`api/permissions.py`](../frappe-bench/apps/myschools/myschools/api/permissions.py) — `_user_scope()` and per-doctype query functions for branches, campuses, students, inspection visits.
+- [`api/royalty.py`](../frappe-bench/apps/myschools/myschools/api/royalty.py) — query functions for the four royalty doctypes.
+- [`api/inspection.py`](../frappe-bench/apps/myschools/myschools/api/inspection.py) — query functions for findings and corrective actions.
+- All are wired in [`hooks.py`](../frappe-bench/apps/myschools/myschools/hooks.py) under `permission_query_conditions`.
+
+---
+
+## 7. ID generation
+
+`before_insert` hooks set unique IDs on Student / Employee:
+
+- Student: `MYS-{cluster_code}-{branch_code}-STU{######}`
+- Employee: `MYS-{branch_code}-{role_code}{####}`
+
+Implementation: [`api/identity.py`](../frappe-bench/apps/myschools/myschools/api/identity.py).
+
+---
+
+## 8. Custom fields on upstream doctypes
+
+Applied as `Custom Field` records (exported as fixtures, filter `name like '%-mys_%'`):
+
+- **Student**: `mys_cluster`, `mys_branch` (fetch from cluster), `mys_campus`, `mys_student_id`
+- **Employee**: `mys_branch`, `mys_campus`, `mys_role_tier` (HO / Cluster / Branch / Campus), `mys_staff_id`
+- **Guardian**: `mys_branch` (so parent portal only shows their branch)
+
+---
+
+## 9. Scheduled jobs
+
+| When | Job | Purpose |
+|---|---|---|
+| `0 3 1 * *` (3am on day 1) | `myschools.api.royalty.scheduled_monthly_royalty_run` | Generate royalty invoices for the previous month |
+
+Registered in [`hooks.py`](../frappe-bench/apps/myschools/myschools/hooks.py) under `scheduler_events.cron`.
+
+---
+
+## 10. Repository layout
+
+```
+.
+├── docs/                                     ← this directory
+├── frappe-bench/                             ← gitignored except the app below
+│   └── apps/myschools/
+│       └── myschools/
+│           ├── api/                          ← business logic (royalty, inspection, permissions, identity)
+│           ├── my_school_erp/doctype/<name>/ ← doctype definitions (json schema + py controller)
+│           ├── scripts/                      ← seed_demo, demo_royalty_invoice
+│           ├── tests/                        ← integration tests (run via `bench run-tests`)
+│           ├── setup/install.py              ← after_install / after_migrate hooks
+│           └── hooks.py                      ← Frappe wiring (events, scheduler, permissions, fixtures)
+├── .github/                                  ← CI workflow, PR/issue templates, CODEOWNERS
+├── CHANGELOG.md                              ← Keep-a-Changelog format
+├── CONTRIBUTING.md                           ← branching, commit conventions, PR workflow
+├── README.md                                 ← landing page
+└── LICENSE                                   ← AGPL-3.0
+```
+
+The whole `frappe-bench/` directory is gitignored except for `apps/myschools/`, so the repo
+only tracks our app and the project-level docs / config. Bench, venv, sites, logs, and
+upstream apps are all reproduced from scratch on each clone.
+
+---
+
+## 11. Engineering practices
+
+See [development.md](development.md) for the full picture. Summary:
+
+- **Branching:** `main` (production, protected) ← `develop` ← `feature-*` / `fix-*`
+- **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`)
+- **Lint/format:** ruff (configured in `pyproject.toml`, runs in pre-commit + CI)
+- **Tests:** `bench --site myschools.localhost run-tests --app myschools` — 16 integration tests at time of writing
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) — lint job + Frappe test suite with MariaDB + Redis services

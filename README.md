@@ -2,6 +2,18 @@
 
 Custom multi-tier school-franchise ERP for **[myschools.pk](https://myschools.pk)**, built on the open-source **Frappe Framework** with the **Frappe Education** app, plus a custom `myschools` app for the franchise hierarchy (Head Office → Cluster → Branch → Campus).
 
+## Documentation
+
+Full documentation lives in [docs/](docs/). Start here:
+
+- [docs/README.md](docs/README.md) — navigation index
+- [docs/overview.md](docs/overview.md) — what / who / why (no code)
+- [docs/architecture.md](docs/architecture.md) — system architecture
+- [docs/data-model.md](docs/data-model.md) — DocType field reference
+- [docs/development.md](docs/development.md) — dev onboarding, tests, releases
+- [docs/processes/](docs/processes/) — royalty billing + inspection workflow
+- [docs/api/](docs/api/) — function reference for `myschools.api.royalty` and `myschools.api.inspection`
+
 ## Quick start
 
 ```bash
@@ -122,8 +134,10 @@ bench --site myschools.localhost execute myschools.scripts.seed_demo.run
 
 ```
 /Users/ali/projects/myschools/
-├── docs/architecture.md          ← module-by-module design notes
+├── docs/                         ← system + process + API docs (start at docs/README.md)
 ├── README.md                     ← this file
+├── CHANGELOG.md                  ← Keep-a-Changelog
+├── CONTRIBUTING.md               ← branching, commits, PR workflow
 └── frappe-bench/                 ← the runtime bench (do not commit verbatim)
     ├── apps/
     │   ├── frappe/               ← upstream, untouched

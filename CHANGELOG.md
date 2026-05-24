@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+- Reworked `docs/architecture.md` to reflect the inspection decomposition, multi-Company royalty,
+  and shipped-vs-planned module status (✅ / 🟡 / ⬜ legend).
+- Added a documentation set under `docs/`:
+  - `docs/README.md` — nav index (tech + non-tech audiences).
+  - `docs/overview.md` — what/who/why for non-technical readers.
+  - `docs/data-model.md` — DocType-by-DocType field reference.
+  - `docs/development.md` — bench setup, daily workflow, test conventions,
+    debugging tips, release process, documentation policy.
+  - `docs/processes/royalty-billing.md` — operator-facing monthly cycle.
+  - `docs/processes/inspection-workflow.md` — operator-facing inspection lifecycle.
+  - `docs/api/royalty.md`, `docs/api/inspection.md` — function references.
+- Root `README.md` and `CONTRIBUTING.md` updated to link into the docs set.
+
 ### Added
 - **Inspection workflow decomposition**: replaced the single `MYS Inspection Visit` stub with a
   five-doctype workflow.
