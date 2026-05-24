@@ -34,6 +34,8 @@ permission_query_conditions = {
 	"MYS Branch": "myschools.api.permissions.branch_query",
 	"MYS Campus": "myschools.api.permissions.campus_query",
 	"MYS Inspection Visit": "myschools.api.permissions.inspection_query",
+	"MYS Inspection Finding": "myschools.api.inspection.finding_query",
+	"MYS Corrective Action": "myschools.api.inspection.corrective_action_query",
 	"MYS Franchise Agreement": "myschools.api.royalty.franchise_agreement_query",
 	"MYS Royalty Rate Override": "myschools.api.royalty.rate_override_query",
 	"MYS Royalty Invoice": "myschools.api.royalty.royalty_invoice_query",

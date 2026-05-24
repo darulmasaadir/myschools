@@ -9,18 +9,29 @@
  "field_order": [
   "branch",
   "campus",
+  "visit_type",
   "column_break_1",
   "visit_date",
   "inspector",
-  "section_break_details",
-  "visit_type",
+  "checklist_template",
+  "section_break_areas",
   "areas_inspected",
-  "section_break_findings",
-  "overall_score",
+  "section_break_checklist",
+  "checklist_results",
+  "section_break_score",
+  "total_items",
+  "items_passed",
+  "items_failed",
+  "items_na",
+  "column_break_score",
+  "score_percent",
+  "weighted_score",
+  "section_break_summary",
   "summary",
   "recommendations",
   "section_break_attachments",
-  "attachments"
+  "attachments",
+  "amended_from"
  ],
  "fields": [
   {
@@ -38,6 +49,14 @@
    "label": "Campus",
    "options": "MYS Campus",
    "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "visit_type",
+   "fieldtype": "Select",
+   "label": "Visit Type",
+   "options": "Academic Monitoring\nFinancial Audit\nFacility\nComplaint\nRoutine",
+   "reqd": 1,
    "in_standard_filter": 1
   },
   {
@@ -61,16 +80,16 @@
    "in_list_view": 1
   },
   {
-   "fieldname": "section_break_details",
-   "fieldtype": "Section Break",
-   "label": "Visit Details"
+   "fieldname": "checklist_template",
+   "fieldtype": "Link",
+   "label": "Checklist Template",
+   "options": "MYS Inspection Checklist Template",
+   "description": "Optional. Apply via the 'Apply Template' action to populate the checklist."
   },
   {
-   "fieldname": "visit_type",
-   "fieldtype": "Select",
-   "label": "Visit Type",
-   "options": "Academic Monitoring\nFinancial Audit\nFacility\nComplaint\nRoutine",
-   "reqd": 1
+   "fieldname": "section_break_areas",
+   "fieldtype": "Section Break",
+   "label": "Scope"
   },
   {
    "fieldname": "areas_inspected",
@@ -78,15 +97,67 @@
    "label": "Areas Inspected"
   },
   {
-   "fieldname": "section_break_findings",
+   "fieldname": "section_break_checklist",
    "fieldtype": "Section Break",
-   "label": "Findings"
+   "label": "Checklist"
   },
   {
-   "fieldname": "overall_score",
-   "fieldtype": "Rating",
-   "label": "Overall Score",
+   "fieldname": "checklist_results",
+   "fieldtype": "Table",
+   "label": "Checklist Results",
+   "options": "MYS Inspection Checklist Result"
+  },
+  {
+   "fieldname": "section_break_score",
+   "fieldtype": "Section Break",
+   "label": "Score"
+  },
+  {
+   "fieldname": "total_items",
+   "fieldtype": "Int",
+   "label": "Total Items",
+   "read_only": 1
+  },
+  {
+   "fieldname": "items_passed",
+   "fieldtype": "Int",
+   "label": "Items Passed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "items_failed",
+   "fieldtype": "Int",
+   "label": "Items Failed",
+   "read_only": 1,
    "in_list_view": 1
+  },
+  {
+   "fieldname": "items_na",
+   "fieldtype": "Int",
+   "label": "Items N/A",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_score",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "score_percent",
+   "fieldtype": "Percent",
+   "label": "Score %",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "weighted_score",
+   "fieldtype": "Percent",
+   "label": "Weighted Score %",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_summary",
+   "fieldtype": "Section Break",
+   "label": "Summary"
   },
   {
    "fieldname": "summary",
@@ -107,11 +178,25 @@
    "fieldname": "attachments",
    "fieldtype": "Attach",
    "label": "Report PDF"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "MYS Inspection Visit",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2026-05-25 12:00:00.000000",
+ "links": [
+  {
+   "link_doctype": "MYS Inspection Finding",
+   "link_fieldname": "visit"
+  }
+ ],
+ "modified": "2026-05-25 14:00:00.000000",
  "modified_by": "Administrator",
  "module": "MY School ERP",
  "name": "MYS Inspection Visit",
