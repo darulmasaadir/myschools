@@ -161,7 +161,7 @@ bench --site myschools.localhost run-tests --app myschools \
   --test test_apply_template_snapshots_items
 ```
 
-Suite at time of writing: **16 integration tests** (7 royalty + 9 inspection).
+Suite at time of writing: **19 integration tests** (7 royalty resolution + 3 royalty-from-fees + 9 inspection).
 
 ### Test conventions
 
