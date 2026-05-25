@@ -26,6 +26,7 @@ def after_install():
 	create_franchise_roles()
 	create_custom_franchise_fields()
 	create_default_head_office_departments()
+	grant_franchise_role_permissions()
 	backfill_module_profiles()
 	frappe.db.commit()
 
@@ -33,8 +34,158 @@ def after_install():
 def after_migrate():
 	create_franchise_roles()
 	create_custom_franchise_fields()
+	grant_franchise_role_permissions()
 	backfill_module_profiles()
 	frappe.db.commit()
+
+
+# Doctypes each franchise role needs read access to so the role's workspace
+# (shortcuts + number cards) renders something useful. Branch-/cluster-/campus-
+# level isolation is enforced separately by `permission_query_conditions` in
+# hooks.py — so granting "read" here just gates VISIBILITY of the doctype, while
+# row-level scoping decides which rows the user sees.
+FRANCHISE_ROLE_READS = {
+	"Chief Executive": [
+		"MYS Cluster",
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Department",
+		"MYS Franchise Owner",
+		"MYS Franchise Agreement",
+		"MYS Royalty Rate Override",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
+		"MYS Communication Log",
+		"MYS Inspection Checklist Template",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"MYS Corrective Action",
+		"Student",
+		"Fees",
+		"Fee Structure",
+		"Employee",
+		"Guardian",
+	],
+	"HO Dept Head": [
+		"MYS Cluster",
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Department",
+		"MYS Franchise Agreement",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
+		"MYS Communication Log",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"Student",
+		"Fees",
+		"Employee",
+	],
+	"Cluster Director": [
+		"MYS Cluster",
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Franchise Agreement",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
+		"MYS Communication Log",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"MYS Corrective Action",
+		"Student",
+		"Fees",
+		"Employee",
+	],
+	"Academic Monitor": [
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Cluster",
+		"MYS Communication Log",
+		"MYS Inspection Checklist Template",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"MYS Corrective Action",
+	],
+	"Audit Officer": [
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Cluster",
+		"MYS Communication Log",
+		"MYS Inspection Checklist Template",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"MYS Corrective Action",
+	],
+	"Branch Director": [
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Communication Log",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"MYS Corrective Action",
+		"Student",
+		"Fees",
+		"Employee",
+		"Guardian",
+	],
+	"Branch Principal": [
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Communication Log",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
+		"MYS Corrective Action",
+		"Student",
+		"Fees",
+		"Employee",
+		"Guardian",
+	],
+	"Branch Admin": [
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Communication Log",
+		"Student",
+		"Fees",
+		"Employee",
+		"Guardian",
+	],
+	"Branch Accountant": [
+		"MYS Branch",
+		"MYS Campus",
+		"MYS Communication Log",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
+		"Student",
+		"Fees",
+	],
+	"Campus Incharge": [
+		"MYS Campus",
+		"MYS Branch",
+		"MYS Communication Log",
+		"Student",
+		"Guardian",
+	],
+}
+
+
+def grant_franchise_role_permissions():
+	"""Grant read perms on the doctypes each franchise role needs to see their
+	workspace's shortcuts and number cards. Uses Custom DocPerm so we don't have
+	to edit per-doctype JSON files. Idempotent — re-running is a no-op."""
+	from frappe.permissions import add_permission, update_permission_property
+
+	for role, doctypes in FRANCHISE_ROLE_READS.items():
+		if not frappe.db.exists("Role", role):
+			continue
+		for doctype in doctypes:
+			if not frappe.db.exists("DocType", doctype):
+				continue
+			# add_permission returns the DocPerm name (existing or new); we then
+			# enforce the read=1 flag idempotently.
+			add_permission(doctype, role, 0)
+			update_permission_property(doctype, role, 0, "read", 1)
 
 
 def backfill_module_profiles():

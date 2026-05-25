@@ -174,3 +174,10 @@ existing logged-in tab may not pick up the new mapping until logout.
 - **`User.validate` (over `after_insert`)** — `after_insert` fires after the
   row is written, so mutating `doc.module_profile` does nothing. `validate`
   runs before the save so the attribute change is persisted naturally.
+- **`User.default_workspace` for desk landing (in addition to
+  `role_home_page`)** — in Frappe v15 the `role_home_page` hook only fires
+  for portal (Website User) logins. For System Users the login API reads
+  `User.default_workspace` and redirects to `/app/<slug>`. We set both —
+  `role_home_page` is harmless for portal users and future-proofs the
+  customer-facing pages we'll add in Phase 7. Caught by HTTP smoke (curl
+  login + parse `home_page`); see [`tests/test_shell.py`](../../frappe-bench/apps/myschools/myschools/tests/test_shell.py).

@@ -12,7 +12,7 @@ Run via:
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-from myschools.api.user_profile import resolve_profile_for_roles
+from myschools.api.user_profile import resolve_profile_for_roles, resolve_workspace_for_roles
 
 EXPECTED_WORKSPACES = [
 	"mys-head-office",
@@ -97,23 +97,35 @@ class TestRoleHomePage(FrappeTestCase):
 			self.assertEqual(value, expected, msg=role)
 
 
-class TestModuleProfileResolver(FrappeTestCase):
-	def test_resolver_picks_highest_tier(self):
+class TestTierResolvers(FrappeTestCase):
+	def test_profile_resolver_picks_highest_tier(self):
 		self.assertEqual(resolve_profile_for_roles({"Chief Executive"}), "MYS HO")
 		self.assertEqual(resolve_profile_for_roles({"Cluster Director"}), "MYS Cluster")
 		self.assertEqual(resolve_profile_for_roles({"Branch Admin"}), "MYS Branch")
 		self.assertEqual(resolve_profile_for_roles({"Campus Incharge"}), "MYS Campus")
 		self.assertEqual(resolve_profile_for_roles({"Audit Officer"}), "MYS Inspection")
 
-	def test_resolver_prefers_higher_tier_when_multiple(self):
-		# A user with both Branch Admin and Cluster Director gets Cluster profile.
+	def test_workspace_resolver_picks_highest_tier(self):
+		self.assertEqual(resolve_workspace_for_roles({"Chief Executive"}), "mys-head-office")
+		self.assertEqual(resolve_workspace_for_roles({"Cluster Director"}), "mys-cluster")
+		self.assertEqual(resolve_workspace_for_roles({"Branch Admin"}), "mys-branch")
+		self.assertEqual(resolve_workspace_for_roles({"Campus Incharge"}), "mys-campus")
+		self.assertEqual(resolve_workspace_for_roles({"Audit Officer"}), "mys-inspection")
+
+	def test_resolvers_prefer_higher_tier_when_multiple(self):
+		# A user with both Branch Admin and Cluster Director gets Cluster.
 		self.assertEqual(
 			resolve_profile_for_roles({"Branch Admin", "Cluster Director"}),
 			"MYS Cluster",
 		)
+		self.assertEqual(
+			resolve_workspace_for_roles({"Branch Admin", "Cluster Director"}),
+			"mys-cluster",
+		)
 
-	def test_resolver_returns_none_for_no_franchise_role(self):
+	def test_resolvers_return_none_for_no_franchise_role(self):
 		self.assertIsNone(resolve_profile_for_roles({"System Manager"}))
+		self.assertIsNone(resolve_workspace_for_roles({"System Manager"}))
 		self.assertIsNone(resolve_profile_for_roles(set()))
 
 
@@ -132,7 +144,7 @@ class TestUserAutoAttach(FrappeTestCase):
 		if frappe.db.exists("User", self.TEST_EMAIL):
 			frappe.delete_doc("User", self.TEST_EMAIL, force=True, ignore_permissions=True)
 
-	def test_branch_admin_gets_branch_profile(self):
+	def test_branch_admin_gets_branch_profile_and_workspace(self):
 		user = frappe.new_doc("User")
 		user.email = self.TEST_EMAIL
 		user.first_name = "Shell"
@@ -143,3 +155,4 @@ class TestUserAutoAttach(FrappeTestCase):
 
 		user.reload()
 		self.assertEqual(user.module_profile, "MYS Branch")
+		self.assertEqual(user.default_workspace, "mys-branch")
