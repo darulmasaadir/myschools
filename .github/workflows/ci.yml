@@ -101,8 +101,10 @@ jobs:
           bench set-config -g redis_socketio redis://127.0.0.1:6379
           bench get-app erpnext --branch version-15
           bench get-app education --branch version-15.2
-          # symlink our app from the checked-out repo
+          # symlink our app from the checked-out repo, then register the
+          # Python package with the bench's venv so `import myschools` works.
           ln -s "${{ github.workspace }}/myschools-repo/frappe-bench/apps/myschools" apps/myschools
+          ./env/bin/pip install -e apps/myschools
 
       - name: Create test site + install apps
         working-directory: frappe-bench
