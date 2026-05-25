@@ -83,9 +83,9 @@ def _ensure_academic_year_and_term():
 
 def _ensure_fee_category():
 	if not frappe.db.exists("Fee Category", FEE_CATEGORY):
-		frappe.get_doc(
-			{"doctype": "Fee Category", "category_name": FEE_CATEGORY}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "Fee Category", "category_name": FEE_CATEGORY}).insert(
+			ignore_permissions=True
+		)
 
 
 def _ensure_programs():
@@ -103,7 +103,9 @@ def _ensure_programs():
 def _ensure_fee_structures(company, receivable):
 	for campus_type, program in PROGRAMS.items():
 		amount = CAMPUS_FEE_AMOUNT[campus_type]
-		if frappe.db.exists("Fee Structure", {"program": program, "academic_year": ACADEMIC_YEAR, "company": company}):
+		if frappe.db.exists(
+			"Fee Structure", {"program": program, "academic_year": ACADEMIC_YEAR, "company": company}
+		):
 			continue
 		fs = frappe.get_doc(
 			{
@@ -242,4 +244,6 @@ def _print_summary():
 		as_dict=True,
 	)
 	for r in rows:
-		print(f"  {r.branch}  {r.campus or '(no campus)':25s}  fees={r.fees_count:2d}  total=PKR {r.total:,.0f}")
+		print(
+			f"  {r.branch}  {r.campus or '(no campus)':25s}  fees={r.fees_count:2d}  total=PKR {r.total:,.0f}"
+		)

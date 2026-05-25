@@ -1,0 +1,123 @@
+[
+ {
+  "doctype": "Module Profile",
+  "module_profile_name": "MYS HO",
+  "name": "MYS HO",
+  "block_modules": [
+   {"doctype": "Block Module", "module": "Manufacturing"},
+   {"doctype": "Block Module", "module": "Stock"},
+   {"doctype": "Block Module", "module": "Buying"},
+   {"doctype": "Block Module", "module": "Maintenance"},
+   {"doctype": "Block Module", "module": "Quality Management"},
+   {"doctype": "Block Module", "module": "Subcontracting"},
+   {"doctype": "Block Module", "module": "Bulk Transaction"},
+   {"doctype": "Block Module", "module": "Assets"},
+   {"doctype": "Block Module", "module": "Regional"},
+   {"doctype": "Block Module", "module": "ERPNext Integrations"},
+   {"doctype": "Block Module", "module": "Telephony"},
+   {"doctype": "Block Module", "module": "Support"},
+   {"doctype": "Block Module", "module": "Projects"},
+   {"doctype": "Block Module", "module": "Utilities"},
+   {"doctype": "Block Module", "module": "EDI"}
+  ]
+ },
+ {
+  "doctype": "Module Profile",
+  "module_profile_name": "MYS Cluster",
+  "name": "MYS Cluster",
+  "block_modules": [
+   {"doctype": "Block Module", "module": "Manufacturing"},
+   {"doctype": "Block Module", "module": "Stock"},
+   {"doctype": "Block Module", "module": "Buying"},
+   {"doctype": "Block Module", "module": "Maintenance"},
+   {"doctype": "Block Module", "module": "Quality Management"},
+   {"doctype": "Block Module", "module": "Subcontracting"},
+   {"doctype": "Block Module", "module": "Bulk Transaction"},
+   {"doctype": "Block Module", "module": "Assets"},
+   {"doctype": "Block Module", "module": "Regional"},
+   {"doctype": "Block Module", "module": "ERPNext Integrations"},
+   {"doctype": "Block Module", "module": "Telephony"},
+   {"doctype": "Block Module", "module": "Support"},
+   {"doctype": "Block Module", "module": "Projects"},
+   {"doctype": "Block Module", "module": "Utilities"},
+   {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "CRM"},
+   {"doctype": "Block Module", "module": "Selling"}
+  ]
+ },
+ {
+  "doctype": "Module Profile",
+  "module_profile_name": "MYS Branch",
+  "name": "MYS Branch",
+  "block_modules": [
+   {"doctype": "Block Module", "module": "Manufacturing"},
+   {"doctype": "Block Module", "module": "Stock"},
+   {"doctype": "Block Module", "module": "Buying"},
+   {"doctype": "Block Module", "module": "Maintenance"},
+   {"doctype": "Block Module", "module": "Quality Management"},
+   {"doctype": "Block Module", "module": "Subcontracting"},
+   {"doctype": "Block Module", "module": "Bulk Transaction"},
+   {"doctype": "Block Module", "module": "Assets"},
+   {"doctype": "Block Module", "module": "Regional"},
+   {"doctype": "Block Module", "module": "ERPNext Integrations"},
+   {"doctype": "Block Module", "module": "Telephony"},
+   {"doctype": "Block Module", "module": "Support"},
+   {"doctype": "Block Module", "module": "Projects"},
+   {"doctype": "Block Module", "module": "Utilities"},
+   {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "CRM"},
+   {"doctype": "Block Module", "module": "Selling"}
+  ]
+ },
+ {
+  "doctype": "Module Profile",
+  "module_profile_name": "MYS Campus",
+  "name": "MYS Campus",
+  "block_modules": [
+   {"doctype": "Block Module", "module": "Manufacturing"},
+   {"doctype": "Block Module", "module": "Stock"},
+   {"doctype": "Block Module", "module": "Buying"},
+   {"doctype": "Block Module", "module": "Maintenance"},
+   {"doctype": "Block Module", "module": "Quality Management"},
+   {"doctype": "Block Module", "module": "Subcontracting"},
+   {"doctype": "Block Module", "module": "Bulk Transaction"},
+   {"doctype": "Block Module", "module": "Assets"},
+   {"doctype": "Block Module", "module": "Regional"},
+   {"doctype": "Block Module", "module": "ERPNext Integrations"},
+   {"doctype": "Block Module", "module": "Telephony"},
+   {"doctype": "Block Module", "module": "Support"},
+   {"doctype": "Block Module", "module": "Projects"},
+   {"doctype": "Block Module", "module": "Utilities"},
+   {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "CRM"},
+   {"doctype": "Block Module", "module": "Selling"},
+   {"doctype": "Block Module", "module": "Accounts"}
+  ]
+ },
+ {
+  "doctype": "Module Profile",
+  "module_profile_name": "MYS Inspection",
+  "name": "MYS Inspection",
+  "block_modules": [
+   {"doctype": "Block Module", "module": "Manufacturing"},
+   {"doctype": "Block Module", "module": "Stock"},
+   {"doctype": "Block Module", "module": "Buying"},
+   {"doctype": "Block Module", "module": "Maintenance"},
+   {"doctype": "Block Module", "module": "Quality Management"},
+   {"doctype": "Block Module", "module": "Subcontracting"},
+   {"doctype": "Block Module", "module": "Bulk Transaction"},
+   {"doctype": "Block Module", "module": "Assets"},
+   {"doctype": "Block Module", "module": "Regional"},
+   {"doctype": "Block Module", "module": "ERPNext Integrations"},
+   {"doctype": "Block Module", "module": "Telephony"},
+   {"doctype": "Block Module", "module": "Support"},
+   {"doctype": "Block Module", "module": "Projects"},
+   {"doctype": "Block Module", "module": "Utilities"},
+   {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "CRM"},
+   {"doctype": "Block Module", "module": "Selling"},
+   {"doctype": "Block Module", "module": "Accounts"},
+   {"doctype": "Block Module", "module": "Education"}
+  ]
+ }
+]

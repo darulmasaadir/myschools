@@ -92,13 +92,9 @@ class TestRoyaltyFromFees(FrappeTestCase):
 			ag = frappe.get_doc("MYS Franchise Agreement", cls.agreement)
 			if ag.docstatus == 1:
 				ag.cancel()
-			frappe.delete_doc(
-				"MYS Franchise Agreement", cls.agreement, force=True, ignore_permissions=True
-			)
+			frappe.delete_doc("MYS Franchise Agreement", cls.agreement, force=True, ignore_permissions=True)
 		if frappe.db.exists("MYS Franchise Owner", "_TEST_FEE_OWNER"):
-			frappe.delete_doc(
-				"MYS Franchise Owner", "_TEST_FEE_OWNER", force=True, ignore_permissions=True
-			)
+			frappe.delete_doc("MYS Franchise Owner", "_TEST_FEE_OWNER", force=True, ignore_permissions=True)
 
 		# Cancel + delete submitted Fees and Program Enrollments, then Students.
 		for fee in frappe.get_all("Fees", filters={"academic_year": ACADEMIC_YEAR}, pluck="name"):
@@ -113,15 +109,11 @@ class TestRoyaltyFromFees(FrappeTestCase):
 			if pedoc.docstatus == 1:
 				pedoc.cancel()
 			frappe.delete_doc("Program Enrollment", pe, force=True, ignore_permissions=True)
-		for stu in frappe.get_all(
-			"Student", filters={"mys_branch": BRANCH}, pluck="name"
-		):
+		for stu in frappe.get_all("Student", filters={"mys_branch": BRANCH}, pluck="name"):
 			frappe.delete_doc("Student", stu, force=True, ignore_permissions=True)
 
 		# Education prerequisites.
-		for fs in frappe.get_all(
-			"Fee Structure", filters={"academic_year": ACADEMIC_YEAR}, pluck="name"
-		):
+		for fs in frappe.get_all("Fee Structure", filters={"academic_year": ACADEMIC_YEAR}, pluck="name"):
 			frappe.delete_doc("Fee Structure", fs, force=True, ignore_permissions=True)
 		for program in [PROGRAM_KIDS, PROGRAM_JUNIOR, PROGRAM_SENIOR]:
 			if frappe.db.exists("Program", program):
@@ -234,9 +226,9 @@ class TestRoyaltyFromFees(FrappeTestCase):
 				}
 			).insert(ignore_permissions=True)
 		if not frappe.db.exists("Fee Category", FEE_CATEGORY):
-			frappe.get_doc(
-				{"doctype": "Fee Category", "category_name": FEE_CATEGORY}
-			).insert(ignore_permissions=True)
+			frappe.get_doc({"doctype": "Fee Category", "category_name": FEE_CATEGORY}).insert(
+				ignore_permissions=True
+			)
 		for program in [PROGRAM_KIDS, PROGRAM_JUNIOR, PROGRAM_SENIOR]:
 			if not frappe.db.exists("Program", program):
 				frappe.get_doc(

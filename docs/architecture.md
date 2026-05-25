@@ -191,7 +191,39 @@ Applied as `Custom Field` records (exported as fixtures, filter `name like '%-my
 
 ---
 
-## 9. Scheduled jobs
+## 9. Navigation shell (branding, workspaces, roles)
+
+The app ships a **role-aware ERP shell** so each franchise operator logs in to
+a workspace built for their tier rather than vanilla ERPNext's full sidebar.
+
+- **Brand** — `app_logo_url`, `brand_html`, `website_context` (favicon, splash),
+  and `app_include_css` are set in [`hooks.py`](../frappe-bench/apps/myschools/myschools/hooks.py).
+  Assets live under [`myschools/public/images/`](../frappe-bench/apps/myschools/myschools/public/images/)
+  (placeholder SVGs — swap for final artwork in a 1-file change) and CSS tokens
+  in [`myschools/public/css/myschools.css`](../frappe-bench/apps/myschools/myschools/public/css/myschools.css).
+- **Workspaces (5)** — JSON fixtures under
+  [`myschools/my_school_erp/workspace/<slug>/<slug>.json`](../frappe-bench/apps/myschools/myschools/my_school_erp/workspace/).
+  Each carries `restrict_to_role` and ships shortcuts and embedded charts for
+  its tier: `mys-head-office`, `mys-cluster`, `mys-branch`, `mys-campus`,
+  `mys-inspection`.
+- **Role landing** — `role_home_page` in `hooks.py` maps all 10 franchise roles
+  to a workspace, so login goes straight there instead of `/app/home`.
+- **Sidebar scoping** — 5 Module Profile fixtures in
+  [`myschools/fixtures/module_profile.json`](../frappe-bench/apps/myschools/myschools/fixtures/module_profile.json)
+  block vanilla modules (Manufacturing, Stock, Buying, etc.) per tier. Attached
+  automatically on `User.validate` via
+  [`myschools.api.user_profile.attach_module_profile_to_user`](../frappe-bench/apps/myschools/myschools/api/user_profile.py)
+  — highest-tier role wins. Existing Users are back-filled on `after_migrate`.
+- **Letter Head** — `MYS Default` in
+  [`myschools/fixtures/letter_head.json`](../frappe-bench/apps/myschools/myschools/fixtures/letter_head.json),
+  inherited by future Print Formats.
+
+Full role-to-workspace mapping and how to add a new role live in
+[processes/navigation-and-roles.md](processes/navigation-and-roles.md).
+
+---
+
+## 10. Scheduled jobs
 
 | When | Job | Purpose |
 |---|---|---|
@@ -201,7 +233,7 @@ Registered in [`hooks.py`](../frappe-bench/apps/myschools/myschools/hooks.py) un
 
 ---
 
-## 10. Repository layout
+## 11. Repository layout
 
 ```
 .
@@ -228,7 +260,7 @@ upstream apps are all reproduced from scratch on each clone.
 
 ---
 
-## 11. Engineering practices
+## 12. Engineering practices
 
 See [development.md](development.md) for the full picture. Summary:
 
