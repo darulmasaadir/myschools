@@ -63,8 +63,8 @@ The MYS Branch doctype carries a `company` Link that bridges the two.
 | Inspection workflow | ✅ | `MYS Inspection Checklist Template` (+ `Item` child), `MYS Inspection Visit` (+ `Result` child), `MYS Inspection Finding`, `MYS Corrective Action` | [process](processes/inspection-workflow.md) · [API](api/inspection.md) |
 | Communication | 🟡 | `MYS Communication Log` | Schema only; no SMS/email integration yet |
 | Permissions | ✅ | (no doctypes — pure Python in `api/permissions.py`) | Branch / cluster scoping via `permission_query_conditions` |
-| SIS (Student Info System) | ⬜ | upstream `education.Student` extended with `mys_cluster`/`mys_branch`/`mys_campus` custom fields | Not yet exercised end-to-end |
-| Fees | ⬜ | upstream `education.Fees` | Royalty pipeline assumes it but no fee records seeded yet |
+| SIS (Student Info System) | ✅ | upstream `education.Student` extended with `mys_cluster`/`mys_branch`/`mys_campus` custom fields | Seeded end-to-end via `scripts/seed_education.py` |
+| Fees | ✅ | upstream `education.Fees` + `education.Fee Structure` (custom `income_account` field) | Submitted Fees roll up into royalty invoices via `get_branch_collection_for_period` |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 

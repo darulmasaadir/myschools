@@ -169,11 +169,29 @@ def create_custom_franchise_fields():
 		},
 	]
 
+	# Workaround for upstream Frappe Education v15.5.3 bug:
+	# `Fees.income_account` declares `fetch_from: "fee_structure.income_account"`,
+	# but `tabFee Structure` has no `income_account` column. Frappe's link
+	# validation issues `SELECT name, income_account FROM tabFeeStructure`,
+	# which crashes with 1054 Unknown column. Adding the field as a Custom
+	# Field gives the SELECT a real column to read.
+	fee_structure_fields = [
+		{
+			"fieldname": "income_account",
+			"label": "Income Account",
+			"fieldtype": "Link",
+			"options": "Account",
+			"insert_after": "receivable_account",
+			"description": "Optional; declared by upstream Fees.fetch_from. Leave blank to use the Company default.",
+		},
+	]
+
 	create_custom_fields(
 		{
 			"Student": student_fields,
 			"Employee": employee_fields,
 			"Guardian": guardian_fields,
+			"Fee Structure": fee_structure_fields,
 		},
 		ignore_validate=True,
 		update=True,

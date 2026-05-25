@@ -128,7 +128,15 @@ Re-run anytime:
 
 ```bash
 bench --site myschools.localhost execute myschools.scripts.seed_demo.run
+bench --site myschools.localhost execute myschools.scripts.seed_education.run
 ```
+
+`seed_demo` builds the franchise tree, multi-Company books, agreements, and
+rate overrides. `seed_education` then seeds Academic Year / Term, Programs,
+Fee Category, 30 students (5 per campus × 6 campuses across BR001 + BR014),
+and submitted `Fees` for May 2026 — feeding real numbers into the royalty
+rollup so `demo_royalty_invoice.run` produces invoices grounded in actual
+Fees rather than hard-coded amounts.
 
 ## Repository layout
 
@@ -217,6 +225,7 @@ bench new-site myschools.localhost \
 bench --site myschools.localhost install-app myschools
 bench --site myschools.localhost migrate
 bench --site myschools.localhost execute myschools.scripts.seed_demo.run
+bench --site myschools.localhost execute myschools.scripts.seed_education.run
 echo "y" | bench setup procfile
 bench start
 ```

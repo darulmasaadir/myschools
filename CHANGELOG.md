@@ -22,6 +22,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Root `README.md` and `CONTRIBUTING.md` updated to link into the docs set.
 
 ### Added
+- **End-to-end Fees → Royalty Invoice loop** wired to real Frappe Education data.
+  - `myschools/scripts/seed_education.py`: idempotent seed for Academic Year/Term, Programs,
+    Fee Category, Fee Structures, Students (stamped with `mys_cluster` / `mys_branch` / `mys_campus`),
+    Program Enrollments, and submitted `Fees` for May 2026 across BR001 and BR014.
+  - `myschools/scripts/demo_royalty_invoice.py` rewritten to call
+    `generate_monthly_royalty_invoices(2026, 5)` against the real `tabFees` rollup, replacing
+    the previous hard-coded collection numbers.
+  - `myschools/tests/test_royalty_from_fees.py`: 3-test integration suite verifying that
+    `get_branch_collection_for_period` groups submitted Fees by `Student.mys_campus`, that
+    out-of-period Fees are excluded, and that `generate_monthly_royalty_invoices` populates
+    campus_lines from real Fees with correct rate resolution.
+- `Fee Structure.income_account` Custom Field (created via `after_migrate`) to work around an
+  upstream Frappe Education v15.5.3 bug where `Fees.income_account` declares
+  `fetch_from: "fee_structure.income_account"` but the Fee Structure table lacks the column.
 - **Inspection workflow decomposition**: replaced the single `MYS Inspection Visit` stub with a
   five-doctype workflow.
   - `MYS Inspection Checklist Template` (+ `MYS Inspection Checklist Item` child): reusable

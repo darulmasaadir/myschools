@@ -326,6 +326,12 @@ on every `bench migrate`.
 |---|---|---|---|
 | `mys_branch` | Link | MYS Branch | so parent portal only shows their branch |
 
+### Fee Structure (upstream `education.Fee Structure`)
+
+| Field | Type | Target | Notes |
+|---|---|---|---|
+| `income_account` | Link | Account | Workaround for upstream v15.5.3 bug: `Fees.income_account` declares `fetch_from: "fee_structure.income_account"` but the column was missing. Optional; leave blank to use the Company default. |
+
 ---
 
 ## ID generation
