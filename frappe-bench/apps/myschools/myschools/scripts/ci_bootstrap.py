@@ -1,34 +1,49 @@
 """Bootstrap a freshly-installed test site so the legacy tests
 (`test_inspection`, `test_royalty_from_fees`) have the prerequisites that
-Frappe's setup wizard would normally provide — Gender records and at least
-one Company. In real installs the setup wizard runs interactively; CI
-skips that, so this script mimics the slice of it the tests depend on.
+Frappe's setup wizard would normally provide — Gender records, the full
+ERPNext fixture set (Warehouse Types, Item Groups, ...) and a Company
+with chart of accounts. In real installs the setup wizard runs
+interactively; CI skips that, so this script runs ERPNext's
+`setup_complete()` headlessly with MY School Head Office defaults.
 
-Idempotent — safe to run multiple times.
+Idempotent — re-running is a no-op once setup has run once.
 
 Run via:
   bench --site test_site execute myschools.scripts.ci_bootstrap.run
 """
 
 import frappe
+from erpnext.setup.setup_wizard.setup_wizard import setup_complete
 from frappe.desk.page.setup_wizard.install_fixtures import update_genders
 
 HEAD_OFFICE_COMPANY = "MY School Head Office"
+ABBR = "MSHO"
 
 
 def run():
 	update_genders()
-	_ensure_company()
-	frappe.db.commit()
-	print("CI bootstrap complete: Genders + Company " f"({HEAD_OFFICE_COMPANY}) ready for tests.")
-
-
-def _ensure_company():
 	if frappe.db.get_value("Company", {}, "name"):
+		print("CI bootstrap: Company already exists, skipping setup_complete.")
+		frappe.db.commit()
 		return
-	company = frappe.new_doc("Company")
-	company.company_name = HEAD_OFFICE_COMPANY
-	company.abbr = "MSHO"
-	company.default_currency = "PKR"
-	company.country = "Pakistan"
-	company.insert(ignore_permissions=True)
+
+	setup_complete(
+		{
+			"currency": "PKR",
+			"full_name": "Administrator",
+			"company_name": HEAD_OFFICE_COMPANY,
+			"company_abbr": ABBR,
+			"domain": "Education",
+			"country": "Pakistan",
+			"fy_start_date": "2026-01-01",
+			"fy_end_date": "2026-12-31",
+			"language": "english",
+			"company_tagline": "MY Schools ERP CI Bootstrap",
+			"email": "admin@example.com",
+			"password": "admin",
+			"chart_of_accounts": "Standard",
+			"bank_account": "Default Bank",
+		}
+	)
+	frappe.db.commit()
+	print("CI bootstrap complete: ran ERPNext setup_complete with " f"company={HEAD_OFFICE_COMPANY!r}.")
