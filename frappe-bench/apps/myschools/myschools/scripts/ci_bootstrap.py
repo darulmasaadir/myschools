@@ -28,22 +28,24 @@ def run():
 		return
 
 	setup_complete(
-		{
-			"currency": "PKR",
-			"full_name": "Administrator",
-			"company_name": HEAD_OFFICE_COMPANY,
-			"company_abbr": ABBR,
-			"domain": "Education",
-			"country": "Pakistan",
-			"fy_start_date": "2026-01-01",
-			"fy_end_date": "2026-12-31",
-			"language": "english",
-			"company_tagline": "MY Schools ERP CI Bootstrap",
-			"email": "admin@example.com",
-			"password": "admin",
-			"chart_of_accounts": "Standard",
-			"bank_account": "Default Bank",
-		}
+		frappe._dict(
+			{
+				"currency": "PKR",
+				"full_name": "Administrator",
+				"company_name": HEAD_OFFICE_COMPANY,
+				"company_abbr": ABBR,
+				"domain": "Education",
+				"country": "Pakistan",
+				"fy_start_date": "2026-01-01",
+				"fy_end_date": "2026-12-31",
+				"language": "english",
+				"company_tagline": "MY Schools ERP CI Bootstrap",
+				"email": "admin@example.com",
+				"password": "admin",
+				"chart_of_accounts": "Standard",
+				"bank_account": "Default Bank",
+			}
+		)
 	)
 	frappe.db.commit()
 	print("CI bootstrap complete: ran ERPNext setup_complete with " f"company={HEAD_OFFICE_COMPANY!r}.")
