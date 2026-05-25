@@ -126,6 +126,10 @@ jobs:
           bench --site test_site install-app myschools
           bench --site test_site set-config developer_mode 1
 
+      - name: Install coverage (for --coverage flag)
+        working-directory: frappe-bench
+        run: ./env/bin/pip install coverage
+
       - name: Run Frappe test suite
         working-directory: frappe-bench
         run: bench --site test_site run-tests --app myschools --coverage
