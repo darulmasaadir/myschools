@@ -1,0 +1,17 @@
+{
+ "color": "#16A085",
+ "creation": "2026-05-25 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "This Month - Fees Collected",
+ "method": "myschools.api.dashboard.current_month_fees_collected",
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS - This Month Fees Collected",
+ "owner": "Administrator",
+ "show_percentage_stats": 0,
+ "type": "Custom"
+}

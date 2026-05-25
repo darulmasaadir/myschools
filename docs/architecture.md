@@ -65,6 +65,7 @@ The MYS Branch doctype carries a `company` Link that bridges the two.
 | Permissions | ✅ | (no doctypes — pure Python in `api/permissions.py`) | Branch / cluster scoping via `permission_query_conditions` |
 | SIS (Student Info System) | ✅ | upstream `education.Student` extended with `mys_cluster`/`mys_branch`/`mys_campus` custom fields | Seeded end-to-end via `scripts/seed_education.py` |
 | Fees | ✅ | upstream `education.Fees` + `education.Fee Structure` (custom `income_account` field) | Submitted Fees roll up into royalty invoices via `get_branch_collection_for_period` |
+| Central Monitoring Dashboard | ✅ | `Dashboard` + 8 `Number Card` + 3 `Dashboard Chart` shipped as JSON under `my_school_erp/` | Single role-aware dashboard — same view for every role, rows filtered through `permission_query_conditions`. Custom-method cards in [`api/dashboard.py`](../frappe-bench/apps/myschools/myschools/api/dashboard.py) |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 

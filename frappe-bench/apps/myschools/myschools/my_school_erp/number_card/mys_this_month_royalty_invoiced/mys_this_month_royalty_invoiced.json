@@ -1,0 +1,17 @@
+{
+ "color": "#8E44AD",
+ "creation": "2026-05-25 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "This Month - Royalty Invoiced",
+ "method": "myschools.api.dashboard.current_month_royalty_invoiced",
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS - This Month Royalty Invoiced",
+ "owner": "Administrator",
+ "show_percentage_stats": 0,
+ "type": "Custom"
+}

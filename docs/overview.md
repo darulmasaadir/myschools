@@ -81,6 +81,7 @@ the headline summary is:
 - ✅ Inspection workflow (template, visit, finding, corrective action)
 - ✅ Branch-scoped permissions across all custom doctypes
 - ✅ Auto-generated student and staff IDs tied to the franchise tree
+- ✅ Central Monitoring Dashboard (8 number cards + 3 charts, role-aware via permission queries)
 - 🟡 Communication (schema only; no SMS / email gateway wired up yet)
 - ⬜ Pakistani payment gateways (JazzCash, Easypaisa, HBL) — planned
 - ⬜ Training module (programs, sessions, certificates) — planned
