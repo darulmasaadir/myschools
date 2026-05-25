@@ -107,6 +107,11 @@ jobs:
           # `bench get-app` would do for a fresh clone).
           ln -s "${{ github.workspace }}/myschools-repo/frappe-bench/apps/myschools" apps/myschools
           ./env/bin/pip install -e apps/myschools
+          # bench init's sites/apps.txt has no trailing newline, so a plain
+          # `echo myschools >> apps.txt` would glue `education` + `myschools`
+          # into `educationmyschools`. Ensure the file ends with a newline
+          # before appending.
+          [ -z "$(tail -c 1 sites/apps.txt)" ] || echo "" >> sites/apps.txt
           echo "myschools" >> sites/apps.txt
 
       - name: Create test site + install apps
