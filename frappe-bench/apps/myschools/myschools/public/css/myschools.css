@@ -1,0 +1,21 @@
+/* MY Schools ERP — brand tokens */
+:root {
+	--mys-primary: #0F7A4A;
+	--mys-primary-dark: #0A5A36;
+	--mys-primary-light: #C8E6D5;
+	--mys-accent: #E67E22;
+	--mys-text: #1A1A1A;
+	--mys-text-muted: #6B7280;
+}
+
+/* Brand strip in the top navbar — Frappe's logo container is `.navbar-home img` */
+.navbar-home img {
+	height: 24px;
+	width: auto;
+}
+
+/* Workspace headers — accent the active MYS workspace tab */
+.standard-sidebar-item.selected[data-name^="mys-"] {
+	background-color: var(--mys-primary-light);
+	color: var(--mys-primary-dark);
+}

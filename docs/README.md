@@ -22,6 +22,9 @@ You probably want a process walkthrough:
 - **[processes/central-dashboard.md](processes/central-dashboard.md)** — what the
   Central Monitoring Dashboard shows, how it's scoped per role, where the JSON
   fixtures live, and how the three custom-method endpoints work.
+- **[processes/navigation-and-roles.md](processes/navigation-and-roles.md)** —
+  where each of the 10 franchise roles lands on login, which modules they see
+  in the sidebar, and how to add a new role or workspace.
 
 ## I am a developer onboarding to the codebase
 
@@ -56,7 +59,8 @@ docs/
 ├── processes/
 │   ├── royalty-billing.md          ← operator-facing: monthly royalty cycle
 │   ├── inspection-workflow.md      ← operator-facing: inspection lifecycle
-│   └── central-dashboard.md        ← central monitoring dashboard reference
+│   ├── central-dashboard.md        ← central monitoring dashboard reference
+│   └── navigation-and-roles.md     ← role landing pages, workspaces, module profiles
 └── api/
     ├── royalty.md                  ← myschools.api.royalty function reference
     └── inspection.md               ← myschools.api.inspection function reference

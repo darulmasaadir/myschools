@@ -7,6 +7,17 @@ app_license = "agpl-3.0"
 
 required_apps = ["erpnext", "education"]
 
+# Brand
+# -----
+app_logo_url = "/assets/myschools/images/mys-logo.svg"
+brand_html = '<img src="/assets/myschools/images/mys-logo.svg" alt="MY Schools" style="height:24px;vertical-align:middle">'
+website_context = {
+	"favicon": "/assets/myschools/images/mys-favicon.svg",
+	"splash_image": "/assets/myschools/images/mys-splash.svg",
+}
+app_include_css = ["/assets/myschools/css/myschools.css"]
+web_include_css = ["/assets/myschools/css/myschools.css"]
+
 # Installation lifecycle
 # ----------------------
 after_install = "myschools.setup.install.after_install"
@@ -25,6 +36,24 @@ doc_events = {
 	"Guardian": {
 		"validate": "myschools.api.identity.sync_guardian_branch",
 	},
+	"User": {
+		"validate": "myschools.api.user_profile.attach_module_profile_to_user",
+	},
+}
+
+# Role-based landing pages
+# ------------------------
+role_home_page = {
+	"Chief Executive": "mys-head-office",
+	"HO Dept Head": "mys-head-office",
+	"Cluster Director": "mys-cluster",
+	"Academic Monitor": "mys-inspection",
+	"Audit Officer": "mys-inspection",
+	"Branch Director": "mys-branch",
+	"Branch Principal": "mys-branch",
+	"Branch Admin": "mys-branch",
+	"Branch Accountant": "mys-branch",
+	"Campus Incharge": "mys-campus",
 }
 
 # Permission query conditions for branch-scoped data isolation
@@ -85,4 +114,10 @@ fixtures = [
 			]
 		],
 	},
+	{"dt": "Workspace", "filters": [["name", "like", "mys-%"]]},
+	{"dt": "Module Profile", "filters": [["name", "like", "MYS %"]]},
+	{"dt": "Letter Head", "filters": [["name", "like", "MYS%"]]},
+	{"dt": "Dashboard", "filters": [["name", "like", "MYS %"]]},
+	{"dt": "Dashboard Chart", "filters": [["name", "like", "MYS - %"]]},
+	{"dt": "Number Card", "filters": [["name", "like", "MYS - %"]]},
 ]

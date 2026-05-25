@@ -22,6 +22,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Root `README.md` and `CONTRIBUTING.md` updated to link into the docs set.
 
 ### Added
+- **MY Schools navigation shell** — turns vanilla ERPNext into a role-aware MY Schools ERP.
+  - Brand: `app_logo_url`, `brand_html`, `website_context` (favicon, splash), `app_include_css`
+    in `hooks.py`. Placeholder SVGs under `myschools/public/images/` (`mys-logo.svg`,
+    `mys-favicon.svg`, `mys-splash.svg`) and a brand-tokens stylesheet at
+    `myschools/public/css/myschools.css`.
+  - 5 role-restricted Workspaces shipped as JSON fixtures under
+    `myschools/my_school_erp/workspace/<slug>/<slug>.json`: `mys-head-office`, `mys-cluster`,
+    `mys-branch`, `mys-campus`, `mys-inspection`. The HO workspace embeds the Central
+    Monitoring Dashboard inline (no URL hunting); each lower-tier workspace ships the
+    shortcuts and charts its roles actually need.
+  - `role_home_page` hook maps all 10 franchise roles to their tier-specific workspace, so
+    login lands the user where they belong instead of `/app/home`.
+  - 5 Module Profile fixtures under `myschools/fixtures/module_profile.json` (`MYS HO`,
+    `MYS Cluster`, `MYS Branch`, `MYS Campus`, `MYS Inspection`) hide vanilla modules
+    (Manufacturing, Stock, Buying, etc.) per tier. Attached automatically to Users on
+    `User.validate` via `myschools.api.user_profile.attach_module_profile_to_user`
+    (highest-tier role wins); existing Users back-filled on `after_migrate`.
+  - `MYS Default` Letter Head fixture under `myschools/fixtures/letter_head.json` —
+    branded header/footer that downstream Print Formats will inherit.
+  - 11 tests in `myschools/tests/test_shell.py` covering workspace import, role→workspace
+    routing, Letter Head presence, Module Profile import + child-row counts, the tier
+    resolver, and end-to-end `User.module_profile` auto-attach on create.
 - **MYS Central Monitoring Dashboard** — single role-aware dashboard tying together royalty,
   fee, branch, and inspection KPIs. Renders the same dashboard for every role; rows are filtered
   via the `permission_query_conditions` registered in `hooks.py` (custom-method cards apply

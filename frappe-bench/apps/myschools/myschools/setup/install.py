@@ -26,13 +26,24 @@ def after_install():
 	create_franchise_roles()
 	create_custom_franchise_fields()
 	create_default_head_office_departments()
+	backfill_module_profiles()
 	frappe.db.commit()
 
 
 def after_migrate():
 	create_franchise_roles()
 	create_custom_franchise_fields()
+	backfill_module_profiles()
 	frappe.db.commit()
+
+
+def backfill_module_profiles():
+	"""Attach the right MYS Module Profile to every existing user — called
+	on `after_migrate` so a fresh install of this app applies sidebar scoping
+	to users who were created before the profiles were shipped."""
+	from myschools.api.user_profile import backfill_existing_users
+
+	backfill_existing_users()
 
 
 def create_franchise_roles():
