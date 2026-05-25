@@ -38,7 +38,7 @@ def run():
 				"country": "Pakistan",
 				# Fiscal Year must cover the dates used by integration tests
 				# (test_royalty_from_fees posts Fees on 2025-09-15). Pakistan
-				# academic year runs Jul–Jun, so this aligns with the test
+				# academic year runs Jul-Jun, so this aligns with the test
 				# data and is also what real installs will pick.
 				"fy_start_date": "2025-07-01",
 				"fy_end_date": "2026-06-30",
