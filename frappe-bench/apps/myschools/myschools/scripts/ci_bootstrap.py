@@ -36,8 +36,12 @@ def run():
 				"company_abbr": ABBR,
 				"domain": "Education",
 				"country": "Pakistan",
-				"fy_start_date": "2026-01-01",
-				"fy_end_date": "2026-12-31",
+				# Fiscal Year must cover the dates used by integration tests
+				# (test_royalty_from_fees posts Fees on 2025-09-15). Pakistan
+				# academic year runs Jul–Jun, so this aligns with the test
+				# data and is also what real installs will pick.
+				"fy_start_date": "2025-07-01",
+				"fy_end_date": "2026-06-30",
 				"language": "english",
 				"company_tagline": "MY Schools ERP CI Bootstrap",
 				"email": "admin@example.com",
