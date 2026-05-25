@@ -22,6 +22,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Root `README.md` and `CONTRIBUTING.md` updated to link into the docs set.
 
 ### Added
+- **Branded Print Formats (Phase 3)** — 4 Jinja-driven Print Formats ship as fixtures and become
+  the default print layout on the doctypes franchise operators actually hand to franchisees, the
+  branch staff, parents, and inspectors.
+  - `myschools/fixtures/print_format.json` — generated from
+    `myschools/scripts/build_print_formats.py` (single Python source of truth, one triple-quoted
+    Jinja template per format). 4 records:
+    - `MYS Royalty Invoice` (doctype `MYS Royalty Invoice`) — campus breakdown, totals, status
+      badge, paid/outstanding panel.
+    - `MYS Inspection Report` (doctype `MYS Inspection Visit`) — scorecard tiles
+      (items/passed/failed/score/weighted), severity-coloured checklist table, recommendations.
+    - `MYS Fee Receipt` (doctype `Fees`) — student / program / term header, component table,
+      PAID / OUTSTANDING badge.
+    - `MYS Franchise Agreement` (doctype `MYS Franchise Agreement`) — royalty terms,
+      financials, signature blocks.
+  - `setup/install.py::set_default_print_formats` creates 4 Property Setters wiring
+    `default_print_format` on each target doctype, so opening a doc and hitting Print shows the
+    MYS layout without needing to choose it from the picker. Runs on both `after_install` and
+    `after_migrate` (after fixtures import, so target records exist).
+  - All four records ship with `custom_format=1` — required so the renderer dispatches to our
+    `html` field instead of falling back to Frappe's auto-built "Standard" layout.
+  - `Print Format` and the four `Property Setter` records are exported via `fixtures` in
+    `hooks.py` so they import cleanly on a fresh install.
+  - `myschools/tests/test_print_formats.py`: 6 tests building a full fixture tree (Cluster →
+    Branch → Campus → Employee + Franchise Owner/Agreement + Program/AcademicYear/Fee chain +
+    Inspection Visit + generated Royalty Invoice), asserting every Print Format exists, every
+    Property Setter exists, and each format renders against a real doc with the expected MYS
+    marker in the HTML.
 - **MY Schools navigation shell** — turns vanilla ERPNext into a role-aware MY Schools ERP.
   - Brand: `app_logo_url`, `brand_html`, `website_context` (favicon, splash), `app_include_css`
     in `hooks.py`. Placeholder SVGs under `myschools/public/images/` (`mys-logo.svg`,

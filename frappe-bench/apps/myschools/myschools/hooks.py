@@ -117,6 +117,23 @@ fixtures = [
 	{"dt": "Workspace", "filters": [["name", "like", "mys-%"]]},
 	{"dt": "Module Profile", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Letter Head", "filters": [["name", "like", "MYS%"]]},
+	{"dt": "Print Format", "filters": [["name", "like", "MYS %"]]},
+	{
+		"dt": "Property Setter",
+		"filters": [
+			[
+				"doc_type",
+				"in",
+				[
+					"MYS Royalty Invoice",
+					"MYS Inspection Visit",
+					"MYS Franchise Agreement",
+					"Fees",
+				],
+			],
+			["property", "=", "default_print_format"],
+		],
+	},
 	{"dt": "Dashboard", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Dashboard Chart", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Number Card", "filters": [["name", "like", "MYS - %"]]},

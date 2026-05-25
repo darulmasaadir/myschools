@@ -25,6 +25,9 @@ You probably want a process walkthrough:
 - **[processes/navigation-and-roles.md](processes/navigation-and-roles.md)** —
   where each of the 10 franchise roles lands on login, which modules they see
   in the sidebar, and how to add a new role or workspace.
+- **[processes/print-formats.md](processes/print-formats.md)** — the four branded
+  PDF layouts (Royalty Invoice, Inspection Report, Fee Receipt, Franchise
+  Agreement), how they get picked as default, and how to add a new one.
 
 ## I am a developer onboarding to the codebase
 
@@ -60,7 +63,8 @@ docs/
 │   ├── royalty-billing.md          ← operator-facing: monthly royalty cycle
 │   ├── inspection-workflow.md      ← operator-facing: inspection lifecycle
 │   ├── central-dashboard.md        ← central monitoring dashboard reference
-│   └── navigation-and-roles.md     ← role landing pages, workspaces, module profiles
+│   ├── navigation-and-roles.md     ← role landing pages, workspaces, module profiles
+│   └── print-formats.md            ← branded PDF layouts (Royalty Invoice / Inspection Report / Fee Receipt / Franchise Agreement)
 └── api/
     ├── royalty.md                  ← myschools.api.royalty function reference
     └── inspection.md               ← myschools.api.inspection function reference

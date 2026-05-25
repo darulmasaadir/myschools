@@ -216,7 +216,14 @@ a workspace built for their tier rather than vanilla ERPNext's full sidebar.
   — highest-tier role wins. Existing Users are back-filled on `after_migrate`.
 - **Letter Head** — `MYS Default` in
   [`myschools/fixtures/letter_head.json`](../frappe-bench/apps/myschools/myschools/fixtures/letter_head.json),
-  inherited by future Print Formats.
+  inherited by the shipped Print Formats.
+- **Print Formats (4)** — branded Jinja PDF layouts for `MYS Royalty Invoice`,
+  `MYS Inspection Visit`, `Fees`, and `MYS Franchise Agreement`. Source of truth
+  is [`myschools/scripts/build_print_formats.py`](../frappe-bench/apps/myschools/myschools/scripts/build_print_formats.py);
+  generated fixture at [`myschools/fixtures/print_format.json`](../frappe-bench/apps/myschools/myschools/fixtures/print_format.json).
+  Wired as each doctype's `default_print_format` via 4 Property Setters created
+  in [`setup/install.py::set_default_print_formats`](../frappe-bench/apps/myschools/myschools/setup/install.py).
+  Details: [processes/print-formats.md](processes/print-formats.md).
 
 Full role-to-workspace mapping and how to add a new role live in
 [processes/navigation-and-roles.md](processes/navigation-and-roles.md).
