@@ -130,6 +130,10 @@ jobs:
         working-directory: frappe-bench
         run: ./env/bin/pip install coverage
 
+      - name: Bootstrap test site (mimic ERPNext setup wizard slice)
+        working-directory: frappe-bench
+        run: bench --site test_site execute myschools.scripts.ci_bootstrap.run
+
       - name: Run Frappe test suite
         working-directory: frappe-bench
         run: bench --site test_site run-tests --app myschools --coverage
