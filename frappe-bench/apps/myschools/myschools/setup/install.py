@@ -28,6 +28,18 @@ def after_install():
 	create_default_head_office_departments()
 	grant_franchise_role_permissions()
 	backfill_module_profiles()
+	# NOTE: `set_default_print_formats` is intentionally NOT called here.
+	# Frappe runs `after_install` BEFORE `sync_fixtures`, so the Print Format
+	# records don't exist yet — the function would silently no-op. Instead it's
+	# wired to `after_sync` (fresh-install path, after fixtures import) and
+	# `after_migrate` (upgrade path).
+	frappe.db.commit()
+
+
+def after_sync():
+	"""Runs once on fresh install after `sync_fixtures` / `sync_customizations` /
+	`sync_dashboards` complete — the only safe point on a clean install at which
+	the shipped Print Format records exist in DB."""
 	set_default_print_formats()
 	frappe.db.commit()
 

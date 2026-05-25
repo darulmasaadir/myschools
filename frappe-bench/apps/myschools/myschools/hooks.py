@@ -21,6 +21,12 @@ web_include_css = ["/assets/myschools/css/myschools.css"]
 # Installation lifecycle
 # ----------------------
 after_install = "myschools.setup.install.after_install"
+# `after_sync` fires on fresh `bench install-app` AFTER fixtures are imported,
+# which is the only moment we can wire `default_print_format` Property Setters
+# referencing our shipped Print Formats. `after_install` is too early — fixtures
+# haven't loaded yet — so the Property-Setter step lives in `after_sync` for
+# fresh installs and `after_migrate` for upgrades.
+after_sync = "myschools.setup.install.after_sync"
 after_migrate = ["myschools.setup.install.after_migrate"]
 
 # Document events
