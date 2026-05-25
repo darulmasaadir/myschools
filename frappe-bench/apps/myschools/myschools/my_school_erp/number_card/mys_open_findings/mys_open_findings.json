@@ -1,0 +1,19 @@
+{
+ "color": "#D35400",
+ "creation": "2026-05-25 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "MYS Inspection Finding",
+ "filters_json": "[[\"MYS Inspection Finding\",\"status\",\"in\",[\"Open\",\"In Progress\"],false]]",
+ "function": "Count",
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Open Inspection Findings",
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS - Open Findings",
+ "owner": "Administrator",
+ "show_percentage_stats": 0,
+ "type": "Document Type"
+}

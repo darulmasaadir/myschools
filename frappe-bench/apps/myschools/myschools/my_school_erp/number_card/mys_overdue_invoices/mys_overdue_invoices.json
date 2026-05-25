@@ -1,0 +1,19 @@
+{
+ "color": "#C0392B",
+ "creation": "2026-05-25 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "MYS Royalty Invoice",
+ "filters_json": "[[\"MYS Royalty Invoice\",\"status\",\"=\",\"Overdue\",false]]",
+ "function": "Count",
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Overdue Invoices",
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS - Overdue Invoices",
+ "owner": "Administrator",
+ "show_percentage_stats": 0,
+ "type": "Document Type"
+}

@@ -19,6 +19,9 @@ You probably want a process walkthrough:
 - **[processes/inspection-workflow.md](processes/inspection-workflow.md)** — how
   to run an inspection from booking to verification, what auto-creates findings,
   how corrective actions close out.
+- **[processes/central-dashboard.md](processes/central-dashboard.md)** — what the
+  Central Monitoring Dashboard shows, how it's scoped per role, where the JSON
+  fixtures live, and how the three custom-method endpoints work.
 
 ## I am a developer onboarding to the codebase
 
@@ -52,7 +55,8 @@ docs/
 ├── development.md                  ← dev onboarding + workflows
 ├── processes/
 │   ├── royalty-billing.md          ← operator-facing: monthly royalty cycle
-│   └── inspection-workflow.md      ← operator-facing: inspection lifecycle
+│   ├── inspection-workflow.md      ← operator-facing: inspection lifecycle
+│   └── central-dashboard.md        ← central monitoring dashboard reference
 └── api/
     ├── royalty.md                  ← myschools.api.royalty function reference
     └── inspection.md               ← myschools.api.inspection function reference

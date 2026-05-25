@@ -1,0 +1,17 @@
+{
+ "color": "#922B21",
+ "creation": "2026-05-25 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Overdue Inspection Findings",
+ "method": "myschools.api.dashboard.overdue_findings_count",
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS - Overdue Findings",
+ "owner": "Administrator",
+ "show_percentage_stats": 0,
+ "type": "Custom"
+}

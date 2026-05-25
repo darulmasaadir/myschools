@@ -22,6 +22,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Root `README.md` and `CONTRIBUTING.md` updated to link into the docs set.
 
 ### Added
+- **MYS Central Monitoring Dashboard** — single role-aware dashboard tying together royalty,
+  fee, branch, and inspection KPIs. Renders the same dashboard for every role; rows are filtered
+  via the `permission_query_conditions` registered in `hooks.py` (custom-method cards apply
+  `_branch_scope_sql` directly), so a Branch Admin sees their branch's numbers and the Chief
+  Executive sees national totals — without a separate dashboard per role.
+  - 8 Number Cards shipped as JSON fixtures under
+    `myschools/my_school_erp/number_card/<slug>/<slug>.json`: Active Branches, Active Students,
+    Outstanding Royalty (PKR), Overdue Invoices, This Month — Royalty Invoiced, This Month —
+    Fees Collected, Open Inspection Findings, Overdue Inspection Findings.
+  - 3 Dashboard Charts under `myschools/my_school_erp/dashboard_chart/`: Findings by Severity
+    (Donut), Royalty by Cluster YTD (Bar), Royalty Invoiced Trend 12m (Line).
+  - 1 Dashboard fixture at `myschools/my_school_erp/my_school_erp_dashboard/mys_central_monitoring/`
+    wiring everything together; folder is named `<module_slug>_dashboard` because that's the
+    only path `frappe.utils.dashboard.sync_dashboards` scans on migrate.
+  - `myschools/api/dashboard.py`: 3 whitelisted endpoints feeding the Custom-type cards
+    (`current_month_royalty_invoiced`, `current_month_fees_collected`, `overdue_findings_count`)
+    plus `_branch_scope_sql` helper that converts the active user's franchise scope into a SQL
+    `AND <col> IN (...)` fragment (returning a `"DENY"` sentinel for users with no scope).
+  - `MYS Royalty Invoice.cluster` Link field added with `fetch_from="branch.cluster"` so the
+    Royalty-by-Cluster Group By chart has a column to aggregate on.
+  - `myschools/tests/test_dashboard.py`: 8 tests verifying every fixture imports on migrate,
+    the dashboard's cards/charts tables wire the expected entries, and all three custom-method
+    endpoints return the `{value, fieldtype, [currency]}` shape Frappe's Number Card expects.
 - **End-to-end Fees → Royalty Invoice loop** wired to real Frappe Education data.
   - `myschools/scripts/seed_education.py`: idempotent seed for Academic Year/Term, Programs,
     Fee Category, Fee Structures, Students (stamped with `mys_cluster` / `mys_branch` / `mys_campus`),

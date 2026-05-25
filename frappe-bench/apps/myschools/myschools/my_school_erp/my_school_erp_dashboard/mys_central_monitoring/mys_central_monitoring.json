@@ -1,0 +1,28 @@
+{
+ "cards": [
+  {"card": "MYS - Active Branches"},
+  {"card": "MYS - Active Students"},
+  {"card": "MYS - Outstanding Royalty"},
+  {"card": "MYS - Overdue Invoices"},
+  {"card": "MYS - This Month Royalty Invoiced"},
+  {"card": "MYS - This Month Fees Collected"},
+  {"card": "MYS - Open Findings"},
+  {"card": "MYS - Overdue Findings"}
+ ],
+ "charts": [
+  {"chart": "MYS - Royalty Invoiced Trend (12m)", "width": "Full"},
+  {"chart": "MYS - Royalty by Cluster (YTD)", "width": "Half"},
+  {"chart": "MYS - Findings by Severity", "width": "Half"}
+ ],
+ "creation": "2026-05-25 12:00:00.000000",
+ "dashboard_name": "MYS Central Monitoring",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "is_default": 1,
+ "is_standard": 1,
+ "modified": "2026-05-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Central Monitoring",
+ "owner": "Administrator"
+}
