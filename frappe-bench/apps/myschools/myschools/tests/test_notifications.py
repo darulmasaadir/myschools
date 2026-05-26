@@ -12,6 +12,8 @@ Run via:
     bench --site test_site run-tests --app myschools --module myschools.tests.test_notifications
 """
 
+from typing import ClassVar
+
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils.jinja import render_template
@@ -100,7 +102,7 @@ class TestNotificationJinjaRenders(FrappeTestCase):
 	We use `frappe.get_doc(dict)` to build unsaved doc instances so this test
 	doesn't depend on inspection fixtures or seeded data."""
 
-	SAMPLE_DOCS = {
+	SAMPLE_DOCS: ClassVar[dict] = {
 		"MYS Royalty Invoice": {
 			"doctype": "MYS Royalty Invoice",
 			"name": "MYS-RI-TEST-0001",
@@ -267,15 +269,11 @@ class TestLogOutboundEmail(FrappeTestCase):
 		The mirror must pick those up — this was the bug that hid every
 		Notification-generated email from the audit log."""
 		notif_api.log_outbound_email(self._stub("Automated Message"))
-		self.assertTrue(
-			frappe.db.exists("MYS Communication Log", {"subject": "stub Automated Message"})
-		)
+		self.assertTrue(frappe.db.exists("MYS Communication Log", {"subject": "stub Automated Message"}))
 
 	def test_manual_communication_on_mys_doc_is_mirrored(self):
 		notif_api.log_outbound_email(self._stub("Communication"))
-		self.assertTrue(
-			frappe.db.exists("MYS Communication Log", {"subject": "stub Communication"})
-		)
+		self.assertTrue(frappe.db.exists("MYS Communication Log", {"subject": "stub Communication"}))
 
 	def test_chat_messages_are_not_mirrored(self):
 		"""``Chat`` (or other non-email types) shouldn't land in the audit log."""
@@ -284,12 +282,8 @@ class TestLogOutboundEmail(FrappeTestCase):
 
 	def test_inbound_communication_is_not_mirrored(self):
 		notif_api.log_outbound_email(self._stub("Communication", sent_or_received="Received"))
-		self.assertFalse(
-			frappe.db.exists("MYS Communication Log", {"subject": "stub Communication"})
-		)
+		self.assertFalse(frappe.db.exists("MYS Communication Log", {"subject": "stub Communication"}))
 
 	def test_non_mys_reference_is_not_mirrored(self):
 		notif_api.log_outbound_email(self._stub("Automated Message", ref_dt="User", ref_name="x"))
-		self.assertFalse(
-			frappe.db.exists("MYS Communication Log", {"subject": "stub Automated Message"})
-		)
+		self.assertFalse(frappe.db.exists("MYS Communication Log", {"subject": "stub Automated Message"}))
