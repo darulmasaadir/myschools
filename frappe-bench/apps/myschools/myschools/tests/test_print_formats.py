@@ -404,26 +404,36 @@ class TestPrintFormats(FrappeTestCase):
 		out = get_html_and_style(doc=doctype, name=name, print_format=print_format, no_letterhead=0)
 		return (out or {}).get("html") or ""
 
+	# Marker that the default Letter Head fixture made it into the rendered
+	# body — failure here usually means a template forgot to emit
+	# `{{ letter_head|safe }}` (custom Jinja formats don't get it automatically
+	# the way Frappe's Standard layout does).
+	LETTERHEAD_LOGO = "/assets/myschools/images/mys-logo.svg"
+
 	def test_royalty_invoice_renders(self):
 		html = self._render("MYS Royalty Invoice", self.invoice, "MYS Royalty Invoice")
 		self.assertIn(self.invoice, html)
 		self.assertIn("ROYALTY INVOICE", html)
 		self.assertIn(BRANCH, html)
+		self.assertIn(self.LETTERHEAD_LOGO, html)
 
 	def test_inspection_report_renders(self):
 		html = self._render("MYS Inspection Visit", self.visit, "MYS Inspection Report")
 		self.assertIn(self.visit, html)
 		self.assertIn("INSPECTION REPORT", html)
 		self.assertIn("Fire exits clear", html)
+		self.assertIn(self.LETTERHEAD_LOGO, html)
 
 	def test_fee_receipt_renders(self):
 		html = self._render("Fees", self.fee, "MYS Fee Receipt")
 		self.assertIn(self.fee, html)
 		self.assertIn("FEE RECEIPT", html)
 		self.assertIn(FEE_CATEGORY, html)
+		self.assertIn(self.LETTERHEAD_LOGO, html)
 
 	def test_franchise_agreement_renders(self):
 		html = self._render("MYS Franchise Agreement", self.agreement, "MYS Franchise Agreement")
 		self.assertIn(self.agreement, html)
 		self.assertIn("FRANCHISE AGREEMENT", html)
 		self.assertIn(BRANCH, html)
+		self.assertIn(self.LETTERHEAD_LOGO, html)

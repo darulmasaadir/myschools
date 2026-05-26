@@ -22,6 +22,9 @@ MODULE = "MY School ERP"
 # ---------------------------------------------------------------------------
 
 ROYALTY_INVOICE = r"""
+{%- if letter_head and not no_letterhead %}
+<div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
+{% endif -%}
 <div style="font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:12px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
     <div>
@@ -119,6 +122,9 @@ ROYALTY_INVOICE = r"""
 """
 
 INSPECTION_REPORT = r"""
+{%- if letter_head and not no_letterhead %}
+<div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
+{% endif -%}
 <div style="font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:12px">
   <div style="margin-bottom:14px">
     <div style="font-size:22px;font-weight:800;letter-spacing:0.5px;color:#0F7A4A">INSPECTION REPORT</div>
@@ -231,6 +237,9 @@ INSPECTION_REPORT = r"""
 """
 
 FEE_RECEIPT = r"""
+{%- if letter_head and not no_letterhead %}
+<div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
+{% endif -%}
 <div style="font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:12px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
     <div>
@@ -311,6 +320,9 @@ FEE_RECEIPT = r"""
 """
 
 FRANCHISE_AGREEMENT = r"""
+{%- if letter_head and not no_letterhead %}
+<div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
+{% endif -%}
 <div style="font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:12px">
   <div style="text-align:center;margin-bottom:18px">
     <div style="font-size:22px;font-weight:800;letter-spacing:1px;color:#0F7A4A">FRANCHISE AGREEMENT</div>
