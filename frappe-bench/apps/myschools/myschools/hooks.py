@@ -45,6 +45,12 @@ doc_events = {
 	"User": {
 		"validate": "myschools.api.user_profile.attach_module_profile_to_user",
 	},
+	# Mirror outbound system-generated emails (anything tied to an MYS doctype
+	# or to Fees) into MYS Communication Log so the audit log is one place,
+	# not two. See `api/notifications.log_outbound_email` for the filter rules.
+	"Communication": {
+		"after_insert": "myschools.api.notifications.log_outbound_email",
+	},
 }
 
 # Role-based landing pages
@@ -143,4 +149,6 @@ fixtures = [
 	{"dt": "Dashboard", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Dashboard Chart", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Number Card", "filters": [["name", "like", "MYS - %"]]},
+	{"dt": "Email Template", "filters": [["name", "like", "MYS - %"]]},
+	{"dt": "Notification", "filters": [["name", "like", "MYS - %"]]},
 ]

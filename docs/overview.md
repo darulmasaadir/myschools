@@ -88,17 +88,19 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
   franchise roles, Module Profiles trimming the sidebar per tier
 - ✅ Branded Print Formats — Royalty Invoice, Inspection Report, Fee Receipt,
   Franchise Agreement, all inheriting the `MYS Default` Letter Head
-- 🟡 Communication (schema only; no SMS / email gateway wired up yet — Phase 4)
-- ⬜ Notifications & email templates — Phase 4 (next)
-- ⬜ Formal workflows + list-view polish — Phase 5
+- ✅ Notifications & Communication wiring — 6 Email Template + 6 Notification
+  fixtures (royalty generated/overdue, finding assigned/overdue, corrective
+  action overdue, agreement expiring); outbound system emails mirrored into
+  `MYS Communication Log`; provider-agnostic SMS adapter stub
+- ⬜ Formal workflows + list-view polish — Phase 5 (next)
 - ⬜ Setup Wizard, onboarding tours, Query Reports — Phase 6
 - ⬜ Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7
 - ⬜ Pakistani payment gateways (JazzCash, Easypaisa, HBL), HR scaffolding, fee overrides — Phase 8
 
 The system is **live for one demo branch network** (BR001 + BR014, three
 campuses each, one fully-submitted royalty invoice on file). It is **not yet
-live for real franchisees** — that's pending the communication and payment
-modules (Phases 4 + 8).
+live for real franchisees** — that's pending the workflow polish and
+Pakistani-payment-gateway modules (Phases 5 + 8).
 
 ## How is it built — briefly
 
