@@ -121,14 +121,10 @@ def _ensure_overdue_invoice():
 	if not inv:
 		return None
 	frappe.db.set_value("MYS Royalty Invoice", inv, "status", "Overdue")
-	frappe.db.set_value(
-		"MYS Royalty Invoice", inv, "due_date", add_days(today(), -30)
-	)
+	frappe.db.set_value("MYS Royalty Invoice", inv, "due_date", add_days(today(), -30))
 	d = frappe.get_doc("MYS Royalty Invoice", inv)
 	if not frappe.db.get_value("MYS Franchise Owner", d.franchisee, "email"):
-		frappe.db.set_value(
-			"MYS Franchise Owner", d.franchisee, "email", "e2e@mys.local"
-		)
+		frappe.db.set_value("MYS Franchise Owner", d.franchisee, "email", "e2e@mys.local")
 	return inv
 
 
@@ -140,8 +136,7 @@ def main():
 	frappe.db.commit()
 	state = {
 		"users": {
-			email: {"password": spec["password"], "roles": spec["roles"]}
-			for email, spec in USERS.items()
+			email: {"password": spec["password"], "roles": spec["roles"]} for email, spec in USERS.items()
 		},
 		"visit": visit,
 		"finding": finding,
