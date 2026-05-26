@@ -62,7 +62,7 @@ NOTIFICATIONS = [
 			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Due Date</td>"
 			"<td><strong>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</strong></td></tr>"
 			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Total Royalty</td>"
-			"<td><strong>{{ frappe.utils.fmt_money(doc.total_royalty, currency=doc.currency) }}</strong></td></tr>"
+			"<td><strong>{{ frappe.utils.fmt_money(doc.royalty_amount, currency=doc.currency) }}</strong></td></tr>"
 			"</table>"
 			"<p>Open the invoice in the desk for the full campus-by-campus breakdown.</p>"
 		),
@@ -132,7 +132,7 @@ NOTIFICATIONS = [
 			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Target Resolution</td>"
 			"<td><strong>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</strong></td></tr>"
 			"</table>"
-			"<p><strong>Title:</strong> {{ doc.title or '—' }}</p>"
+			"<p><strong>Category:</strong> {{ doc.category or '—' }}</p>"
 			"<p style='font-size:13px;color:#6B7280'>{{ doc.description or '' }}</p>"
 		),
 		"recipients_roles": [
@@ -200,7 +200,7 @@ NOTIFICATIONS = [
 			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Status</td>"
 			"<td>{{ doc.status }}</td></tr>"
 			"</table>"
-			"<p><strong>What was planned:</strong> {{ doc.description or '—' }}</p>"
+			"<p><strong>What was planned:</strong> {{ doc.action_description or '—' }}</p>"
 		),
 		"recipients_roles": ["Branch Director", "Audit Officer"],
 		"recipients_doc_fields": ["assigned_to"],

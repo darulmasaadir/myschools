@@ -110,8 +110,13 @@ def log_outbound_email(doc, method=None) -> None:
 	+ SMS + future channels. Bails out for inbound mail, draft comms, and
 	non-MYS references — Frappe's own Communication doctype already
 	captures those.
+
+	Both manual emails (``communication_type='Communication'``) and
+	Notification-fired emails (``communication_type='Automated Message'``)
+	get mirrored. Skipping `Automated Message` was the bug that silently
+	dropped every alert-generated email out of the audit log.
 	"""
-	if getattr(doc, "communication_type", None) != "Communication":
+	if getattr(doc, "communication_type", None) not in ("Communication", "Automated Message"):
 		return
 	if getattr(doc, "sent_or_received", None) != "Sent":
 		return

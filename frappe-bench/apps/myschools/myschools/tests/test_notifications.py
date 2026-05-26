@@ -14,6 +14,7 @@ Run via:
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
+from frappe.utils.jinja import render_template
 
 from myschools.api import notifications as notif_api
 
@@ -90,6 +91,88 @@ class TestNotificationFixtures(FrappeTestCase):
 		self.assertEqual(doc_fields, {"reported_by"})
 
 
+class TestNotificationJinjaRenders(FrappeTestCase):
+	"""Render every notification's subject + body against an in-memory doc of
+	the right type. Catches typos like `doc.total_royalty` (the real field is
+	`royalty_amount`) — which a fixture-import-only test will silently miss
+	because Frappe defers Jinja evaluation until the alert actually fires.
+
+	We use `frappe.get_doc(dict)` to build unsaved doc instances so this test
+	doesn't depend on inspection fixtures or seeded data."""
+
+	SAMPLE_DOCS = {
+		"MYS Royalty Invoice": {
+			"doctype": "MYS Royalty Invoice",
+			"name": "MYS-RI-TEST-0001",
+			"branch": "BR-TEST",
+			"period_month": 5,
+			"period_year": 2026,
+			"due_date": "2026-06-15",
+			"royalty_amount": 12345.67,
+			"outstanding_amount": 12345.67,
+			"currency": "PKR",
+			"status": "Unpaid",
+		},
+		"MYS Inspection Finding": {
+			"doctype": "MYS Inspection Finding",
+			"name": "MYS-FND-TEST-0001",
+			"branch": "BR-TEST",
+			"severity": "Major",
+			"category": "Safety",
+			"status": "Open",
+			"description": "Test description",
+			"due_date": "2026-06-15",
+			"reported_by": "Administrator",
+		},
+		"MYS Corrective Action": {
+			"doctype": "MYS Corrective Action",
+			"name": "MYS-CA-TEST-0001",
+			"finding": "MYS-FND-TEST-0001",
+			"branch": "BR-TEST",
+			"status": "Planned",
+			"due_date": "2026-06-15",
+			"action_description": "Fix it",
+			"assigned_to": "Administrator",
+		},
+		"MYS Franchise Agreement": {
+			"doctype": "MYS Franchise Agreement",
+			"name": "MYS-FA-TEST-0001",
+			"branch": "BR-TEST",
+			"franchisee": "Test Franchisee",
+			"status": "Active",
+			"end_date": "2026-12-31",
+		},
+	}
+
+	def _stub_doc(self, doctype):
+		"""Build an unsaved doc instance carrying the sample field values."""
+		return frappe.get_doc(self.SAMPLE_DOCS[doctype])
+
+	def test_every_notification_renders_subject_and_message(self):
+		notifs = frappe.get_all(
+			"Notification",
+			filters={"name": ["like", "MYS - %"]},
+			fields=["name", "document_type", "subject", "message"],
+		)
+		self.assertEqual(len(notifs), 6, "expected 6 MYS notifications")
+		for n in notifs:
+			with self.subTest(notification=n["name"]):
+				doc = self._stub_doc(n["document_type"])
+				rendered_subject = render_template(n["subject"], {"doc": doc})
+				rendered_body = render_template(n["message"], {"doc": doc})
+				# No unrendered Jinja markers left behind.
+				self.assertNotIn("{{", rendered_subject, msg=n["name"])
+				self.assertNotIn("{{", rendered_body, msg=n["name"])
+				# Smoke-check that the rendered output actually contains the
+				# branch (or the doc name) — proves we hit at least one real
+				# attribute and didn't just emit a static string.
+				self.assertTrue(
+					"BR-TEST" in rendered_subject + rendered_body
+					or "MYS-" in rendered_subject + rendered_body,
+					msg=f"{n['name']}: rendered output missing doc context",
+				)
+
+
 class TestSmsStub(FrappeTestCase):
 	"""`send_sms` is provider-agnostic. Today it just logs; phase 8 plugs in
 	a real gateway. The signature and return shape must stay stable so callers
@@ -148,3 +231,65 @@ class TestLogCommunication(FrappeTestCase):
 		self.assertEqual(doc.scope, "Branch")
 		self.assertEqual(doc.recipient_role, "Branch Director")
 		self.assertEqual(doc.subject, "hello")
+
+
+class TestLogOutboundEmail(FrappeTestCase):
+	"""Hook-level coverage. The mirror has to accept both manual emails
+	(``communication_type='Communication'``) AND Notification-fired emails
+	(``communication_type='Automated Message'``) — only matching the former
+	was the bug that silently dropped every alert out of the audit log."""
+
+	@staticmethod
+	def _stub(comm_type, sent_or_received="Sent", ref_dt="MYS Royalty Invoice", ref_name="STUB"):
+		# Use Administrator for sender/recipient so the MYS Communication Log
+		# row (which has Link fields to User) saves cleanly. The hook never
+		# touches the Communication itself — it reads attrs and forwards.
+		return frappe.get_doc(
+			{
+				"doctype": "Communication",
+				"communication_type": comm_type,
+				"sent_or_received": sent_or_received,
+				"subject": f"stub {comm_type}",
+				"content": "body",
+				"sender": "Administrator",
+				"recipients": "Administrator",
+				"reference_doctype": ref_dt,
+				"reference_name": ref_name,
+			}
+		)
+
+	def setUp(self):
+		frappe.db.delete("MYS Communication Log", {"subject": ["like", "stub %"]})
+		frappe.db.commit()
+
+	def test_automated_message_on_mys_doc_is_mirrored(self):
+		"""Notifications create Communication rows with type='Automated Message'.
+		The mirror must pick those up — this was the bug that hid every
+		Notification-generated email from the audit log."""
+		notif_api.log_outbound_email(self._stub("Automated Message"))
+		self.assertTrue(
+			frappe.db.exists("MYS Communication Log", {"subject": "stub Automated Message"})
+		)
+
+	def test_manual_communication_on_mys_doc_is_mirrored(self):
+		notif_api.log_outbound_email(self._stub("Communication"))
+		self.assertTrue(
+			frappe.db.exists("MYS Communication Log", {"subject": "stub Communication"})
+		)
+
+	def test_chat_messages_are_not_mirrored(self):
+		"""``Chat`` (or other non-email types) shouldn't land in the audit log."""
+		notif_api.log_outbound_email(self._stub("Chat"))
+		self.assertFalse(frappe.db.exists("MYS Communication Log", {"subject": "stub Chat"}))
+
+	def test_inbound_communication_is_not_mirrored(self):
+		notif_api.log_outbound_email(self._stub("Communication", sent_or_received="Received"))
+		self.assertFalse(
+			frappe.db.exists("MYS Communication Log", {"subject": "stub Communication"})
+		)
+
+	def test_non_mys_reference_is_not_mirrored(self):
+		notif_api.log_outbound_email(self._stub("Automated Message", ref_dt="User", ref_name="x"))
+		self.assertFalse(
+			frappe.db.exists("MYS Communication Log", {"subject": "stub Automated Message"})
+		)
