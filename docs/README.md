@@ -9,6 +9,10 @@ landing page lives here.
 Start with **[overview.md](overview.md)**. It explains what MY School ERP is, who
 uses it, why we built it on Frappe, and what's shipped vs. planned. No code.
 
+For the **phase-by-phase customisation status** (what's shipped, what's in flight,
+what's planned, with PRs and commits cited), see **[roadmap.md](roadmap.md)** —
+that doc is the single source of truth before starting any new piece of work.
+
 ## I am a school operator using the product
 
 You probably want a process walkthrough:
@@ -56,6 +60,7 @@ Read in this order:
 docs/
 ├── README.md                       ← this nav index
 ├── overview.md                     ← non-technical: what / who / why
+├── roadmap.md                      ← phase-by-phase status, single source of truth
 ├── architecture.md                 ← technical: how it's built
 ├── data-model.md                   ← DocType field reference
 ├── development.md                  ← dev onboarding + workflows

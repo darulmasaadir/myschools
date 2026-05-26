@@ -72,9 +72,10 @@ The system addresses all three:
 
 ## What's shipped today
 
-Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned. The
-authoritative module table is in [architecture.md §3](architecture.md#3-modules-shipped-so-far);
-the headline summary is:
+The **authoritative roadmap is [roadmap.md](roadmap.md)** — phase status,
+delivering PR, files. Read that for the full picture. The headline:
+
+Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
 
 - ✅ Franchise hierarchy (cluster / branch / campus / department doctypes)
 - ✅ Royalty rate resolution + monthly invoice generation
@@ -82,15 +83,22 @@ the headline summary is:
 - ✅ Branch-scoped permissions across all custom doctypes
 - ✅ Auto-generated student and staff IDs tied to the franchise tree
 - ✅ Central Monitoring Dashboard (8 number cards + 3 charts, role-aware via permission queries)
-- 🟡 Communication (schema only; no SMS / email gateway wired up yet)
-- ⬜ Pakistani payment gateways (JazzCash, Easypaisa, HBL) — planned
-- ⬜ Training module (programs, sessions, certificates) — planned
-- ⬜ Transport, Library, LMS — planned, leveraging upstream Frappe apps where possible
+- ✅ Role-aware ERP shell — branding (logo / favicon / brand CSS), 5 tier
+  workspaces with `restrict_to_role`, role-aware login landing for all 10
+  franchise roles, Module Profiles trimming the sidebar per tier
+- ✅ Branded Print Formats — Royalty Invoice, Inspection Report, Fee Receipt,
+  Franchise Agreement, all inheriting the `MYS Default` Letter Head
+- 🟡 Communication (schema only; no SMS / email gateway wired up yet — Phase 4)
+- ⬜ Notifications & email templates — Phase 4 (next)
+- ⬜ Formal workflows + list-view polish — Phase 5
+- ⬜ Setup Wizard, onboarding tours, Query Reports — Phase 6
+- ⬜ Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7
+- ⬜ Pakistani payment gateways (JazzCash, Easypaisa, HBL), HR scaffolding, fee overrides — Phase 8
 
 The system is **live for one demo branch network** (BR001 + BR014, three
 campuses each, one fully-submitted royalty invoice on file). It is **not yet
 live for real franchisees** — that's pending the communication and payment
-modules.
+modules (Phases 4 + 8).
 
 ## How is it built — briefly
 
