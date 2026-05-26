@@ -27,7 +27,7 @@ frappe.ui.form.on("MYS Royalty Invoice", {
 					},
 				});
 			},
-			__("Actions"),
+			__("Actions")
 		);
 	},
 });

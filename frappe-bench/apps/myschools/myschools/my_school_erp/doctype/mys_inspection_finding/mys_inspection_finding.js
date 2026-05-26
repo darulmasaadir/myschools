@@ -16,7 +16,7 @@ frappe.ui.form.on("MYS Inspection Finding", {
 					campus: frm.doc.campus,
 				});
 			},
-			__("Actions"),
+			__("Actions")
 		);
 	},
 });

@@ -172,9 +172,7 @@ class TestFindingWorkflow(FrappeTestCase):
 		# in the workflow but not the gating one, and WorkflowTransitionError
 		# when the action isn't visible to them at all — both are valid
 		# "blocked" outcomes for an outsider.
-		with _as_user(self.outsider), self.assertRaises(
-			(WorkflowPermissionError, WorkflowTransitionError)
-		):
+		with _as_user(self.outsider), self.assertRaises((WorkflowPermissionError, WorkflowTransitionError)):
 			apply_workflow(f, "Submit")
 
 	def test_director_cannot_verify_only_audit(self):
@@ -187,9 +185,7 @@ class TestFindingWorkflow(FrappeTestCase):
 		f.reload()
 		f.resolution_notes = "fixed and photographed"
 		f.save()
-		with _as_user(self.director), self.assertRaises(
-			(WorkflowPermissionError, WorkflowTransitionError)
-		):
+		with _as_user(self.director), self.assertRaises((WorkflowPermissionError, WorkflowTransitionError)):
 			apply_workflow(f, "Verify")
 
 	def tearDown(self):
