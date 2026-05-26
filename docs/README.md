@@ -32,6 +32,13 @@ You probably want a process walkthrough:
 - **[processes/print-formats.md](processes/print-formats.md)** — the four branded
   PDF layouts (Royalty Invoice, Inspection Report, Fee Receipt, Franchise
   Agreement), how they get picked as default, and how to add a new one.
+- **[processes/notifications.md](processes/notifications.md)** — six Email
+  Template + Notification pairs, the `MYS Communication Log` audit trail, and
+  how a new alert/reminder gets wired in.
+- **[processes/workflows.md](processes/workflows.md)** — the two formal Frappe
+  Workflows (Inspection Finding, Royalty Invoice), role-gated transitions, and
+  the `update_after_submit` / `allow_on_submit` / `db.set_value` rules every
+  workflow contributor will hit.
 
 ## I am a developer onboarding to the codebase
 
@@ -69,7 +76,9 @@ docs/
 │   ├── inspection-workflow.md      ← operator-facing: inspection lifecycle
 │   ├── central-dashboard.md        ← central monitoring dashboard reference
 │   ├── navigation-and-roles.md     ← role landing pages, workspaces, module profiles
-│   └── print-formats.md            ← branded PDF layouts (Royalty Invoice / Inspection Report / Fee Receipt / Franchise Agreement)
+│   ├── print-formats.md            ← branded PDF layouts (Royalty Invoice / Inspection Report / Fee Receipt / Franchise Agreement)
+│   ├── notifications.md            ← email templates + notifications + Communication Log
+│   └── workflows.md                ← Frappe Workflows on Finding + Royalty Invoice
 └── api/
     ├── royalty.md                  ← myschools.api.royalty function reference
     └── inspection.md               ← myschools.api.inspection function reference

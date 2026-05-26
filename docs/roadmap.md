@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-05-26
-**Up next:** Phase 5 — Workflows & List View polish
+**Up next:** Phase 6 — Setup Wizard, Module Onboarding & Reports
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -30,7 +30,7 @@ These bind every phase:
 | 2 | Workspaces + role landing | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 3 | Print Formats | ✅ | PR [#4](https://github.com/darulmasaadir/myschools/pull/4) (`d952960`) + hotfix PR [#5](https://github.com/darulmasaadir/myschools/pull/5) (`c1b22b7`) |
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
-| 5 | Workflows & List View polish | 🟡 | In flight on `feature/workflows` |
+| 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ⬜ | — |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ⬜ | — |
 | 8 | Domain extensions | ⬜ | — |
@@ -125,17 +125,21 @@ Shipped:
 
 ---
 
-## Phase 5 — Workflows & List View polish 🟡
+## Phase 5 — Workflows & List View polish ✅
 
-**Status:** In flight on `feature/workflows`.
-**Estimated size:** M (6–10 h)
+**Delivered:** PR #8, `feature/workflows`.
 
-Scope (this PR):
-- Convert status enums to formal Frappe Workflows with role-gated transitions on the two doctypes whose `status` field already exists:
-  - `MYS Inspection Finding` (Open → In Progress → Resolved → Verified)
-  - `MYS Royalty Invoice` (Draft → Unpaid → Partial / Paid / Overdue / Cancelled — submission gated by HO Accountant)
-- List-view JS (`<doctype>_list.js`) for severity colour badges (Finding) and status indicators (all three).
-- Form JS (`<doctype>.js`) primary actions: "Send Reminder" on overdue Royalty Invoice, "Close Finding" on Finding (workflow-aware), "Generate Royalty Now" on Branch.
+Shipped:
+- Formal Frappe Workflows attached to the two doctypes with a `status` field:
+  - **`MYS Inspection Finding Workflow`** — Draft → Open → In Progress → Resolved → Verified, plus Cancelled. Role-gated transitions: Submit by Audit Officer / Branch Director / Branch Principal; Acknowledge by Branch Director / Branch Principal; Mark Resolved by Branch Director / Branch Principal; Verify and Reject Resolution by Audit Officer only.
+  - **`MYS Royalty Invoice Workflow`** — Draft → Unpaid (submit by HO Dept Head or Branch Accountant); payment-driven states (Partial / Paid / Overdue) reached only via `db.set_value` from the controller's `_refresh_status`, which bypasses workflow validation as required. Cancel gated to Chief Executive / HO Dept Head.
+- Source-of-truth Python script [`scripts/build_workflows.py`](../frappe-bench/apps/myschools/myschools/scripts/build_workflows.py) emits the three fixture files (`workflow.json`, `workflow_state.json`, `workflow_action_master.json`) so edits never touch hand-written JSON.
+- `status` and `resolution_notes` fields on `MYS Inspection Finding` marked `allow_on_submit: 1` so workflow transitions can update them post-submit; controller's `_validate_resolution_state` wired into both `validate` and `before_update_after_submit` so the "Verified requires resolution_notes" guard still fires after submission.
+- `api/inspection.py` auto-creation drives new Findings through `apply_workflow("Submit")` so they land at Open with `docstatus=1` instead of being directly submitted.
+- List-view JS (`<doctype>_list.js`) for severity colour badges (Finding) and status indicators (Finding, Royalty Invoice, Visit).
+- Form-JS primary actions: "Send Reminder" on overdue Royalty Invoice (calls new `api.royalty.send_overdue_reminder`); "Create Corrective Action" shortcut on Open / In Progress Findings.
+- Tests: [`tests/test_workflows.py`](../frappe-bench/apps/myschools/myschools/tests/test_workflows.py) covers fixture import, finding state machine, role gates, and the Royalty `db_set` bypass. Existing `test_inspection.py::test_finding_cannot_be_verified_without_resolution_notes` updated to use `db.set_value` to seed Resolved state (bypassing the workflow's transition rules) so it exercises only the controller guard. 74/74 passing.
+- Process doc: [`docs/processes/workflows.md`](processes/workflows.md).
 
 Deferred to a small follow-up:
 - `MYS Inspection Visit` workflow — the doctype currently has no `status` field (only `visit_type` + `is_submittable: 1`). Adding the field + workflow is a separate small PR rather than bloating this one.

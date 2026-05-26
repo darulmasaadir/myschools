@@ -1,0 +1,50 @@
+[
+ {
+  "doctype": "Workflow State",
+  "name": "Open",
+  "workflow_state_name": "Open",
+  "style": "warning"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "In Progress",
+  "workflow_state_name": "In Progress",
+  "style": "primary"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Resolved",
+  "workflow_state_name": "Resolved",
+  "style": "info"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Verified",
+  "workflow_state_name": "Verified",
+  "style": "success"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Unpaid",
+  "workflow_state_name": "Unpaid",
+  "style": "warning"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Partial",
+  "workflow_state_name": "Partial",
+  "style": "primary"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Paid",
+  "workflow_state_name": "Paid",
+  "style": "success"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Overdue",
+  "workflow_state_name": "Overdue",
+  "style": "danger"
+ }
+]

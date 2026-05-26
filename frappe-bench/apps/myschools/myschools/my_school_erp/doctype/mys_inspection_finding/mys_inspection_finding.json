@@ -80,10 +80,11 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nIn Progress\nResolved\nVerified",
-   "default": "Open",
+   "options": "Draft\nOpen\nIn Progress\nResolved\nVerified\nCancelled",
+   "default": "Draft",
    "in_list_view": 1,
-   "in_standard_filter": 1
+   "in_standard_filter": 1,
+   "allow_on_submit": 1
   },
   {
    "fieldname": "section_break_desc",
@@ -130,7 +131,8 @@
    "fieldname": "resolved_on",
    "fieldtype": "Date",
    "label": "Resolved On",
-   "read_only": 1
+   "read_only": 1,
+   "allow_on_submit": 1
   },
   {
    "fieldname": "section_break_resolution",
@@ -140,7 +142,8 @@
   {
    "fieldname": "resolution_notes",
    "fieldtype": "Text",
-   "label": "Resolution Notes"
+   "label": "Resolution Notes",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "amended_from",
