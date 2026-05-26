@@ -61,6 +61,41 @@ class TestDashboardFixtures(FrappeTestCase):
 		for card_name, method in expected.items():
 			self.assertEqual(frappe.db.get_value("Number Card", card_name, "method"), method)
 
+	def test_chart_filters_json_is_list_of_lists(self):
+		"""Frappe's `dashboard_chart.get()` calls `.append()` on the parsed
+		`filters_json`. If a chart fixture ships a JSON OBJECT
+		(`{"docstatus":1}`) instead of an ARRAY of arrays
+		(`[["DocType","docstatus","=",1,false]]`), the dashboard blows up with
+		`'NoneType' object is not callable` at chart render time. This guard
+		makes that shape mistake impossible to land again."""
+		import json as _json
+
+		for name in EXPECTED_CHARTS:
+			raw = frappe.db.get_value("Dashboard Chart", name, "filters_json") or "[]"
+			parsed = _json.loads(raw)
+			self.assertIsInstance(
+				parsed,
+				list,
+				msg=f"{name} filters_json must be a JSON array, got {type(parsed).__name__}: {raw}",
+			)
+			for row in parsed:
+				self.assertIsInstance(
+					row, list, msg=f"{name} filters_json rows must be arrays, got {type(row).__name__}: {row}"
+				)
+
+	def test_chart_get_endpoint_does_not_raise(self):
+		"""End-to-end guard: hit Frappe's dashboard_chart.get for each MYS chart
+		and assert no exception. Catches any future fixture or schema drift that
+		would crash the desk dashboard for a real user."""
+		from frappe.desk.doctype.dashboard_chart.dashboard_chart import get as chart_get
+
+		for name in EXPECTED_CHARTS:
+			with self.subTest(chart=name):
+				# Just call — any exception fails the test. We don't assert on the
+				# shape because Group By charts return None when there's no data,
+				# which is legitimate.
+				chart_get(chart_name=name, refresh=1)
+
 
 class TestDashboardEndpoints(FrappeTestCase):
 	"""The three Custom-type cards call whitelisted Python endpoints — they must
