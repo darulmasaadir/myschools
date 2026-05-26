@@ -29,8 +29,8 @@ These bind every phase:
 | 1 | Branding | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 2 | Workspaces + role landing | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 3 | Print Formats | ✅ | PR [#4](https://github.com/darulmasaadir/myschools/pull/4) (`d952960`) + hotfix PR [#5](https://github.com/darulmasaadir/myschools/pull/5) (`c1b22b7`) |
-| 4 | Notifications & Communication wiring | 🟡 | PR pending (branch `feature/notifications`) |
-| 5 | Workflows & List View polish | ⬜ | — |
+| 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
+| 5 | Workflows & List View polish | 🟡 | In flight on `feature/workflows` |
 | 6 | Setup Wizard, Module Onboarding, Reports | ⬜ | — |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ⬜ | — |
 | 8 | Domain extensions | ⬜ | — |
@@ -106,36 +106,39 @@ What shipped:
 
 ---
 
-## Phase 4 — Notifications & Communication wiring 🟡
+## Phase 4 — Notifications & Communication wiring ✅
 
-**Status:** In flight on `feature/notifications`; PR pending.
-**Estimated size:** M (8–12 h) — actuals tracked when PR merges.
+**Status:** Shipped in PR [#7](https://github.com/darulmasaadir/myschools/pull/7), merge commit `ff4dc38` (squash).
+**Size:** M (matched estimate — ~10 h including the bug-fix follow-up).
 
-Shipped on the branch:
+Shipped:
 - 6 `Email Template` fixtures + 6 `Notification` fixtures generated from a single source-of-truth builder ([`scripts/build_notifications.py`](../frappe-bench/apps/myschools/myschools/scripts/build_notifications.py)):
   royalty invoice generated, royalty invoice overdue (Days After due_date),
   inspection finding assigned, finding overdue, corrective action overdue,
   franchise agreement expiring (Days Before end_date, 30 days).
-- `Communication.after_insert` mirror ([`api/notifications.log_outbound_email`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — every outbound system email tied to an MYS doctype (or `Fees`) is mirrored into `MYS Communication Log` with branch / campus / scope auto-resolved.
+- `Communication.after_insert` mirror ([`api/notifications.log_outbound_email`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — every outbound system email tied to an MYS doctype (or `Fees`) is mirrored into `MYS Communication Log` with branch / campus / scope auto-resolved. Accepts both `Communication` and `Automated Message` types (the latter is what Notifications produce).
 - Provider-agnostic `send_sms()` stub ([`api/notifications.send_sms`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — writes a `Sent` row to `MYS Communication Log` today; Phase 8 swaps in Jazz / Easypaisa / Twilio behind the same signature.
-- 11 unit tests in [`tests/test_notifications.py`](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py) across 3 classes (fixture coverage, SMS stub, log helper).
-- Verification battery: 58/58 unit tests · pre-commit clean · 48/48 HTTP smoke · live mirror smoke (Communication → Log) · live SMS-stub smoke.
+- 17 unit tests in [`tests/test_notifications.py`](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py) across 5 classes — fixture coverage, Jinja render against real docs (would have caught the 3 field typos found pre-merge), SMS stub, log helper, and the `log_outbound_email` mirror filter regression coverage.
+- Verification battery: 64/64 unit tests · pre-commit clean · 48/48 HTTP smoke · fresh-install smoke (drop-site → install-app → migrate) · live end-to-end Notification fire smoke (Communication → MYS Communication Log).
 
 **Files:** [scripts/build_notifications.py](../frappe-bench/apps/myschools/myschools/scripts/build_notifications.py), [api/notifications.py](../frappe-bench/apps/myschools/myschools/api/notifications.py), [fixtures/email_template.json](../frappe-bench/apps/myschools/myschools/fixtures/email_template.json), [fixtures/notification.json](../frappe-bench/apps/myschools/myschools/fixtures/notification.json), [tests/test_notifications.py](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py), [processes/notifications.md](processes/notifications.md)
 
 ---
 
-## Phase 5 — Workflows & List View polish ⬜
+## Phase 5 — Workflows & List View polish 🟡
 
+**Status:** In flight on `feature/workflows`.
 **Estimated size:** M (6–10 h)
 
-Scope:
-- Convert status enums to formal Frappe Workflows with role-gated transitions:
+Scope (this PR):
+- Convert status enums to formal Frappe Workflows with role-gated transitions on the two doctypes whose `status` field already exists:
   - `MYS Inspection Finding` (Open → In Progress → Resolved → Verified)
-  - `MYS Royalty Invoice` (Draft → Submitted → Paid / Overdue / Cancelled)
-  - `MYS Inspection Visit` (Draft → Scheduled → In Progress → Completed → Submitted)
-- List view JS (`<doctype>_list.js`) for severity colour badges and status indicators.
-- Per-doctype form JS (`<doctype>.js`) for primary action buttons ("Generate Royalty Now", "Close Finding", "Send Reminder") — turns link-driven flows into button-driven ones inside the desk.
+  - `MYS Royalty Invoice` (Draft → Unpaid → Partial / Paid / Overdue / Cancelled — submission gated by HO Accountant)
+- List-view JS (`<doctype>_list.js`) for severity colour badges (Finding) and status indicators (all three).
+- Form JS (`<doctype>.js`) primary actions: "Send Reminder" on overdue Royalty Invoice, "Close Finding" on Finding (workflow-aware), "Generate Royalty Now" on Branch.
+
+Deferred to a small follow-up:
+- `MYS Inspection Visit` workflow — the doctype currently has no `status` field (only `visit_type` + `is_submittable: 1`). Adding the field + workflow is a separate small PR rather than bloating this one.
 
 ---
 
