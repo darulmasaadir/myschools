@@ -56,16 +56,21 @@ The MYS Branch doctype carries a `company` Link that bridges the two.
 
 ## 3. Modules shipped so far
 
-| Module | Status | DocTypes | Notes |
+For phase-by-phase status with delivering PRs and commits, see [roadmap.md](roadmap.md).
+This table is the architectural view — module by module, what it ships:
+
+| Module | Status | DocTypes / fixtures | Notes |
 |---|---|---|---|
 | Franchise hierarchy | ✅ | `MYS Cluster`, `MYS Branch`, `MYS Campus`, `MYS Department` | [data-model](data-model.md#1-franchise-hierarchy) |
 | Royalty | ✅ | `MYS Franchise Owner`, `MYS Franchise Agreement`, `MYS Royalty Rate Override`, `MYS Royalty Invoice` (+ `Campus Line` child), `MYS Royalty Payment` | [process](processes/royalty-billing.md) · [API](api/royalty.md) |
 | Inspection workflow | ✅ | `MYS Inspection Checklist Template` (+ `Item` child), `MYS Inspection Visit` (+ `Result` child), `MYS Inspection Finding`, `MYS Corrective Action` | [process](processes/inspection-workflow.md) · [API](api/inspection.md) |
-| Communication | 🟡 | `MYS Communication Log` | Schema only; no SMS/email integration yet |
+| Communication | 🟡 | `MYS Communication Log` | Schema only; no SMS/email integration yet (Phase 4 wires it up) |
 | Permissions | ✅ | (no doctypes — pure Python in `api/permissions.py`) | Branch / cluster scoping via `permission_query_conditions` |
 | SIS (Student Info System) | ✅ | upstream `education.Student` extended with `mys_cluster`/`mys_branch`/`mys_campus` custom fields | Seeded end-to-end via `scripts/seed_education.py` |
 | Fees | ✅ | upstream `education.Fees` + `education.Fee Structure` (custom `income_account` field) | Submitted Fees roll up into royalty invoices via `get_branch_collection_for_period` |
 | Central Monitoring Dashboard | ✅ | `Dashboard` + 8 `Number Card` + 3 `Dashboard Chart` shipped as JSON under `my_school_erp/` | Single role-aware dashboard — same view for every role, rows filtered through `permission_query_conditions`. Custom-method cards in [`api/dashboard.py`](../frappe-bench/apps/myschools/myschools/api/dashboard.py) |
+| Navigation shell (Phases 1+2) | ✅ | 5 `Workspace`, 5 `Module Profile`, `Letter Head` `MYS Default`; brand CSS + assets; `app_logo_url` / `brand_html` / `role_home_page` hooks | All 10 franchise roles land on a tier-specific workspace with a trimmed sidebar. [process](processes/navigation-and-roles.md) · §9 below |
+| Print Formats (Phase 3) | ✅ | 4 branded Jinja Print Formats: `MYS Royalty Invoice`, `MYS Inspection Report`, `MYS Fee Receipt`, `MYS Franchise Agreement`; Property Setters mark each as default | All inherit `MYS Default` Letter Head. [process](processes/print-formats.md) |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 

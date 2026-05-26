@@ -22,6 +22,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   one calls `dashboard_chart.get()` directly and asserts no exception.
 
 ### Documentation
+- **`docs/roadmap.md` — single source of truth for customisation phase status.**
+  Captures all 8 phases (Branding, Workspaces, Print Formats, Notifications,
+  Workflows, Setup Wizard, Portals, Domain extensions) with status, delivering
+  PR + commit SHA for each shipped phase, and the standing constraints that bind
+  every PR (upgrade-safe only, test-first, conventional commits). Phase 7
+  rewritten in this doc from "Vue/React SPA" to "Frappe Web Forms + `www/`
+  Jinja templates" per the upgrade-safe-only constraint. Motivated by
+  near-mistake: cut a `feature/shell-phase-1-2` branch to "start Phase 1+2"
+  when it had already shipped in PR #3 — the session plan was stale, the repo
+  had no roadmap doc to consult. Now the repo does.
+- `docs/overview.md` § "What's shipped today" updated to match current state:
+  adds the role-aware ERP shell (Phases 1+2) and branded Print Formats
+  (Phase 3) as ✅, and lists Phases 4–8 as ⬜ with a one-line scope hint.
+- `docs/architecture.md` § 3 "Modules shipped so far" gains two rows for the
+  Navigation shell and Print Formats modules so the architectural table
+  doesn't trail behind the roadmap.
+- `docs/README.md` nav index links to `roadmap.md` for evaluators and adds it
+  to the layout diagram.
 - Reworked `docs/architecture.md` to reflect the inspection decomposition, multi-Company royalty,
   and shipped-vs-planned module status (✅ / 🟡 / ⬜ legend).
 - Added a documentation set under `docs/`:
