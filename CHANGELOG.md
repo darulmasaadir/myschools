@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Dashboard charts no longer crash the Central Monitoring view.** The three
+  MYS Dashboard Chart fixtures shipped `filters_json` as a JSON object
+  (`{"docstatus":1}`) instead of an array of arrays. Frappe's
+  `dashboard_chart.get()` calls `.append()` on the parsed filters, so the
+  object form crashed every chart render with `'NoneType' object is not
+  callable` and the desk dashboard surfaced a server-error modal in front of
+  the loading charts. All three fixtures (`MYS - Findings by Severity`,
+  `MYS - Royalty by Cluster (YTD)`, `MYS - Royalty Invoiced Trend (12m)`)
+  now use the array-of-arrays form Frappe expects. Two regression tests
+  added to `tests/test_dashboard.py` so this shape mistake can never land
+  again: one parses each chart's `filters_json` and asserts list-of-lists,
+  one calls `dashboard_chart.get()` directly and asserts no exception.
+
 ### Documentation
 - Reworked `docs/architecture.md` to reflect the inspection decomposition, multi-Company royalty,
   and shipped-vs-planned module status (✅ / 🟡 / ⬜ legend).
