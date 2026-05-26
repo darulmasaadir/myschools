@@ -64,7 +64,7 @@ This table is the architectural view — module by module, what it ships:
 | Franchise hierarchy | ✅ | `MYS Cluster`, `MYS Branch`, `MYS Campus`, `MYS Department` | [data-model](data-model.md#1-franchise-hierarchy) |
 | Royalty | ✅ | `MYS Franchise Owner`, `MYS Franchise Agreement`, `MYS Royalty Rate Override`, `MYS Royalty Invoice` (+ `Campus Line` child), `MYS Royalty Payment` | [process](processes/royalty-billing.md) · [API](api/royalty.md) |
 | Inspection workflow | ✅ | `MYS Inspection Checklist Template` (+ `Item` child), `MYS Inspection Visit` (+ `Result` child), `MYS Inspection Finding`, `MYS Corrective Action` | [process](processes/inspection-workflow.md) · [API](api/inspection.md) |
-| Communication | 🟡 | `MYS Communication Log` | Schema only; no SMS/email integration yet (Phase 4 wires it up) |
+| Communication | ✅ | `MYS Communication Log`; 6 `Email Template` + 6 `Notification` fixtures; `Communication.after_insert` mirror; provider-agnostic `send_sms` stub | Royalty + inspection + agreement alerts wired; system emails mirrored into the audit log. SMS gateway swap is Phase 8. [process](processes/notifications.md) |
 | Permissions | ✅ | (no doctypes — pure Python in `api/permissions.py`) | Branch / cluster scoping via `permission_query_conditions` |
 | SIS (Student Info System) | ✅ | upstream `education.Student` extended with `mys_cluster`/`mys_branch`/`mys_campus` custom fields | Seeded end-to-end via `scripts/seed_education.py` |
 | Fees | ✅ | upstream `education.Fees` + `education.Fee Structure` (custom `income_account` field) | Submitted Fees roll up into royalty invoices via `get_branch_collection_for_period` |

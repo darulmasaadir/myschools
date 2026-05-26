@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Notifications & Communication wiring (Phase 4).** Six `Email Template` +
+  six `Notification` fixtures generated from a single source-of-truth builder
+  (`scripts/build_notifications.py`) cover royalty invoice generated, royalty
+  invoice overdue (Days After due_date), inspection finding assigned, finding
+  overdue, corrective action overdue, and franchise agreement expiring (30
+  days before end_date). Each fires off the underlying doctype's lifecycle
+  events and pings the right mix of role-based recipients and
+  document-field-based recipients (e.g. `reported_by`, `assigned_to`). All
+  templates use the MY Schools branded HTML container and inherit the
+  primary green `#0F7A4A`.
+  - `Communication.after_insert` mirror (`api/notifications.log_outbound_email`)
+    so every outbound system email tied to an MYS doctype (or `Fees`) lands in
+    `MYS Communication Log` with branch / campus / scope auto-resolved.
+    Inbound mail, drafts, and non-MYS references are skipped — Frappe's own
+    `Communication` doctype already captures those, and the audit log shouldn't
+    double up.
+  - Provider-agnostic `send_sms(recipient, message, doctype, name)` stub
+    (`api/notifications.send_sms`) writes a `Sent` row to `MYS Communication
+    Log` today; Phase 8 swaps `gateway="stub"` for a real Pakistani gateway
+    (Jazz / Easypaisa / Twilio) without changing the signature. Callers
+    (Notifications using `channel=SMS`, scheduled jobs, future WhatsApp
+    adapter) stay unchanged when the real gateway lands.
+  - 11 unit tests in `tests/test_notifications.py` across three classes —
+    fixture coverage (all 6 imported, use_html, enabled, correct doctype +
+    event, Days After date_changed, 30-days-before for agreement, mixed-mode
+    recipients on Finding Assigned), SMS stub (returns ok/gateway/log, writes
+    Log, rejects empty args), and `log_communication` helper field round-trip.
+  - Process doc `docs/processes/notifications.md` covers what ships, how an
+    alert actually fires, how to add a new one (always via the builder, never
+    by hand-editing fixtures), why the audit log lives outside Frappe's own
+    `Communication`, and a troubleshooting table.
+
 ### Fixed
 - **Dashboard charts no longer crash the Central Monitoring view.** The three
   MYS Dashboard Chart fixtures shipped `filters_json` as a JSON object

@@ -1,0 +1,238 @@
+[
+ {
+  "name": "MYS - Royalty Invoice Generated",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Royalty Invoice",
+  "event": "Submit",
+  "condition": "doc.docstatus == 1",
+  "subject": "Royalty Invoice {{ doc.name }} generated — {{ doc.branch }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p>A new royalty invoice has been generated.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Invoice</td><td style='font-weight:600'>{{ doc.name }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Period</td><td>{{ doc.period_month }}/{{ doc.period_year }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Due Date</td><td><strong>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</strong></td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Total Royalty</td><td><strong>{{ frappe.utils.fmt_money(doc.royalty_amount, currency=doc.currency) }}</strong></td></tr></table><p>Open the invoice in the desk for the full campus-by-campus breakdown.</p><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 1,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Chief Executive"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "HO Dept Head"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Accountant"
+   }
+  ]
+ },
+ {
+  "name": "MYS - Royalty Invoice Overdue",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Royalty Invoice",
+  "event": "Days After",
+  "condition": "doc.status in ('Unpaid', 'Partial', 'Overdue')",
+  "subject": "OVERDUE: Royalty Invoice {{ doc.name }} — {{ doc.branch }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p style='color:#991B1B;font-weight:600'>This royalty invoice is past its due date and remains unpaid.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Invoice</td><td style='font-weight:600'>{{ doc.name }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Due Date</td><td>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Outstanding</td><td><strong style='color:#991B1B'>{{ frappe.utils.fmt_money(doc.outstanding_amount, currency=doc.currency) }}</strong></td></tr></table><p>Please reconcile payment or contact the franchisee.</p><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 0,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Chief Executive"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "HO Dept Head"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Accountant"
+   }
+  ],
+  "date_changed": "due_date",
+  "days_in_advance": 1
+ },
+ {
+  "name": "MYS - Inspection Finding Assigned",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Inspection Finding",
+  "event": "Submit",
+  "condition": "doc.docstatus == 1",
+  "subject": "New finding {{ doc.name }} — {{ doc.severity }} at {{ doc.branch }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p>A new inspection finding has been recorded and requires action.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Finding</td><td style='font-weight:600'>{{ doc.name }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Severity</td><td><span style='display:inline-block;padding:2px 8px;border-radius:3px;font-weight:600;font-size:11px;background:{% if doc.severity == 'Critical' %}#FEE2E2;color:#991B1B{% elif doc.severity == 'Major' %}#FEF3C7;color:#92400E{% else %}#E5E7EB;color:#1F2937{% endif %}'>{{ doc.severity }}</span></td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Target Resolution</td><td><strong>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</strong></td></tr></table><p><strong>Category:</strong> {{ doc.category or '—' }}</p><p style='font-size:13px;color:#6B7280'>{{ doc.description or '' }}</p><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 0,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Principal"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Audit Officer"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_document_field": "reported_by"
+   }
+  ]
+ },
+ {
+  "name": "MYS - Inspection Finding Overdue",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Inspection Finding",
+  "event": "Days After",
+  "condition": "doc.status in ('Open', 'In Progress')",
+  "subject": "OVERDUE: Finding {{ doc.name }} — {{ doc.branch }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p style='color:#991B1B;font-weight:600'>This inspection finding has passed its target resolution date and is still open.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Finding</td><td style='font-weight:600'>{{ doc.name }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Severity</td><td>{{ doc.severity }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Status</td><td>{{ doc.status }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Was due</td><td><strong>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</strong></td></tr></table><p>Open the finding in the desk and either close it or extend the target date.</p><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 0,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Principal"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Audit Officer"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Academic Monitor"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_document_field": "reported_by"
+   }
+  ],
+  "date_changed": "due_date",
+  "days_in_advance": 1
+ },
+ {
+  "name": "MYS - Corrective Action Overdue",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Corrective Action",
+  "event": "Days After",
+  "condition": "doc.status in ('Planned', 'In Progress')",
+  "subject": "OVERDUE: Corrective action for finding {{ doc.finding }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p style='color:#991B1B;font-weight:600'>A corrective action assigned to you is past its due date.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Action</td><td style='font-weight:600'>{{ doc.name }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Finding</td><td>{{ doc.finding }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Due</td><td>{{ frappe.utils.formatdate(doc.due_date, 'long') }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Status</td><td>{{ doc.status }}</td></tr></table><p><strong>What was planned:</strong> {{ doc.action_description or '—' }}</p><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 0,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Audit Officer"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_document_field": "assigned_to"
+   }
+  ],
+  "date_changed": "due_date",
+  "days_in_advance": 1
+ },
+ {
+  "name": "MYS - Franchise Agreement Expiring",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Franchise Agreement",
+  "event": "Days Before",
+  "condition": "doc.status == 'Active'",
+  "subject": "Agreement {{ doc.name }} expires in 30 days — {{ doc.branch }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p>The franchise agreement below expires in 30 days. Initiate renewal or termination workflow.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Agreement</td><td style='font-weight:600'>{{ doc.name }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Franchisee</td><td>{{ doc.franchisee }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>End Date</td><td><strong>{{ frappe.utils.formatdate(doc.end_date, 'long') }}</strong></td></tr></table><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 0,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Chief Executive"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "HO Dept Head"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Cluster Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   }
+  ],
+  "date_changed": "end_date",
+  "days_in_advance": 30
+ }
+]

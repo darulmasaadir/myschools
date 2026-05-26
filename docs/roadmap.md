@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-05-26
-**Up next:** Phase 4 — Notifications & Communication wiring
+**Up next:** Phase 5 — Workflows & List View polish
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -29,7 +29,7 @@ These bind every phase:
 | 1 | Branding | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 2 | Workspaces + role landing | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 3 | Print Formats | ✅ | PR [#4](https://github.com/darulmasaadir/myschools/pull/4) (`d952960`) + hotfix PR [#5](https://github.com/darulmasaadir/myschools/pull/5) (`c1b22b7`) |
-| 4 | Notifications & Communication wiring | ⬜ | — |
+| 4 | Notifications & Communication wiring | 🟡 | PR pending (branch `feature/notifications`) |
 | 5 | Workflows & List View polish | ⬜ | — |
 | 6 | Setup Wizard, Module Onboarding, Reports | ⬜ | — |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ⬜ | — |
@@ -106,20 +106,22 @@ What shipped:
 
 ---
 
-## Phase 4 — Notifications & Communication wiring ⬜
+## Phase 4 — Notifications & Communication wiring 🟡
 
-**Status:** Next up. Not started.
-**Estimated size:** M (8–12 h)
+**Status:** In flight on `feature/notifications`; PR pending.
+**Estimated size:** M (8–12 h) — actuals tracked when PR merges.
 
-Scope:
-- Email Template fixtures for: royalty invoice generated, royalty invoice overdue, finding assigned, finding overdue, agreement expiring, corrective action overdue.
-- Notification fixtures (Frappe's `Notification` doctype, condition-based) firing those templates off doc events / scheduler.
-- Wire up `MYS Communication Log` so every system-generated email gets logged automatically.
-- Provider-agnostic SMS adapter stub (specific gateway — Jazz / Easypaisa / Twilio — chosen in Phase 8).
+Shipped on the branch:
+- 6 `Email Template` fixtures + 6 `Notification` fixtures generated from a single source-of-truth builder ([`scripts/build_notifications.py`](../frappe-bench/apps/myschools/myschools/scripts/build_notifications.py)):
+  royalty invoice generated, royalty invoice overdue (Days After due_date),
+  inspection finding assigned, finding overdue, corrective action overdue,
+  franchise agreement expiring (Days Before end_date, 30 days).
+- `Communication.after_insert` mirror ([`api/notifications.log_outbound_email`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — every outbound system email tied to an MYS doctype (or `Fees`) is mirrored into `MYS Communication Log` with branch / campus / scope auto-resolved.
+- Provider-agnostic `send_sms()` stub ([`api/notifications.send_sms`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — writes a `Sent` row to `MYS Communication Log` today; Phase 8 swaps in Jazz / Easypaisa / Twilio behind the same signature.
+- 11 unit tests in [`tests/test_notifications.py`](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py) across 3 classes (fixture coverage, SMS stub, log helper).
+- Verification battery: 58/58 unit tests · pre-commit clean · 48/48 HTTP smoke · live mirror smoke (Communication → Log) · live SMS-stub smoke.
 
-Why it's next:
-- The royalty engine and inspection workflow already produce the data; today nothing pings operators when an invoice is overdue or a finding is assigned. This is the highest-leverage missing piece for daily operations.
-- Has to land before Phase 5 (formal workflows) — once we have role-gated state transitions, they need to ping the next assignee.
+**Files:** [scripts/build_notifications.py](../frappe-bench/apps/myschools/myschools/scripts/build_notifications.py), [api/notifications.py](../frappe-bench/apps/myschools/myschools/api/notifications.py), [fixtures/email_template.json](../frappe-bench/apps/myschools/myschools/fixtures/email_template.json), [fixtures/notification.json](../frappe-bench/apps/myschools/myschools/fixtures/notification.json), [tests/test_notifications.py](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py), [processes/notifications.md](processes/notifications.md)
 
 ---
 
