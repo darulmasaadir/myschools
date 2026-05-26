@@ -222,8 +222,20 @@ jobs:
         working-directory: frappe-bench
         run: bench --site test_site execute myschools.scripts.ci_bootstrap.run
 
+      - name: Build frontend assets (needed for the desk shell to bootstrap)
+        working-directory: frappe-bench
+        run: |
+          # `bench init` builds frappe + erpnext bundles, but does not pick up
+          # apps added after init (myschools was symlinked post-init). The
+          # desk shell (.navbar, .form-page) is rendered by frappe's bundle
+          # and won't appear in Playwright if those bundles are missing.
+          bench build --app myschools
+
       - name: Seed deterministic e2e data
         working-directory: frappe-bench
+        # seed_e2e self-bootstraps: if no Branch exists it chains seed_demo;
+        # if no submitted Invoice exists it chains seed_education +
+        # demo_royalty_invoice. Idempotent — re-running it is a no-op.
         run: bench --site test_site execute myschools.scripts.seed_e2e.main
 
       - name: Make test_site resolve to loopback
@@ -255,11 +267,9 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
-      - name: Copy seed state into expected path
+      - name: Verify seed state file exists
         run: |
-          # seed_e2e.py writes to /tmp/mys_e2e_state.json on whichever host
-          # ran the bench command. We're on the same runner, so the file is
-          # already there. Just confirm.
+          # seed_e2e.py wrote /tmp/mys_e2e_state.json earlier in this job.
           ls -l /tmp/mys_e2e_state.json
           cat /tmp/mys_e2e_state.json
 

@@ -2,15 +2,19 @@
 
 Creates (or reuses):
 - Test users with predictable passwords for each MYS role we exercise.
-- One submitted MYS Inspection Visit + one MYS Inspection Finding at status
-  "Resolved" with resolution_notes filled in — that's the state where the
-  role gating on Verify is most visible (Audit Officer sees it, Director
-  does not).
-- One overdue MYS Royalty Invoice (status forced via db.set_value) so the
-  "Send Reminder" button shows up.
+- The minimum franchise tree (one Cluster + Branch + Employee inspector)
+  that the inspection workflow needs, by chaining `seed_demo.run` when
+  the site has only the bare `ci_bootstrap` Company.
+- One submitted MYS Royalty Invoice (via `demo_royalty_invoice.run`,
+  which pulls in `seed_education.run` for Students + submitted Fees).
+- One submitted MYS Inspection Finding at status "Resolved" with
+  resolution_notes filled in — that's the state where the role gating
+  on Verify is most visible (Audit Officer sees it, Director does not).
+- One Overdue MYS Royalty Invoice (status forced via `db.set_value`) so
+  the "Send Reminder" button shows up.
 
-Stash returned IDs into /tmp/mys_e2e_state.json so the Playwright spec can
-read them without re-discovering through the API.
+Stash returned IDs into /tmp/mys_e2e_state.json so the Playwright spec
+can read them without re-discovering through the API.
 
 Run via:
     bench --site myschools.localhost execute myschools.scripts.seed_e2e.main
@@ -64,11 +68,59 @@ def _ensure_user(email, spec):
 	return email
 
 
-def _ensure_resolved_finding():
+def _ensure_franchise_tree():
+	"""Run seed_demo if there's no branch yet. Returns the first branch."""
 	branch = frappe.db.get_value("MYS Branch", {}, "name")
+	if branch:
+		return branch
+	from myschools.scripts import seed_demo
+
+	seed_demo.run()
+	return frappe.db.get_value("MYS Branch", {}, "name")
+
+
+def _ensure_inspector_employee(branch):
+	"""Create a minimal Employee linked to the branch if none exists."""
+	emp = frappe.db.get_value("Employee", {}, "name")
+	if emp:
+		return emp
+	company = frappe.db.get_value("MYS Branch", branch, "company") or frappe.db.get_value(
+		"Company", {}, "name"
+	)
+	doc = frappe.get_doc(
+		{
+			"doctype": "Employee",
+			"first_name": "E2E",
+			"last_name": "Inspector",
+			"gender": "Male",
+			"date_of_birth": "1990-01-01",
+			"date_of_joining": today(),
+			"status": "Active",
+			"company": company,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return doc.name
+
+
+def _ensure_submitted_invoice():
+	"""Run demo_royalty_invoice if there is no submitted invoice yet."""
+	inv = frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 1}, "name")
+	if inv:
+		return inv
+	# demo_royalty_invoice depends on seed_education (Students + Fees).
+	from myschools.scripts import demo_royalty_invoice, seed_education
+
+	seed_education.run()
+	demo_royalty_invoice.run()
+	return frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 1}, "name")
+
+
+def _ensure_resolved_finding():
+	branch = _ensure_franchise_tree()
 	if not branch:
 		return None, None
-	inspector = frappe.db.get_value("Employee", {}, "name")
+	inspector = _ensure_inspector_employee(branch)
 	if not inspector:
 		return None, None
 
@@ -117,7 +169,7 @@ def _ensure_resolved_finding():
 
 
 def _ensure_overdue_invoice():
-	inv = frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 1}, "name")
+	inv = _ensure_submitted_invoice()
 	if not inv:
 		return None
 	frappe.db.set_value("MYS Royalty Invoice", inv, "status", "Overdue")
