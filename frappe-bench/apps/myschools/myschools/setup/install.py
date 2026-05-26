@@ -28,6 +28,19 @@ def after_install():
 	create_default_head_office_departments()
 	grant_franchise_role_permissions()
 	backfill_module_profiles()
+	# NOTE: `set_default_print_formats` is intentionally NOT called here.
+	# Frappe runs `after_install` BEFORE `sync_fixtures`, so the Print Format
+	# records don't exist yet — the function would silently no-op. Instead it's
+	# wired to `after_sync` (fresh-install path, after fixtures import) and
+	# `after_migrate` (upgrade path).
+	frappe.db.commit()
+
+
+def after_sync():
+	"""Runs once on fresh install after `sync_fixtures` / `sync_customizations` /
+	`sync_dashboards` complete — the only safe point on a clean install at which
+	the shipped Print Format records exist in DB."""
+	set_default_print_formats()
 	frappe.db.commit()
 
 
@@ -36,7 +49,39 @@ def after_migrate():
 	create_custom_franchise_fields()
 	grant_franchise_role_permissions()
 	backfill_module_profiles()
+	set_default_print_formats()
 	frappe.db.commit()
+
+
+DEFAULT_PRINT_FORMATS = {
+	"MYS Royalty Invoice": "MYS Royalty Invoice",
+	"MYS Inspection Visit": "MYS Inspection Report",
+	"MYS Franchise Agreement": "MYS Franchise Agreement",
+	"Fees": "MYS Fee Receipt",
+}
+
+
+def set_default_print_formats():
+	"""Point each customised doctype's default_print_format at the MYS Print
+	Format that ships with this app — runs after fixtures are imported on
+	migrate so the target Print Format records already exist. Uses a Property
+	Setter so we don't have to edit upstream/owned doctype JSONs."""
+	from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+
+	for doctype, print_format in DEFAULT_PRINT_FORMATS.items():
+		if not frappe.db.exists("DocType", doctype):
+			continue
+		if not frappe.db.exists("Print Format", print_format):
+			continue
+		make_property_setter(
+			doctype,
+			"",
+			"default_print_format",
+			print_format,
+			"Data",
+			for_doctype=True,
+			validate_fields_for_doctype=False,
+		)
 
 
 # Doctypes each franchise role needs read access to so the role's workspace
