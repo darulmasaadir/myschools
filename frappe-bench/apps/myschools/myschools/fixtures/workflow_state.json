@@ -1,6 +1,18 @@
 [
  {
   "doctype": "Workflow State",
+  "name": "Draft",
+  "workflow_state_name": "Draft",
+  "style": "danger"
+ },
+ {
+  "doctype": "Workflow State",
+  "name": "Cancelled",
+  "workflow_state_name": "Cancelled",
+  "style": "danger"
+ },
+ {
+  "doctype": "Workflow State",
   "name": "Open",
   "workflow_state_name": "Open",
   "style": "warning"

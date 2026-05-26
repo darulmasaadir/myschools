@@ -182,15 +182,40 @@ bench --site myschools.localhost run-tests --app myschools --module myschools.te
 bench --site myschools.localhost run-tests --app myschools  # full suite, 74 pass
 ```
 
-### 4.2 Browser
+### 4.2 Browser (automated)
 
-1. As Administrator, open any Open Finding → use the **Acknowledge** button
-   from the workflow menu → status flips to In Progress, docstatus stays 1.
-2. Open a Resolved Finding → use **Verify** → status flips to Verified.
-3. Open an overdue Royalty Invoice → **Actions → Send Reminder** → expect
-   a green toast "Reminder sent to …".
-4. Visit `/app/mys-inspection-finding` → severity badges render in the
-   Severity column, status indicators in the Status column.
+The browser pass is automated via Playwright — no manual click-through
+is required. From `frappe-bench/apps/myschools/`:
+
+```bash
+# One-time per machine: install deps + the Chromium browser binary
+npm install
+npm run test:e2e:install
+
+# Seed deterministic test data (users + Resolved finding + Overdue invoice)
+bench --site myschools.localhost execute myschools.scripts.seed_e2e.main
+
+# Run the spec
+npm run test:e2e   # all 6 cases must pass
+```
+
+[`tests/e2e/workflows.spec.ts`](../../frappe-bench/apps/myschools/tests/e2e/workflows.spec.ts)
+exercises what unit tests can't: that the Frappe desk actually *renders*
+the workflow menu and the form-JS custom buttons for the right roles.
+It catches DOM-level regressions (missing Workflow State records, JS
+errors that blank the form) that backend tests are blind to.
+
+### 4.3 Workflow State records — easy-to-miss gotcha
+
+Every `state` referenced in `workflow.json` (including `Draft` and
+`Cancelled`) must have a matching record in
+[`workflow_state.json`](../../frappe-bench/apps/myschools/myschools/fixtures/workflow_state.json).
+Frappe ships `Pending`/`Approved`/`Rejected` as defaults but **not**
+`Draft` or `Cancelled`. If the records are missing, unit tests still
+pass (they call `apply_workflow` which doesn't validate state-record
+existence) but the form shows a blocking "Workflow State X not found"
+modal on first open — the Playwright suite catches this; CLI tests
+do not.
 
 ---
 

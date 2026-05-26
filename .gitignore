@@ -31,6 +31,11 @@ frappe-bench/apps/myschools/**/build/
 frappe-bench/apps/myschools/**/dist/
 frappe-bench/apps/myschools/node_modules/
 
+# Playwright (Phase-5 browser tests) — installs + outputs are local-only
+frappe-bench/apps/myschools/test-results/
+frappe-bench/apps/myschools/playwright-report/
+frappe-bench/apps/myschools/playwright/.cache/
+
 # -----------------------------------------------------------------------------
 # Editor / OS
 # -----------------------------------------------------------------------------

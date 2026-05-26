@@ -1,0 +1,13 @@
+{
+  "name": "myschools-e2e",
+  "private": true,
+  "description": "Playwright browser tests for MY Schools desk (Phase 5+)",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:install": "playwright install chromium --with-deps || playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
