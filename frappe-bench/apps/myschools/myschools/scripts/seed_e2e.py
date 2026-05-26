@@ -73,8 +73,13 @@ def _ensure_franchise_tree():
 	branch = frappe.db.get_value("MYS Branch", {}, "name")
 	if branch:
 		return branch
+	# ci_bootstrap creates "MY School Head Office" via ERPNext's setup_complete
+	# as a non-group Company. seed_demo creates cluster Companies parented to
+	# HO, which requires HO to be a group. Flip it before chaining seed_demo.
 	from myschools.scripts import seed_demo
 
+	if frappe.db.exists("Company", seed_demo.HEAD_OFFICE_COMPANY):
+		frappe.db.set_value("Company", seed_demo.HEAD_OFFICE_COMPANY, "is_group", 1)
 	seed_demo.run()
 	return frappe.db.get_value("MYS Branch", {}, "name")
 
