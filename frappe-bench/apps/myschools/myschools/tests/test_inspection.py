@@ -343,7 +343,14 @@ class TestInspectionWorkflow(FrappeTestCase):
 	# --- finding workflow --------------------------------------------------
 
 	def test_finding_cannot_be_verified_without_resolution_notes(self):
-		"""Status=Verified requires resolution_notes."""
+		"""Status=Verified requires resolution_notes.
+
+		With the Phase-5 workflow attached, Open -> Verified is not a valid
+		transition (must go through Resolved first). We seed the workflow
+		state to Resolved via ``db.set_value`` (bypasses workflow validation)
+		so this test exercises only the controller's resolution_notes guard,
+		not the workflow's transition rules.
+		"""
 		visit = self._new_visit()
 		apply_template_to_visit(visit.name, self.template)
 		visit.reload()
@@ -355,9 +362,10 @@ class TestInspectionWorkflow(FrappeTestCase):
 		finding_name = frappe.get_all("MYS Inspection Finding", filters={"visit": visit.name}, pluck="name")[
 			0
 		]
+		frappe.db.set_value("MYS Inspection Finding", finding_name, "status", "Resolved")
 		finding = frappe.get_doc("MYS Inspection Finding", finding_name)
 		finding.status = "Verified"
-		# resolution_notes is blank — should fail
+		# resolution_notes is blank — controller throws, not workflow.
 		with self.assertRaises(frappe.exceptions.ValidationError):
 			finding.save()
 

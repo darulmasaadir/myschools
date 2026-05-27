@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-05-26
-**Up next:** Phase 5 — Workflows & List View polish
+**Up next:** Phase 6 — Setup Wizard, Module Onboarding & Reports
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -29,8 +29,8 @@ These bind every phase:
 | 1 | Branding | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 2 | Workspaces + role landing | ✅ | PR [#3](https://github.com/darulmasaadir/myschools/pull/3) (`9ad4351`) |
 | 3 | Print Formats | ✅ | PR [#4](https://github.com/darulmasaadir/myschools/pull/4) (`d952960`) + hotfix PR [#5](https://github.com/darulmasaadir/myschools/pull/5) (`c1b22b7`) |
-| 4 | Notifications & Communication wiring | 🟡 | PR pending (branch `feature/notifications`) |
-| 5 | Workflows & List View polish | ⬜ | — |
+| 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
+| 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ⬜ | — |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ⬜ | — |
 | 8 | Domain extensions | ⬜ | — |
@@ -106,36 +106,43 @@ What shipped:
 
 ---
 
-## Phase 4 — Notifications & Communication wiring 🟡
+## Phase 4 — Notifications & Communication wiring ✅
 
-**Status:** In flight on `feature/notifications`; PR pending.
-**Estimated size:** M (8–12 h) — actuals tracked when PR merges.
+**Status:** Shipped in PR [#7](https://github.com/darulmasaadir/myschools/pull/7), merge commit `ff4dc38` (squash).
+**Size:** M (matched estimate — ~10 h including the bug-fix follow-up).
 
-Shipped on the branch:
+Shipped:
 - 6 `Email Template` fixtures + 6 `Notification` fixtures generated from a single source-of-truth builder ([`scripts/build_notifications.py`](../frappe-bench/apps/myschools/myschools/scripts/build_notifications.py)):
   royalty invoice generated, royalty invoice overdue (Days After due_date),
   inspection finding assigned, finding overdue, corrective action overdue,
   franchise agreement expiring (Days Before end_date, 30 days).
-- `Communication.after_insert` mirror ([`api/notifications.log_outbound_email`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — every outbound system email tied to an MYS doctype (or `Fees`) is mirrored into `MYS Communication Log` with branch / campus / scope auto-resolved.
+- `Communication.after_insert` mirror ([`api/notifications.log_outbound_email`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — every outbound system email tied to an MYS doctype (or `Fees`) is mirrored into `MYS Communication Log` with branch / campus / scope auto-resolved. Accepts both `Communication` and `Automated Message` types (the latter is what Notifications produce).
 - Provider-agnostic `send_sms()` stub ([`api/notifications.send_sms`](../frappe-bench/apps/myschools/myschools/api/notifications.py)) — writes a `Sent` row to `MYS Communication Log` today; Phase 8 swaps in Jazz / Easypaisa / Twilio behind the same signature.
-- 11 unit tests in [`tests/test_notifications.py`](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py) across 3 classes (fixture coverage, SMS stub, log helper).
-- Verification battery: 58/58 unit tests · pre-commit clean · 48/48 HTTP smoke · live mirror smoke (Communication → Log) · live SMS-stub smoke.
+- 17 unit tests in [`tests/test_notifications.py`](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py) across 5 classes — fixture coverage, Jinja render against real docs (would have caught the 3 field typos found pre-merge), SMS stub, log helper, and the `log_outbound_email` mirror filter regression coverage.
+- Verification battery: 64/64 unit tests · pre-commit clean · 48/48 HTTP smoke · fresh-install smoke (drop-site → install-app → migrate) · live end-to-end Notification fire smoke (Communication → MYS Communication Log).
 
 **Files:** [scripts/build_notifications.py](../frappe-bench/apps/myschools/myschools/scripts/build_notifications.py), [api/notifications.py](../frappe-bench/apps/myschools/myschools/api/notifications.py), [fixtures/email_template.json](../frappe-bench/apps/myschools/myschools/fixtures/email_template.json), [fixtures/notification.json](../frappe-bench/apps/myschools/myschools/fixtures/notification.json), [tests/test_notifications.py](../frappe-bench/apps/myschools/myschools/tests/test_notifications.py), [processes/notifications.md](processes/notifications.md)
 
 ---
 
-## Phase 5 — Workflows & List View polish ⬜
+## Phase 5 — Workflows & List View polish ✅
 
-**Estimated size:** M (6–10 h)
+**Delivered:** PR #8, `feature/workflows`.
 
-Scope:
-- Convert status enums to formal Frappe Workflows with role-gated transitions:
-  - `MYS Inspection Finding` (Open → In Progress → Resolved → Verified)
-  - `MYS Royalty Invoice` (Draft → Submitted → Paid / Overdue / Cancelled)
-  - `MYS Inspection Visit` (Draft → Scheduled → In Progress → Completed → Submitted)
-- List view JS (`<doctype>_list.js`) for severity colour badges and status indicators.
-- Per-doctype form JS (`<doctype>.js`) for primary action buttons ("Generate Royalty Now", "Close Finding", "Send Reminder") — turns link-driven flows into button-driven ones inside the desk.
+Shipped:
+- Formal Frappe Workflows attached to the two doctypes with a `status` field:
+  - **`MYS Inspection Finding Workflow`** — Draft → Open → In Progress → Resolved → Verified, plus Cancelled. Role-gated transitions: Submit by Audit Officer / Branch Director / Branch Principal; Acknowledge by Branch Director / Branch Principal; Mark Resolved by Branch Director / Branch Principal; Verify and Reject Resolution by Audit Officer only.
+  - **`MYS Royalty Invoice Workflow`** — Draft → Unpaid (submit by HO Dept Head or Branch Accountant); payment-driven states (Partial / Paid / Overdue) reached only via `db.set_value` from the controller's `_refresh_status`, which bypasses workflow validation as required. Cancel gated to Chief Executive / HO Dept Head.
+- Source-of-truth Python script [`scripts/build_workflows.py`](../frappe-bench/apps/myschools/myschools/scripts/build_workflows.py) emits the three fixture files (`workflow.json`, `workflow_state.json`, `workflow_action_master.json`) so edits never touch hand-written JSON.
+- `status` and `resolution_notes` fields on `MYS Inspection Finding` marked `allow_on_submit: 1` so workflow transitions can update them post-submit; controller's `_validate_resolution_state` wired into both `validate` and `before_update_after_submit` so the "Verified requires resolution_notes" guard still fires after submission.
+- `api/inspection.py` auto-creation drives new Findings through `apply_workflow("Submit")` so they land at Open with `docstatus=1` instead of being directly submitted.
+- List-view JS (`<doctype>_list.js`) for severity colour badges (Finding) and status indicators (Finding, Royalty Invoice, Visit).
+- Form-JS primary actions: "Send Reminder" on overdue Royalty Invoice (calls new `api.royalty.send_overdue_reminder`); "Create Corrective Action" shortcut on Open / In Progress Findings.
+- Tests: [`tests/test_workflows.py`](../frappe-bench/apps/myschools/myschools/tests/test_workflows.py) covers fixture import, finding state machine, role gates, and the Royalty `db_set` bypass. Existing `test_inspection.py::test_finding_cannot_be_verified_without_resolution_notes` updated to use `db.set_value` to seed Resolved state (bypassing the workflow's transition rules) so it exercises only the controller guard. 74/74 passing.
+- Process doc: [`docs/processes/workflows.md`](processes/workflows.md).
+
+Deferred to a small follow-up:
+- `MYS Inspection Visit` workflow — the doctype currently has no `status` field (only `visit_type` + `is_submittable: 1`). Adding the field + workflow is a separate small PR rather than bloating this one.
 
 ---
 

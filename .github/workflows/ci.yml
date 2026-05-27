@@ -137,3 +137,156 @@ jobs:
       - name: Run Frappe test suite
         working-directory: frappe-bench
         run: bench --site test_site run-tests --app myschools --coverage
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-22.04
+    needs: lint
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: travis
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h localhost -ptravis"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: myschools-repo
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install OS deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wkhtmltopdf libmariadb-dev
+
+      - name: Configure MariaDB for Frappe
+        run: |
+          mysql -uroot -ptravis -h127.0.0.1 -e "SET GLOBAL character_set_server = 'utf8mb4'"
+          mysql -uroot -ptravis -h127.0.0.1 -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
+
+      - name: Install frappe-bench CLI
+        run: pip install frappe-bench
+
+      - name: Initialise bench
+        run: |
+          bench init --skip-redis-config-generation --frappe-branch version-15 --python "$(which python3.12)" frappe-bench
+          cd frappe-bench
+          bench set-config -g redis_cache redis://127.0.0.1:6379
+          bench set-config -g redis_queue redis://127.0.0.1:6379
+          bench set-config -g redis_socketio redis://127.0.0.1:6379
+          bench get-app erpnext --branch version-15
+          bench get-app education --branch version-15.2
+          ln -s "${{ github.workspace }}/myschools-repo/frappe-bench/apps/myschools" apps/myschools
+          ./env/bin/pip install -e apps/myschools
+          [ -z "$(tail -c 1 sites/apps.txt)" ] || echo "" >> sites/apps.txt
+          echo "myschools" >> sites/apps.txt
+
+      - name: Create test site + install apps
+        working-directory: frappe-bench
+        run: |
+          bench new-site test_site \
+            --mariadb-root-password travis \
+            --admin-password admin \
+            --no-mariadb-socket \
+            --db-host 127.0.0.1 \
+            --install-app erpnext --install-app education
+          bench --site test_site install-app myschools
+          bench --site test_site set-config developer_mode 1
+          bench use test_site
+
+      - name: Bootstrap test site (mimic ERPNext setup wizard slice)
+        working-directory: frappe-bench
+        run: bench --site test_site execute myschools.scripts.ci_bootstrap.run
+
+      - name: Build frontend assets (needed for the desk shell to bootstrap)
+        working-directory: frappe-bench
+        run: |
+          # `bench init` builds frappe + erpnext bundles, but does not pick up
+          # apps added after init (myschools was symlinked post-init). The
+          # desk shell (.navbar, .form-page) is rendered by frappe's bundle
+          # and won't appear in Playwright if those bundles are missing.
+          bench build --app myschools
+
+      - name: Seed deterministic e2e data
+        working-directory: frappe-bench
+        # seed_e2e self-bootstraps: if no Branch exists it chains seed_demo;
+        # if no submitted Invoice exists it chains seed_education +
+        # demo_royalty_invoice. Idempotent — re-running it is a no-op.
+        run: bench --site test_site execute myschools.scripts.seed_e2e.main
+
+      - name: Make test_site resolve to loopback
+        run: |
+          echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts
+
+      - name: Start Frappe web server (background)
+        working-directory: frappe-bench
+        run: |
+          # bench serve binds the configured default site (set via `bench use`).
+          # Run it in the background and tail its log to a file so we can
+          # surface errors if the e2e step fails.
+          nohup bench serve --port 8000 > /tmp/bench-serve.log 2>&1 &
+          # Wait for the server to accept connections (max 60s).
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null "http://test_site:8000/api/method/ping"; then
+              echo "bench up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "bench failed to start within 60s — log follows:"
+          cat /tmp/bench-serve.log
+          exit 1
+
+      - name: Install Playwright deps
+        working-directory: frappe-bench/apps/myschools
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Verify seed state file exists
+        run: |
+          # seed_e2e.py wrote /tmp/mys_e2e_state.json earlier in this job.
+          ls -l /tmp/mys_e2e_state.json
+          cat /tmp/mys_e2e_state.json
+
+      - name: Run Playwright tests
+        working-directory: frappe-bench/apps/myschools
+        env:
+          MYS_BASE_URL: http://test_site:8000
+          CI: "1"
+        run: npx playwright test --reporter=list
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frappe-bench/apps/myschools/playwright-report/
+            frappe-bench/apps/myschools/test-results/
+            /tmp/bench-serve.log
+          retention-days: 7

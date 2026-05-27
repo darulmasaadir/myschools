@@ -1,0 +1,323 @@
+[
+ {
+  "doctype": "Workflow",
+  "name": "MYS Inspection Finding Workflow",
+  "workflow_name": "MYS Inspection Finding Workflow",
+  "document_type": "MYS Inspection Finding",
+  "is_active": 1,
+  "override_status": 0,
+  "send_email_alert": 0,
+  "workflow_state_field": "status",
+  "states": [
+   {
+    "doctype": "Workflow Document State",
+    "state": "Draft",
+    "doc_status": "0",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "Audit Officer",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Draft",
+    "doc_status": "0",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "Branch Director",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Draft",
+    "doc_status": "0",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "Branch Principal",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Open",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "In Progress",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Resolved",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Verified",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Cancelled",
+    "doc_status": "2",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   }
+  ],
+  "transitions": [
+   {
+    "doctype": "Workflow Transition",
+    "state": "Draft",
+    "action": "Submit",
+    "next_state": "Open",
+    "allowed": "Audit Officer",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Draft",
+    "action": "Submit",
+    "next_state": "Open",
+    "allowed": "Branch Director",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Draft",
+    "action": "Submit",
+    "next_state": "Open",
+    "allowed": "Branch Principal",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Open",
+    "action": "Acknowledge",
+    "next_state": "In Progress",
+    "allowed": "Branch Director",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Open",
+    "action": "Acknowledge",
+    "next_state": "In Progress",
+    "allowed": "Branch Principal",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "In Progress",
+    "action": "Mark Resolved",
+    "next_state": "Resolved",
+    "allowed": "Branch Director",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "In Progress",
+    "action": "Mark Resolved",
+    "next_state": "Resolved",
+    "allowed": "Branch Principal",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Resolved",
+    "action": "Verify",
+    "next_state": "Verified",
+    "allowed": "Audit Officer",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Resolved",
+    "action": "Reject Resolution",
+    "next_state": "In Progress",
+    "allowed": "Audit Officer",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Open",
+    "action": "Cancel",
+    "next_state": "Cancelled",
+    "allowed": "Audit Officer",
+    "allow_self_approval": 1
+   }
+  ]
+ },
+ {
+  "doctype": "Workflow",
+  "name": "MYS Royalty Invoice Workflow",
+  "workflow_name": "MYS Royalty Invoice Workflow",
+  "document_type": "MYS Royalty Invoice",
+  "is_active": 1,
+  "override_status": 0,
+  "send_email_alert": 0,
+  "workflow_state_field": "status",
+  "states": [
+   {
+    "doctype": "Workflow Document State",
+    "state": "Draft",
+    "doc_status": "0",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "HO Dept Head",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Draft",
+    "doc_status": "0",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "Branch Accountant",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Unpaid",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Partial",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Paid",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Overdue",
+    "doc_status": "1",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   },
+   {
+    "doctype": "Workflow Document State",
+    "state": "Cancelled",
+    "doc_status": "2",
+    "update_field": "",
+    "update_value": "",
+    "allow_edit": "System Manager",
+    "is_optional_state": 0,
+    "avoid_status_override": 0,
+    "send_email": 0
+   }
+  ],
+  "transitions": [
+   {
+    "doctype": "Workflow Transition",
+    "state": "Draft",
+    "action": "Submit",
+    "next_state": "Unpaid",
+    "allowed": "HO Dept Head",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Draft",
+    "action": "Submit",
+    "next_state": "Unpaid",
+    "allowed": "Branch Accountant",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Unpaid",
+    "action": "Cancel",
+    "next_state": "Cancelled",
+    "allowed": "Chief Executive",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Unpaid",
+    "action": "Cancel",
+    "next_state": "Cancelled",
+    "allowed": "HO Dept Head",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Partial",
+    "action": "Cancel",
+    "next_state": "Cancelled",
+    "allowed": "Chief Executive",
+    "allow_self_approval": 1
+   },
+   {
+    "doctype": "Workflow Transition",
+    "state": "Overdue",
+    "action": "Cancel",
+    "next_state": "Cancelled",
+    "allowed": "Chief Executive",
+    "allow_self_approval": 1
+   }
+  ]
+ }
+]

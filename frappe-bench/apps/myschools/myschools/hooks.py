@@ -151,4 +151,34 @@ fixtures = [
 	{"dt": "Number Card", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Email Template", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Notification", "filters": [["name", "like", "MYS - %"]]},
+	{
+		"dt": "Workflow State",
+		"filters": [
+			[
+				"name",
+				"in",
+				[
+					"Open",
+					"In Progress",
+					"Resolved",
+					"Verified",
+					"Unpaid",
+					"Partial",
+					"Paid",
+					"Overdue",
+				],
+			]
+		],
+	},
+	{
+		"dt": "Workflow Action Master",
+		"filters": [
+			[
+				"name",
+				"in",
+				["Acknowledge", "Mark Resolved", "Verify", "Reject Resolution"],
+			]
+		],
+	},
+	{"dt": "Workflow", "filters": [["name", "like", "MYS %"]]},
 ]

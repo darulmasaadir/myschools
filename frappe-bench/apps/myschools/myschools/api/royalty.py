@@ -272,3 +272,36 @@ def rate_override_query(user):
 		return "`tabMYS Royalty Rate Override`.branch = '__none__'"
 	in_list = ", ".join(frappe.db.escape(b) for b in branches)
 	return f"`tabMYS Royalty Rate Override`.branch IN ({in_list})"
+
+
+@frappe.whitelist()
+def send_overdue_reminder(invoice: str) -> dict:
+	"""Send the "Royalty Invoice Overdue" notification immediately.
+
+	Bound to the "Send Reminder" button on the Royalty Invoice form. Picks
+	the franchisee's primary contact email; falls back to the franchisee
+	record's own email field. Returns {ok, recipient} for the UI toast.
+	"""
+	doc = frappe.get_doc("MYS Royalty Invoice", invoice)
+	if doc.docstatus != 1:
+		frappe.throw(frappe._("Reminders can only be sent on submitted invoices"))
+	if doc.status not in ("Unpaid", "Partial", "Overdue"):
+		frappe.throw(frappe._("Invoice {0} is {1} — nothing to remind about").format(invoice, doc.status))
+
+	recipient = frappe.db.get_value("MYS Franchise Owner", doc.franchisee, "email")
+	if not recipient:
+		frappe.throw(frappe._("Franchisee {0} has no email on file").format(doc.franchisee))
+
+	template = frappe.get_doc("Email Template", "MYS - Royalty Invoice Overdue")
+	subject = frappe.render_template(template.subject, {"doc": doc})
+	body = frappe.render_template(template.response_html, {"doc": doc})
+
+	frappe.sendmail(
+		recipients=[recipient],
+		subject=subject,
+		message=body,
+		reference_doctype=doc.doctype,
+		reference_name=doc.name,
+		now=False,
+	)
+	return {"ok": True, "recipient": recipient}

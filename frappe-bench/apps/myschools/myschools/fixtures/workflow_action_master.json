@@ -1,0 +1,22 @@
+[
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Acknowledge",
+  "workflow_action_name": "Acknowledge"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Mark Resolved",
+  "workflow_action_name": "Mark Resolved"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Verify",
+  "workflow_action_name": "Verify"
+ },
+ {
+  "doctype": "Workflow Action Master",
+  "name": "Reject Resolution",
+  "workflow_action_name": "Reject Resolution"
+ }
+]

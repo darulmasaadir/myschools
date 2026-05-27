@@ -8,6 +8,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Workflows & List View polish (Phase 5).** Two formal Frappe Workflows
+  attached to existing `status` fields:
+  - `MYS Inspection Finding Workflow` — Draft → Open → In Progress →
+    Resolved → Verified (+ Cancelled). Role-gated transitions:
+    Submit/Cancel by Audit Officer / Branch Director / Branch Principal,
+    Acknowledge + Mark Resolved by Branch Director / Branch Principal,
+    Verify + Reject Resolution by **Audit Officer only**.
+  - `MYS Royalty Invoice Workflow` — Draft → Unpaid (submit by HO Dept
+    Head or Branch Accountant). Payment-driven states (Partial / Paid /
+    Overdue) keep flowing via `db.set_value` from the controller's
+    `_refresh_status` — a regression test pins that bypass.
+  - All three fixture files (`workflow.json`, `workflow_state.json`,
+    `workflow_action_master.json`) generated from
+    `scripts/build_workflows.py` — never hand-edit the JSON.
+  - List-view JS for severity badges (Finding) and status indicators
+    (Finding, Royalty Invoice, Visit).
+  - Form-JS primary actions: "Create Corrective Action" shortcut on
+    Open / In Progress Findings; "Send Reminder" on overdue Royalty
+    Invoices that fires the Phase-4 overdue template immediately via the
+    new whitelisted `api.royalty.send_overdue_reminder`.
+  - 10 new tests in `tests/test_workflows.py` (fixture coverage, state
+    machine walks, role gating with `frappe.set_user` context, payment
+    `db_set` bypass) — full suite now 74/74 passing.
+  - Process doc `docs/processes/workflows.md` covers transition matrices,
+    the `update_after_submit` controller-validate gotcha, the
+    `allow_on_submit` field requirement, and `WorkflowTransitionError`
+    vs `WorkflowPermissionError` semantics.
+  - **Playwright e2e suite** (`tests/e2e/workflows.spec.ts`, 6 cases) wired
+    into a new `e2e` CI job: logs in as the Audit Officer / Branch Director
+    / Administrator, opens the Resolved finding + the overdue royalty
+    invoice, and asserts the right workflow buttons render for each role.
+    Deterministic test data is created by
+    `scripts/seed_e2e.py`. The suite caught a missing
+    `Workflow State Draft` fixture record that unit tests couldn't see —
+    `Draft` and `Cancelled` are now shipped in `workflow_state.json`
+    alongside the visible states. Frappe ships `Pending`/`Approved`/
+    `Rejected` as defaults but **not** these two, and without the records
+    the form throws a blocking "Workflow State X not found" modal even
+    though every backend transition still works.
+
 - **Notifications & Communication wiring (Phase 4).** Six `Email Template` +
   six `Notification` fixtures generated from a single source-of-truth builder
   (`scripts/build_notifications.py`) cover royalty invoice generated, royalty

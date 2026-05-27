@@ -11,6 +11,7 @@ Two main entry points:
 
 import frappe
 from frappe import _
+from frappe.model.workflow import apply_workflow
 from frappe.utils import add_days, today
 
 from myschools.api.permissions import _user_scope
@@ -81,12 +82,17 @@ def auto_create_findings_from_failed_results(visit: str) -> list[str]:
 				"campus": visit_doc.campus,
 				"severity": row.severity,
 				"category": row.category,
-				"status": "Open",
+				"status": "Draft",
 				"description": f"{row.item_text}\n\nInspector notes: {row.notes or '(none)'}",
 				"reported_on": visit_doc.visit_date or today(),
 				"due_date": add_days(visit_doc.visit_date or today(), due_offset),
 			}
 		).insert(ignore_permissions=True)
+		# Findings auto-created from a submitted Visit go straight to Open
+		# (docstatus=1) so they're visible to the branch and the
+		# "Finding Assigned" notification fires. ignore_permissions bypasses
+		# role checks because this runs in the Visit.on_submit hook.
+		apply_workflow(finding, "Submit")
 		created.append(finding.name)
 	return created
 

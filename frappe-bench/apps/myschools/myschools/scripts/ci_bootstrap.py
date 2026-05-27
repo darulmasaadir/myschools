@@ -22,8 +22,16 @@ ABBR = "MSHO"
 
 def run():
 	update_genders()
+	from frappe.desk.page.setup_wizard.setup_wizard import disable_future_access
+
 	if frappe.db.get_value("Company", {}, "name"):
 		print("CI bootstrap: Company already exists, skipping setup_complete.")
+		# Still make sure the wizard flags are set — older sites may have
+		# data but not the setup_complete flags, which causes the desk to
+		# redirect every login to /app/setup-wizard.
+		for app in ("frappe", "erpnext"):
+			frappe.db.set_value("Installed Application", {"app_name": app}, "is_setup_complete", 1)
+		disable_future_access()
 		frappe.db.commit()
 		return
 
@@ -51,5 +59,12 @@ def run():
 			}
 		)
 	)
+	# erpnext.setup_complete() performs the data setup but does NOT mark the
+	# wizard as done — that's only set by Frappe's wizard orchestrator
+	# (`disable_future_access`). Without these flags every desk login
+	# redirects to /app/setup-wizard, which breaks Playwright e2e logins.
+	for app in ("frappe", "erpnext"):
+		frappe.db.set_value("Installed Application", {"app_name": app}, "is_setup_complete", 1)
+	disable_future_access()
 	frappe.db.commit()
 	print("CI bootstrap complete: ran ERPNext setup_complete with " f"company={HEAD_OFFICE_COMPANY!r}.")
