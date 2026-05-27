@@ -69,7 +69,7 @@ The site is then at <http://myschools.localhost:8000/login> (`Administrator` /
 ```
 myschools/
 ├── docs/                                ← you are here
-├── .github/workflows/ci.yml             ← lint + Frappe test suite on push/PR
+├── .github/workflows/ci.yml             ← lint + Frappe tests + Playwright e2e on push/PR
 ├── .pre-commit-config.yaml              ← whitespace, AST, ruff, JSON/TOML/YAML lint
 ├── CHANGELOG.md                         ← Keep-a-Changelog; update under [Unreleased]
 ├── CONTRIBUTING.md                      ← branching, commits, PR rules
@@ -77,6 +77,9 @@ myschools/
 └── frappe-bench/                        ← gitignored except apps/myschools
     └── apps/myschools/
         ├── pyproject.toml               ← ruff config (line-length 110, py310 target, tabs)
+        ├── package.json                 ← Playwright deps + test:e2e scripts
+        ├── playwright.config.ts         ← e2e config (testDir: tests/e2e)
+        ├── tests/e2e/                   ← Playwright specs + fixtures (browser tests)
         └── myschools/
             ├── hooks.py                 ← all Frappe wiring (events, scheduler, permissions, fixtures)
             ├── setup/install.py         ← after_install / after_migrate
@@ -161,7 +164,40 @@ bench --site myschools.localhost run-tests --app myschools \
   --test test_apply_template_snapshots_items
 ```
 
-Suite at time of writing: **19 integration tests** (7 royalty resolution + 3 royalty-from-fees + 9 inspection).
+Backend suite covers royalty resolution, royalty-from-fees, inspection,
+workflows, notifications, branding, and the shell — full count is the
+authority of the day's run, not a number copy-pasted here.
+
+### Browser tests (Playwright)
+
+The Frappe desk has DOM-level concerns that backend tests are blind to:
+workflow menus, form-JS custom buttons, list-view indicators, and the
+Setup Wizard trap (see [Debugging tips §8](#8-debugging-tips)). These
+live under `frappe-bench/apps/myschools/tests/e2e/` and run via
+Playwright against a running bench.
+
+```bash
+cd frappe-bench/apps/myschools
+
+# One-time per machine
+npm ci
+npx playwright install chromium      # or: npm run test:e2e:install
+
+# Seed deterministic test data — creates two test users
+# (e2e_audit@mys.local, e2e_director@mys.local), a Resolved Inspection
+# Finding, and an Overdue Royalty Invoice. Idempotent, but it DOES
+# mutate your dev site. Run only on disposable sites.
+bench --site myschools.localhost execute myschools.scripts.seed_e2e.main
+
+# Run the spec (assumes `bench start` is running)
+npm run test:e2e
+```
+
+Frappe-specific gotchas that bit us writing the suite (Workflow State
+records, `allow_on_submit`, `update_after_submit`, `db.set_value`
+bypassing workflow validation) are documented in
+[processes/workflows.md §3](processes/workflows.md). Read it before
+adding a new transition.
 
 ### Test conventions
 
@@ -177,15 +213,20 @@ Suite at time of writing: **19 integration tests** (7 royalty resolution + 3 roy
 
 ### CI
 
-Every push and PR runs:
+Every push and PR runs three jobs:
 
-1. **Lint** — `ruff check` + `ruff format --check`.
-2. **Frappe test suite** — spins up MariaDB + Redis services in GitHub
-   Actions, builds the bench, installs erpnext/education/myschools, runs the
-   suite.
+1. **Lint** — `ruff check` + `ruff format --check` via pre-commit.
+2. **Tests (Frappe + pytest)** — spins up MariaDB + Redis services in
+   GitHub Actions, builds the bench, installs erpnext/education/myschools,
+   runs `bench run-tests --app myschools --coverage`.
+3. **E2E (Playwright)** — separate job that builds the bench, runs
+   `ci_bootstrap.run` + `seed_e2e.main`, starts `bench serve` in the
+   background, and runs the Playwright spec against it. On failure it
+   uploads `playwright-report/`, `test-results/`, and `bench-serve.log`
+   as an artifact (download with `gh run download <id> -n playwright-report`).
 
-Workflow: [.github/workflows/ci.yml](../.github/workflows/ci.yml). Both jobs
-must pass before a PR can merge.
+Workflow: [.github/workflows/ci.yml](../.github/workflows/ci.yml). All
+three jobs must pass before a PR can merge.
 
 ---
 
@@ -240,6 +281,13 @@ We never fork upstream apps. Customisations go through Custom Field records:
 - **`bench update` rewrites my custom field** — never edit custom fields
   via JSON directly; always go through the UI and re-export fixtures.
   Manual JSON edits are blown away by `bench migrate`.
+- **Login redirects to `/app/setup-wizard`** — ERPNext's `setup_complete()`
+  populates the data but does not flip the wizard-done flags
+  (`Installed Application.is_setup_complete` + `System Settings.setup_complete`).
+  Without them every desk login lands on the Welcome screen, and any
+  Playwright test waiting for `.navbar` will time out. Fix:
+  `bench --site <site> execute myschools.scripts.ci_bootstrap.run` — it
+  flips both flags idempotently.
 
 ---
 

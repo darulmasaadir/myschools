@@ -49,8 +49,9 @@ Read in this order:
    hierarchy, modules, royalty rate resolution, inspection workflow,
    permissions, scheduled jobs, repo layout).
 3. **[data-model.md](data-model.md)** — DocType-by-DocType field reference.
-4. **[development.md](development.md)** — bench bootstrap, running tests,
-   branching, commit conventions, releasing, debugging tips.
+4. **[development.md](development.md)** — bench bootstrap, running tests
+   (Frappe + Playwright), branching, commit conventions, releasing,
+   debugging tips.
 5. **[api/royalty.md](api/royalty.md)** and **[api/inspection.md](api/inspection.md)** —
    function reference for the two core APIs.
 
