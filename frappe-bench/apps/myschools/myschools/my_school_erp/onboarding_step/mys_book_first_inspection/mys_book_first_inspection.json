@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Book an Inspection",
+ "creation": "2026-05-28 00:00:00.000000",
+ "description": "## Why book an Inspection?\n\nThe **MYS Inspection Visit** is how Academic Monitors and Audit Officers cover Branches against shared checklists. Booking a visit generates the empty inspection record; the inspector fills in checklist items in the field, and any failing items auto-create `MYS Inspection Finding` records that flow into the corrective-action workflow.\n\nBook one visit now — even a dry-run against your own Head Office Branch — to see the inspection lifecycle and the dashboards light up.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-28 00:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "MYS Book First Inspection",
+ "owner": "Administrator",
+ "reference_document": "MYS Inspection Visit",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Book Your First Inspection Visit",
+ "validate_action": 1
+}

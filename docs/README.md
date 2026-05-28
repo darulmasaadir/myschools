@@ -39,6 +39,11 @@ You probably want a process walkthrough:
   Workflows (Inspection Finding, Royalty Invoice), role-gated transitions, and
   the `update_after_submit` / `allow_on_submit` / `db.set_value` rules every
   workflow contributor will hit.
+- **[processes/setup-and-onboarding.md](processes/setup-and-onboarding.md)** —
+  the first-time-install operator journey: the MYS Setup Wizard slide, the
+  `MYS Franchise Setup` Module Onboarding card, the four Query Reports
+  (Royalty Aging / Fee Collection by Branch / Findings by Branch & Severity /
+  Branch Health Scorecard), and the headless-install `is_setup_complete` trap.
 
 ## I am a developer onboarding to the codebase
 
@@ -79,7 +84,8 @@ docs/
 │   ├── navigation-and-roles.md     ← role landing pages, workspaces, module profiles
 │   ├── print-formats.md            ← branded PDF layouts (Royalty Invoice / Inspection Report / Fee Receipt / Franchise Agreement)
 │   ├── notifications.md            ← email templates + notifications + Communication Log
-│   └── workflows.md                ← Frappe Workflows on Finding + Royalty Invoice
+│   ├── workflows.md                ← Frappe Workflows on Finding + Royalty Invoice
+│   └── setup-and-onboarding.md     ← Setup Wizard / Module Onboarding / Query Reports
 └── api/
     ├── royalty.md                  ← myschools.api.royalty function reference
     └── inspection.md               ← myschools.api.inspection function reference

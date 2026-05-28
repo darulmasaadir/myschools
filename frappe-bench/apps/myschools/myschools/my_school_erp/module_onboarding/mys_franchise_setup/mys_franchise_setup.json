@@ -1,0 +1,32 @@
+{
+ "allow_roles": [
+  {"role": "Chief Executive"},
+  {"role": "HO Dept Head"},
+  {"role": "Cluster Director"},
+  {"role": "Branch Director"},
+  {"role": "Branch Principal"},
+  {"role": "Branch Admin"}
+ ],
+ "creation": "2026-05-28 00:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Module Onboarding",
+ "documentation_url": "https://github.com/darulmasaadir/myschools/blob/main/docs/overview.md",
+ "idx": 0,
+ "is_complete": 0,
+ "modified": "2026-05-28 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Franchise Setup",
+ "owner": "Administrator",
+ "steps": [
+  {"step": "MYS Add First Cluster"},
+  {"step": "MYS Add First Branch"},
+  {"step": "MYS Add First Campus"},
+  {"step": "MYS Sign First Agreement"},
+  {"step": "MYS Book First Inspection"},
+  {"step": "MYS View Central Dashboard"}
+ ],
+ "subtitle": "Cluster → Branch → Campus → Agreement → Inspection → Dashboard.",
+ "success_message": "Your franchise tree is live. Royalty invoicing and inspections now run automatically against the structure you just created.",
+ "title": "Set up your MY Schools franchise"
+}

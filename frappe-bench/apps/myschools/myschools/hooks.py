@@ -18,6 +18,15 @@ website_context = {
 app_include_css = ["/assets/myschools/css/myschools.css"]
 web_include_css = ["/assets/myschools/css/myschools.css"]
 
+# Setup wizard
+# ------------
+# `setup_wizard_requires` loads our JS slide *after* ERPNext's slides
+# (operators land on Cluster / Branch / Campus after Company + Region).
+# `setup_wizard_stages` runs our Python stage after ERPNext finishes,
+# so the Company exists by the time we link the first Branch to it.
+setup_wizard_requires = "/assets/myschools/js/setup_wizard.js"
+setup_wizard_stages = "myschools.scripts.setup_wizard.get_setup_stages"
+
 # Installation lifecycle
 # ----------------------
 after_install = "myschools.setup.install.after_install"
@@ -149,6 +158,9 @@ fixtures = [
 	{"dt": "Dashboard", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Dashboard Chart", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Number Card", "filters": [["name", "like", "MYS - %"]]},
+	{"dt": "Module Onboarding", "filters": [["name", "like", "MYS %"]]},
+	{"dt": "Onboarding Step", "filters": [["name", "like", "MYS %"]]},
+	{"dt": "Report", "filters": [["name", "like", "MYS %"], ["is_standard", "=", "Yes"]]},
 	{"dt": "Email Template", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Notification", "filters": [["name", "like", "MYS - %"]]},
 	{

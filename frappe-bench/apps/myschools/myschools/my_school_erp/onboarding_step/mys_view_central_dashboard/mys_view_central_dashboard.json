@@ -1,0 +1,23 @@
+{
+ "action": "Go to Page",
+ "action_label": "Open the dashboard",
+ "callback_message": "If everything is wired up, you should see live counts for active Branches, open Findings, royalty totals and inspection coverage. The numbers populate as soon as you have one Branch + one Inspection Visit recorded.",
+ "callback_title": "Welcome to MYS Central Monitoring",
+ "creation": "2026-05-28 00:00:00.000000",
+ "description": "## See the whole franchise in one view\n\n`MYS Central Monitoring` aggregates the eight headline metrics Head Office watches — active Branches, open Findings, royalty receivable, attendance gaps, and more — into a single dashboard the CEO and HO Dept Heads land on every morning.\n\nThe charts and number cards auto-scope to whatever Branches the logged-in user can see, so the same dashboard is safe to grant to a Cluster Director (sees only her cluster) or a Branch Director (sees only his branch).",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-28 00:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "MYS View Central Dashboard",
+ "owner": "Administrator",
+ "path": "dashboard-view/MYS Central Monitoring",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "View the Central Monitoring Dashboard",
+ "validate_action": 1
+}
