@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-05-26
-**Up next:** Phase 6 — Setup Wizard, Module Onboarding & Reports
+**Last updated:** 2026-05-28
+**Up next:** Phase 7 — Portals (Guardian / Branch / Inspection) via Frappe Web Forms + `www/`
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -31,7 +31,7 @@ These bind every phase:
 | 3 | Print Formats | ✅ | PR [#4](https://github.com/darulmasaadir/myschools/pull/4) (`d952960`) + hotfix PR [#5](https://github.com/darulmasaadir/myschools/pull/5) (`c1b22b7`) |
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
-| 6 | Setup Wizard, Module Onboarding, Reports | ⬜ | — |
+| 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ⬜ | — |
 | 8 | Domain extensions | ⬜ | — |
 
@@ -146,18 +146,48 @@ Deferred to a small follow-up:
 
 ---
 
-## Phase 6 — Setup Wizard, Module Onboarding, Reports ⬜
+## Phase 6 — Setup Wizard, Module Onboarding, Reports ✅
 
-**Estimated size:** M (10–14 h)
+**Delivered:** PR #9, `feature/setup-wizard-and-reports`
 
-Scope:
-- Custom Setup Wizard replacing ERPNext's stages: Head Office → first Cluster → first Branch → first Campus.
-- Module Onboarding tours per workspace (first-login walkthroughs).
-- First batch of Query Reports:
-  - Royalty aging
-  - Fee collection by branch
-  - Findings by branch + severity
-  - Branch health scorecard
+Three independent slices, each landed as its own commit on the branch:
+
+**Slice 1 — Setup Wizard slide + stage** (`16ba09d`)
+
+- New JS slide [`public/js/setup_wizard.js`](../frappe-bench/apps/myschools/myschools/public/js/setup_wizard.js) registered via the `setup_wizard_requires` hook, runs *after* ERPNext's stock slides. Optional fields for first Cluster (code/name/region), first Branch (code/name) and first Campus (type).
+- New Python stage [`scripts/setup_wizard.py`](../frappe-bench/apps/myschools/myschools/scripts/setup_wizard.py) registered via the `setup_wizard_stages` hook. Three idempotent helpers (`_maybe_create_cluster`, `_maybe_create_branch`, `_maybe_create_campus`) that silently drop incomplete rows.
+- Every field optional — operators who skip the slide get a vanilla install plus our app, and create records through the normal forms later.
+
+**Slice 2 — Module Onboarding card** (`0d76dc4`)
+
+- One [`Module Onboarding` fixture](../frappe-bench/apps/myschools/myschools/my_school_erp/module_onboarding/mys_franchise_setup/mys_franchise_setup.json) named `MYS Franchise Setup`, attached to module `MY School ERP` (so it surfaces on every MYS workspace, since all five workspaces share that module).
+- Six [`Onboarding Step` fixtures](../frappe-bench/apps/myschools/myschools/my_school_erp/onboarding_step/) walking an operator through Cluster → Branch → Campus → Franchise Agreement → Inspection Visit → Central Monitoring Dashboard.
+- Visible to the six operator-facing roles that actually do the setup (Chief Executive, HO Dept Head, Cluster Director, Branch Director, Branch Principal, Branch Admin).
+
+**Slice 3 — First batch of Query Reports** (`6987be5`)
+
+Four Script Reports under [`my_school_erp/report/`](../frappe-bench/apps/myschools/myschools/my_school_erp/report/):
+
+| Report | `ref_doctype` | Use case |
+|---|---|---|
+| `MYS Royalty Aging` | MYS Royalty Invoice | Aged outstanding (0-30 / 31-60 / 61-90 / 90+) per branch |
+| `MYS Fee Collection by Branch` | Fees | Billed vs. collected vs. outstanding, with collection % |
+| `MYS Findings by Branch and Severity` | MYS Inspection Finding | Pivot of open findings by branch (rows) × severity (cols) |
+| `MYS Branch Health Scorecard` | MYS Branch | One-row-per-branch overview: campuses, students, findings, royalty, last inspection |
+
+All four respect existing `permission_query_conditions` — Cluster Directors see only their cluster, Branch Directors only their branch.
+
+**Hooks wired** in [`hooks.py`](../frappe-bench/apps/myschools/myschools/hooks.py):
+
+```python
+setup_wizard_requires = "/assets/myschools/js/setup_wizard.js"
+setup_wizard_stages = "myschools.scripts.setup_wizard.get_setup_stages"
+
+# fixtures = [..., Module Onboarding (MYS %), Onboarding Step (MYS %),
+#                  Report (MYS %, is_standard=Yes) ]
+```
+
+**Tests:** 18 new tests across 3 modules ([`tests/test_setup_wizard.py`](../frappe-bench/apps/myschools/myschools/tests/test_setup_wizard.py), [`tests/test_onboarding.py`](../frappe-bench/apps/myschools/myschools/tests/test_onboarding.py), [`tests/test_reports.py`](../frappe-bench/apps/myschools/myschools/tests/test_reports.py)). Full app suite: 92 / 92 passing.
 
 ---
 

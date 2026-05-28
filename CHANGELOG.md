@@ -8,6 +8,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Setup Wizard, Module Onboarding & Reports (Phase 6).** Three
+  independent slices that close out the operator-onboarding gap:
+  - **Setup Wizard.** New JS slide
+    (`public/js/setup_wizard.js`) added after ERPNext's stock slides via
+    `setup_wizard_requires`. Optional fields for first Cluster / Branch /
+    Campus. The matching Python stage
+    (`scripts/setup_wizard.py`) is registered via `setup_wizard_stages`
+    and runs after ERPNext has created the Company, so the first Branch
+    has a Company to link to. Every field is optional, partial input is
+    silently dropped, and re-running the wizard is idempotent (skips
+    records that already exist).
+  - **Module Onboarding.** New `MYS Franchise Setup` Module Onboarding
+    fixture plus six Onboarding Step fixtures (Add First Cluster → Add
+    First Branch → Add First Campus → Sign First Agreement → Book First
+    Inspection → View Central Dashboard). The card surfaces on every MYS
+    workspace because all five workspaces share `module = MY School ERP`.
+    Six operator-facing roles have visibility.
+  - **First batch of Query Reports.** Four Script Reports under
+    `my_school_erp/report/`: `MYS Royalty Aging`,
+    `MYS Fee Collection by Branch`, `MYS Findings by Branch and
+    Severity`, `MYS Branch Health Scorecard`. All four respect existing
+    `permission_query_conditions` so a Cluster Director sees only her
+    cluster, etc.
+  - New fixture filters in `hooks.py` export Module Onboarding,
+    Onboarding Step and `is_standard=Yes` MYS Reports.
+  - 18 new tests across three modules (`tests/test_setup_wizard.py`,
+    `tests/test_onboarding.py`, `tests/test_reports.py`) — full suite
+    now 92/92 passing.
+  - Process doc `docs/processes/setup-and-onboarding.md` covers the
+    full first-time-install operator journey, the wizard slide contract,
+    the onboarding step model, the four reports' columns and roles, and
+    headless-install gotchas (`is_setup_complete` flag flipping in
+    `ci_bootstrap`).
+
 - **Workflows & List View polish (Phase 5).** Two formal Frappe Workflows
   attached to existing `status` fields:
   - `MYS Inspection Finding Workflow` — Draft → Open → In Progress →
