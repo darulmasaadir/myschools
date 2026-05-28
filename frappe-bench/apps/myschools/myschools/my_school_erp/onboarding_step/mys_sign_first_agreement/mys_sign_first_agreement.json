@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Sign an Agreement",
+ "creation": "2026-05-28 00:00:00.000000",
+ "description": "## What is a Franchise Agreement?\n\nThe **MYS Franchise Agreement** is the contract between Head Office and a Branch's franchisee. It captures the agreed **royalty rate**, the agreement period, and the start / end dates that drive the monthly royalty invoicing cron.\n\nWithout an active agreement, the royalty engine will skip that Branch entirely on its monthly run.\n\nLink the agreement to the Branch you just created and set a sensible default rate — you can layer override rates per period later via `MYS Royalty Rate Override`.",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-28 00:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "MYS Sign First Agreement",
+ "owner": "Administrator",
+ "reference_document": "MYS Franchise Agreement",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Sign Your First Franchise Agreement",
+ "validate_action": 1
+}

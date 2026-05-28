@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Add a Cluster",
+ "creation": "2026-05-28 00:00:00.000000",
+ "description": "## What is a Cluster?\n\nA **Cluster** is the regional grouping that sits between Head Office and your individual Branches. A Cluster Director owns the cluster's branches and runs them as a group.\n\nEvery Branch must belong to a Cluster — even single-region operators usually start with one Cluster (e.g. `CLR-NORTH`) and add more as the network grows.\n\nGive your first Cluster a short **code** (e.g. `CLR-NORTH`) and a friendly **name** (e.g. `Northern Punjab Cluster`).",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-28 00:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "MYS Add First Cluster",
+ "owner": "Administrator",
+ "reference_document": "MYS Cluster",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Add Your First Cluster",
+ "validate_action": 1
+}

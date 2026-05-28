@@ -1,0 +1,21 @@
+{
+ "action": "Create Entry",
+ "action_label": "Add a Campus",
+ "creation": "2026-05-28 00:00:00.000000",
+ "description": "## What is a Campus?\n\nA **Campus** is one academic tier inside a Branch — `Kids`, `Junior` or `Senior`. Each Campus has its own Incharge, its own student roster, and its own attendance tracking, but shares the Branch's accounts and admissions desk.\n\nPick the tier and the Branch — the Campus name is generated automatically as `<branch-code>-<tier>` (e.g. `BR-001-Junior`).",
+ "docstatus": 0,
+ "doctype": "Onboarding Step",
+ "idx": 0,
+ "is_complete": 0,
+ "is_single": 0,
+ "is_skipped": 0,
+ "modified": "2026-05-28 00:00:00.000000",
+ "modified_by": "Administrator",
+ "name": "MYS Add First Campus",
+ "owner": "Administrator",
+ "reference_document": "MYS Campus",
+ "show_form_tour": 0,
+ "show_full_form": 0,
+ "title": "Add Your First Campus",
+ "validate_action": 1
+}
