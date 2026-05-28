@@ -8,7 +8,6 @@ another in the correct order, and reference real DocTypes / paths.
 import frappe
 from frappe.tests.utils import FrappeTestCase
 
-
 EXPECTED_STEPS = [
 	("MYS Add First Cluster", "Create Entry", "MYS Cluster"),
 	("MYS Add First Branch", "Create Entry", "MYS Branch"),
@@ -74,8 +73,5 @@ class TestMysFranchiseSetupOnboarding(FrappeTestCase):
 		)
 
 	def test_franchise_roles_can_see_onboarding(self):
-		roles = {
-			r.role
-			for r in frappe.get_doc("Module Onboarding", "MYS Franchise Setup").allow_roles
-		}
+		roles = {r.role for r in frappe.get_doc("Module Onboarding", "MYS Franchise Setup").allow_roles}
 		self.assertEqual(roles, EXPECTED_ROLES)

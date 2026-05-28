@@ -86,15 +86,9 @@ class TestCreateFirstFranchiseTree(FrappeTestCase):
 
 	def test_empty_args_is_noop(self):
 		# Snapshot counts before.
-		before = {
-			dt: frappe.db.count(dt)
-			for dt in ("MYS Cluster", "MYS Branch", "MYS Campus")
-		}
+		before = {dt: frappe.db.count(dt) for dt in ("MYS Cluster", "MYS Branch", "MYS Campus")}
 		create_first_franchise_tree({})
-		after = {
-			dt: frappe.db.count(dt)
-			for dt in ("MYS Cluster", "MYS Branch", "MYS Campus")
-		}
+		after = {dt: frappe.db.count(dt) for dt in ("MYS Cluster", "MYS Branch", "MYS Campus")}
 		self.assertEqual(before, after)
 
 	def test_partial_branch_args_skips_branch(self):

@@ -160,6 +160,7 @@ fixtures = [
 	{"dt": "Number Card", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Module Onboarding", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Onboarding Step", "filters": [["name", "like", "MYS %"]]},
+	{"dt": "Report", "filters": [["name", "like", "MYS %"], ["is_standard", "=", "Yes"]]},
 	{"dt": "Email Template", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Notification", "filters": [["name", "like", "MYS - %"]]},
 	{
