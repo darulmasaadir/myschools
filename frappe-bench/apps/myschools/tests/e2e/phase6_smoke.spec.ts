@@ -73,12 +73,15 @@ test.describe("Phase 6 — Query Reports render", () => {
 			});
 			// Give the script-report shell a beat to finish wiring.
 			await page.waitForTimeout(1000);
-			// Filter out the harmless ones Frappe emits on every page.
+			// Filter out the harmless ones Frappe emits on every page. socket.io
+			// errors fire in CI where no realtime worker is running — they are
+			// infrastructure noise, not a defect in the report code.
 			const real = consoleErrors.filter(
 				(e) =>
 					!e.includes("favicon") &&
 					!e.includes("AbortError") &&
-					!e.includes("Failed to load resource"),
+					!e.includes("Failed to load resource") &&
+					!e.includes("socket.io"),
 			);
 			expect(real, `console errors on ${name}: ${real.join(" | ")}`).toEqual([]);
 		});
