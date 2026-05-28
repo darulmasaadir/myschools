@@ -10,20 +10,7 @@
 // `frappe.desk.page.setup_wizard.setup_wizard.setup_complete` and are
 // read in Python by `myschools.scripts.setup_wizard.create_first_franchise_tree`.
 
-frappe.provide("mys.setup");
-
-frappe.setup.on("before_load", function () {
-	// Skip if this app's setup already completed on a prior wizard run.
-	if (
-		frappe.boot.setup_wizard_completed_apps?.length &&
-		frappe.boot.setup_wizard_completed_apps.includes("myschools")
-	) {
-		return;
-	}
-	mys.setup.slides_settings.map(frappe.setup.add_slide);
-});
-
-mys.setup.slides_settings = [
+const slides_settings = [
 	{
 		name: "mys_franchise",
 		title: __("Seed your first Cluster, Branch and Campus"),
@@ -87,14 +74,18 @@ mys.setup.slides_settings = [
 				(v.mys_branch_code && !v.mys_branch_name) ||
 				(v.mys_branch_name && !v.mys_branch_code);
 			if (branch_partial) {
-				frappe.msgprint(__("Enter both Branch Code and Branch Name, or leave both blank."));
+				frappe.msgprint(
+					__("Enter both Branch Code and Branch Name, or leave both blank.")
+				);
 				return false;
 			}
 			const cluster_partial =
 				(v.mys_cluster_code && !v.mys_cluster_name) ||
 				(v.mys_cluster_name && !v.mys_cluster_code);
 			if (cluster_partial) {
-				frappe.msgprint(__("Enter both Cluster Code and Cluster Name, or leave both blank."));
+				frappe.msgprint(
+					__("Enter both Cluster Code and Cluster Name, or leave both blank.")
+				);
 				return false;
 			}
 			// Branch needs a Cluster — either from this slide or pre-existing.
@@ -111,3 +102,14 @@ mys.setup.slides_settings = [
 		},
 	},
 ];
+
+frappe.setup.on("before_load", function () {
+	// Skip if this app's setup already completed on a prior wizard run.
+	if (
+		frappe.boot.setup_wizard_completed_apps?.length &&
+		frappe.boot.setup_wizard_completed_apps.includes("myschools")
+	) {
+		return;
+	}
+	slides_settings.map(frappe.setup.add_slide);
+});
