@@ -8,7 +8,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 from myschools.api.identity import link_guardian_user
-from myschools.api.portal import get_portal_redirect
+from myschools.api.portal import get_portal_redirect, redirect_guest_to_login, redirect_to_portal_home
 from myschools.setup.install import create_portal_roles
 
 
@@ -76,14 +76,30 @@ class TestGuardianUserLink(FrappeTestCase):
 		self.assertEqual(guardian.user, user_name)
 
 
-class TestPortalHTTP(FrappeTestCase):
-	def test_portal_guest_redirects_to_login(self):
-		from frappe.app import application
-		from werkzeug.test import Client
+class TestPortalRedirectHelpers(FrappeTestCase):
+	"""Direct unit coverage of /portal dispatcher logic.
 
-		client = Client(application)
-		host = frappe.get_site_config().host_name or frappe.local.site
-		response = client.get("/portal", headers={"Host": host})
-		self.assertIn(response.status_code, (301, 302, 303))
-		location = (response.headers.get("Location") or "").lower()
-		self.assertIn("login", location)
+	Avoid calling into the full WSGI stack here — `werkzeug.test.Client`
+	leaves `frappe.session.user` set to Guest and pollutes the next
+	test class's `setUpClass`. Live HTTP smoke runs in the PR battery.
+	"""
+
+	def setUp(self):
+		frappe.local.flags.redirect_location = None
+
+	def tearDown(self):
+		frappe.local.flags.redirect_location = None
+
+	def test_guest_helper_sets_login_location(self):
+		with self.assertRaises(frappe.Redirect):
+			redirect_guest_to_login()
+		self.assertEqual(frappe.local.flags.redirect_location, "/login?redirect-to=/portal")
+
+	def test_helper_throws_for_user_without_portal_role(self):
+		original = frappe.session.user
+		try:
+			frappe.set_user("Guest")
+			with self.assertRaises(frappe.PermissionError):
+				redirect_to_portal_home()
+		finally:
+			frappe.set_user(original)
