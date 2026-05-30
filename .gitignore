@@ -29,7 +29,9 @@ frappe-bench/apps/myschools/**/htmlcov/
 frappe-bench/apps/myschools/**/*.egg-info/
 frappe-bench/apps/myschools/**/build/
 frappe-bench/apps/myschools/**/dist/
-frappe-bench/apps/myschools/node_modules/
+frappe-bench/apps/myschools/**/node_modules/
+# Playwright hoists deps to app root; public/ is a symlink — ignore the link too.
+frappe-bench/apps/myschools/myschools/public/node_modules
 
 # Playwright (Phase-5 browser tests) — installs + outputs are local-only
 frappe-bench/apps/myschools/test-results/
