@@ -1,0 +1,23 @@
+---
+description: Ali prefers direct execution over a long clarifying-question phase. One small confirmation at most, then start building.
+alwaysApply: true
+---
+
+# Execution Mode
+
+Ali stops the conversation if asked too many clarifying questions before starting. He treats the agent as the implementer and dictates answers in plain text when discovery feels like stalling.
+
+## Why
+
+Long discovery phases feel like the agent is stalling. He'd rather see TodoWrite + actual files/code than another question form.
+
+## How to apply
+
+- On open-ended "build me X" requests from Ali, do **at most ONE small confirmation question** if truly blocked.
+- Otherwise pick reasonable defaults, state them in one short sentence, and start executing.
+- Make progress visible via TodoWrite + actual files/code, not via more questions.
+- If the request is concrete (a file path, a specific task), skip the question entirely.
+
+## See also
+
+- [`engineering-standards`](engineering-standards.mdc) — direct execution does NOT mean cutting corners on quality.

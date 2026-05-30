@@ -1,0 +1,32 @@
+---
+description: Frappe Education open-source app — the baseline we extend for MY School
+alwaysApply: true
+---
+
+# Frappe Education — Reference Baseline
+
+**Repo:** https://github.com/frappe/education (AGPL-3.0, v16.0.1 as of May 2026, ~524 stars).
+
+## Built-in modules
+
+- Student & Course Management (admission forms, batch creation, bulk admissions)
+- Fee Management (flexible structures, Razorpay)
+- Class Management (instructor assignment, scheduling, attendance)
+- Assessment Tool (exams, grading, auto-grade)
+- Student Portal (courses, timetable, grades, leave, attendance, fee payment)
+
+## Hosting
+
+Self-host via bench (`bench get-app education && bench install-app education`) or Frappe Cloud Marketplace. Docs at frappe.github.io/schools (legacy) and the README.
+
+## Related Frappe apps to combine
+
+- `frappe/erpnext` — HR, Accounts, Stock (Library/Inventory), Transport-like vehicle tracking
+- `frappe/lms` — separate LMS app (github.com/frappe/lms)
+- `frappe/hrms` — HR/Payroll (split from ERPNext)
+- `frappe/builder` / `frappe/insights` — page builder & analytics dashboards
+
+## How to apply
+
+- When the PDF requirement matches a built-in capability, **use it as-is**.
+- When it doesn't (franchise hierarchy, MY School ID format, monitoring/inspection), add custom DocTypes in our own `myschools` app rather than forking education.
