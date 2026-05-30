@@ -21,9 +21,15 @@ FRANCHISE_ROLES = [
 	"Campus Incharge",
 ]
 
+# Website-only role for parent/guardian portal (no Desk access).
+PORTAL_ROLES = {
+	"Guardian": {"desk_access": 0},
+}
+
 
 def after_install():
 	create_franchise_roles()
+	create_portal_roles()
 	create_custom_franchise_fields()
 	create_default_head_office_departments()
 	grant_franchise_role_permissions()
@@ -46,9 +52,11 @@ def after_sync():
 
 def after_migrate():
 	create_franchise_roles()
+	create_portal_roles()
 	create_custom_franchise_fields()
 	grant_franchise_role_permissions()
 	backfill_module_profiles()
+	backfill_guardian_user_links()
 	set_default_print_formats()
 	frappe.db.commit()
 
@@ -212,6 +220,11 @@ FRANCHISE_ROLE_READS = {
 		"Student",
 		"Guardian",
 	],
+	"Guardian": [
+		"Guardian",
+		"Student",
+		"Fees",
+	],
 }
 
 
@@ -249,6 +262,23 @@ def create_franchise_roles():
 			role.role_name = role_name
 			role.desk_access = 1
 			role.insert(ignore_permissions=True)
+
+
+def create_portal_roles():
+	for role_name, opts in PORTAL_ROLES.items():
+		if frappe.db.exists("Role", role_name):
+			frappe.db.set_value("Role", role_name, "desk_access", opts.get("desk_access", 0))
+			continue
+		role = frappe.new_doc("Role")
+		role.role_name = role_name
+		role.desk_access = opts.get("desk_access", 0)
+		role.insert(ignore_permissions=True)
+
+
+def backfill_guardian_user_links():
+	from myschools.api.identity import backfill_guardian_user_links as _run
+
+	_run()
 
 
 def create_default_head_office_departments():
@@ -373,6 +403,15 @@ def create_custom_franchise_fields():
 			"options": "MYS Branch",
 			"insert_after": "education",
 			"in_standard_filter": 1,
+		},
+		{
+			"fieldname": "user",
+			"label": "Portal User",
+			"fieldtype": "Link",
+			"options": "User",
+			"insert_after": "mys_branch",
+			"read_only": 1,
+			"description": "Website User login linked to this guardian (auto-set when email matches).",
 		},
 	]
 

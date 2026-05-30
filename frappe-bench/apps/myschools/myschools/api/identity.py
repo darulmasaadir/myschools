@@ -69,6 +69,10 @@ def set_mys_staff_id(doc, method=None):
 	doc.mys_staff_id = f"MYS-{branch_code}-{role_code}{count:04d}"
 
 
+def _guardian_email(doc) -> str:
+	return (doc.get("email_address") or doc.get("email_id") or "").strip()
+
+
 def sync_guardian_branch(doc, method=None):
 	"""When a Guardian links to a Student, copy the student's branch onto
 	the Guardian so the parent portal can filter visible data by branch."""
@@ -80,3 +84,34 @@ def sync_guardian_branch(doc, method=None):
 		if student and student.mys_branch:
 			doc.mys_branch = student.mys_branch
 			break
+
+
+def link_guardian_user(doc, method=None):
+	"""Link Guardian.user to an existing User when emails match.
+
+	Administrators create Website Users for guardians; this hook idempotently
+	wires the back-link on save. Does not create users (signup stays admin-driven).
+	"""
+	if doc.get("user"):
+		return
+	email = _guardian_email(doc)
+	if not email:
+		return
+	user = frappe.db.get_value("User", {"email": email}, "name")
+	if user:
+		doc.user = user
+
+
+def backfill_guardian_user_links():
+	"""One-shot linker for Guardians saved before the user field shipped."""
+	if not frappe.db.has_column("Guardian", "user"):
+		return
+	for name in frappe.get_all(
+		"Guardian",
+		filters=[["user", "in", ("", None)]],
+		pluck="name",
+	):
+		doc = frappe.get_doc("Guardian", name)
+		link_guardian_user(doc)
+		if doc.get("user"):
+			frappe.db.set_value("Guardian", name, "user", doc.user, update_modified=False)
