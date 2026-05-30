@@ -49,7 +49,10 @@ doc_events = {
 		"before_insert": "myschools.api.identity.set_mys_staff_id",
 	},
 	"Guardian": {
-		"validate": "myschools.api.identity.sync_guardian_branch",
+		"validate": [
+			"myschools.api.identity.sync_guardian_branch",
+			"myschools.api.identity.link_guardian_user",
+		],
 	},
 	"User": {
 		"validate": "myschools.api.user_profile.attach_module_profile_to_user",
@@ -75,6 +78,7 @@ role_home_page = {
 	"Branch Admin": "mys-branch",
 	"Branch Accountant": "mys-branch",
 	"Campus Incharge": "mys-campus",
+	"Guardian": "guardian",
 }
 
 # Permission query conditions for branch-scoped data isolation
@@ -131,6 +135,7 @@ fixtures = [
 					"Branch Admin",
 					"Branch Accountant",
 					"Campus Incharge",
+					"Guardian",
 				],
 			]
 		],

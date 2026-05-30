@@ -1,6 +1,6 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-05-28
+**Last updated:** 2026-05-31
 **Up next:** Phase 7 — Portals (Guardian / Branch / Inspection) via Frappe Web Forms + `www/`
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
@@ -32,7 +32,7 @@ These bind every phase:
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
-| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ⬜ | — |
+| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | `feature/phase-7a-portal-foundations` (7a in flight) |
 | 8 | Domain extensions | ⬜ | — |
 
 ---
@@ -191,17 +191,27 @@ setup_wizard_stages = "myschools.scripts.setup_wizard.get_setup_stages"
 
 ---
 
-## Phase 7 — Portals: Guardian / Branch / Inspection ⬜
+## Phase 7 — Portals: Guardian / Branch / Inspection 🟡
 
 **Important rewrite from the original plan.** The original scoped a Vue/React SPA frontend; per the **upgrade-safe-only** standing constraint, this is now **Frappe Web Forms + `www/` Jinja templates inside the `myschools` app**. No parallel codebase, no separate auth, no separate build pipeline.
 
-**Estimated size:** L (16–24 h)
+**Estimated size:** L (16–24 h), split into 7a–7d PRs.
 
-Scope:
-- Guardian portal — see your children, their fees, download receipts, view attendance.
-- Branch portal — mobile-friendly dashboard for principals: today's findings, pending royalty, fee collection.
-- Inspection portal — mobile-friendly checklist runner for auditors in the field.
-- Web Forms: admission enquiry, guardian feedback.
+### 7a — Portal foundations (in flight)
+
+Branch: `feature/phase-7a-portal-foundations`.
+
+- `Guardian` website role + `Guardian.user` custom field + email→User linker (`api/identity.py`).
+- `/portal` dispatcher + stub `/guardian`, `/branch`, `/inspection` pages with shared `mys_portal_base.html` layout.
+- `role_home_page` for Guardian; read perms for Guardian role on Guardian / Student / Fees.
+- Tests: `tests/test_portal_shell.py` · process doc [`processes/portals.md`](processes/portals.md).
+
+### 7b–7d (planned)
+
+Scope (full phase):
+- **7b** Guardian portal — children, fees, receipt download, attendance, guardian feedback Web Form.
+- **7c** Branch portal — mobile dashboard: findings, royalty, fee collection.
+- **7d** Inspection portal — checklist runner; admission enquiry Web Form.
 
 ---
 
