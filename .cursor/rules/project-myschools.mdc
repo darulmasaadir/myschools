@@ -1,0 +1,41 @@
+---
+description: Multi-tier Frappe-based school ERP being built at /Users/ali/projects/myschools for myschools.pk
+alwaysApply: true
+---
+
+# MY School ERP — Project Context
+
+Building a multi-tier school ERP for **MY School (myschools.pk)** on Frappe Framework + the open-source [Frappe Education](.cursor/rules/reference-frappe-education.mdc) app.
+
+## Hierarchy (from the "Software Infrastructure" PDF)
+
+Head Office (Chief Executive, Monitoring / Academic / Finance / Training / Admin Depts)
+→ Cluster (Cluster Director, Academic Monitor, Audit Officer)
+→ Branch (Director, Principal, Admin, Accountant, Teacher)
+→ Campus (Junior / Kids / Senior, each with Incharge + Teachers / Admin)
+→ Students → Parents (mobile/web portal).
+
+## Unique ID format
+
+- Student: `MYS-CL03-BR014-STU000245`
+- Staff: `MYS-BR014-TCH0056`
+
+## 22 modules required (per PDF)
+
+Master Setup, Franchise Mgmt, SIS, HR/Staff, Campus Mgmt, Academic, Examination, Attendance, Finance/Fee, Parent Portal, Teacher Portal, Communication, Monitoring & Inspection, Transport, Library, LMS, Document Mgmt, Security/Role, Mobile App, Unique ID, Reporting.
+
+## Why this scope
+
+Frappe Education v16 ships with SIS, Fee, Class, Assessment, Student Portal — covers ~5 of 22 modules. The franchise hierarchy (Cluster/Branch/Campus multi-tenancy), custom ID system, monitoring/inspection workflows, parent mobile app, and several other modules are custom work on top.
+
+## How to apply
+
+- Treat the 22 modules as the scope ceiling.
+- Build franchise hierarchy first — it's the foundation everything else scopes off of.
+- Use ERPNext HR for staff, `frappe/lms` for LMS, custom DocTypes for what's missing.
+- App lives at `frappe-bench/apps/myschools/`. Repo cwd is `/Users/ali/projects/myschools`.
+
+## See also
+
+- [`docs/roadmap.md`](docs/roadmap.md) — single source of truth for phase status
+- [`docs/architecture.md`](docs/architecture.md), [`docs/data-model.md`](docs/data-model.md), [`docs/overview.md`](docs/overview.md)

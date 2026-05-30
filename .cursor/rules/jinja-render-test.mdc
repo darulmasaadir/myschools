@@ -1,0 +1,25 @@
+---
+description: For Frappe Notification/Email Template fixtures, always add a Jinja-render-against-real-doc test — fixture-import alone misses field typos because Frappe defers Jinja eval until the alert fires.
+globs: frappe-bench/apps/myschools/myschools/fixtures/notification.json,frappe-bench/apps/myschools/myschools/fixtures/email_template.json,frappe-bench/apps/myschools/myschools/scripts/build_notifications.py,frappe-bench/apps/myschools/myschools/tests/test_notifications.py
+alwaysApply: true
+---
+
+# Jinja Render Test for Notification / Email Template Fixtures
+
+When shipping Frappe Notification or Email Template fixtures, fixture-import assertions (`frappe.db.exists("Notification", name)`) are **not enough**. They only prove the row imported — they do not exercise the Jinja templates.
+
+## Why
+
+In Phase 4 of the MY Schools ERP, three Notification templates referenced fields that did not exist on their target doctypes (`doc.total_royalty`, `doc.title`, `doc.description`). All fixture-import tests passed because **Frappe defers Jinja evaluation until the alert fires.** Every alert would have crashed at send time in production. The bugs were caught only after Ali pushed back with *"have you tested it from all perspectives?"* — see [`pr-verification`](pr-verification.mdc).
+
+## How to apply
+
+For every Notification / Email Template fixture, add a regression test that:
+
+1. Builds an **unsaved** stub doc with `frappe.get_doc(<dict of sample fields>)` for the target doctype — no DB hit, no save, no validation.
+2. Calls `frappe.utils.jinja.render_template(notif.subject, {"doc": doc})` and the same for `notif.message`.
+3. Asserts the rendered output contains no unrendered `{{` markers AND includes at least one real attribute value (e.g. branch name or doc name).
+
+## Reference implementation
+
+Lives in `frappe-bench/apps/myschools/myschools/tests/test_notifications.py` under `TestNotificationJinjaRenders`. Use the same `SAMPLE_DOCS: ClassVar[dict]` pattern for new fixtures.

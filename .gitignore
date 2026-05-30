@@ -49,9 +49,18 @@ frappe-bench/apps/myschools/playwright/.cache/
 *~
 
 # -----------------------------------------------------------------------------
-# Local Claude metadata (per-user, not for the repo)
+# Local AI-agent metadata
 # -----------------------------------------------------------------------------
+# Claude Code's per-project allowlist + transcripts are user-local, not shared.
 .claude/
+
+# Cursor: commit AGENTS.md and .cursor/rules/ (shared agent memory), but
+# exclude any per-user state Cursor may drop alongside them (scratch logs,
+# extension caches, etc.). Add specific allow-rules as needed.
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+!.cursor/mcp.json
 
 # -----------------------------------------------------------------------------
 # Secrets / env
@@ -69,3 +78,8 @@ secrets/
 *.log
 logs/
 tmp/
+
+# -----------------------------------------------------------------------------
+# Workspaces
+# -----------------------------------------------------------------------------
+myschools.code-workspace

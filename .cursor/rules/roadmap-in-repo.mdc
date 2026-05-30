@@ -1,0 +1,26 @@
+---
+description: Roadmap and phase status live in docs/roadmap.md in the repo. Update it in the same PR that lands a phase. Session plans don't count — read the repo before acting.
+alwaysApply: true
+---
+
+# Roadmap Lives in the Repo
+
+The customisation roadmap and per-phase status must live at [`docs/roadmap.md`](../../docs/roadmap.md), updated in the same PR that lands a phase. Session-local plan files (Claude `~/.claude/plans/*.md`, Cursor scratch notes, Notion, Linear) **do not count** — they don't persist across sessions and Ali doesn't read them.
+
+## Why
+
+Ali called this out directly: *"why you didn't capture in somewhere in docs that what is actually implemented?"*
+
+The motivating incident: a `feature/shell-phase-1-2` branch was cut to start Phase 1+2 work that had already shipped in PR #3 (`9ad4351 feat(shell): role-aware ERP shell — brand, workspaces, sidebar scoping`). Reading `docs/roadmap.md` first would have shown Phase 1+2 was ✅. The session plan said "first PR scope: Phase 1+2 bundled" — true when written, stale by the time it was acted on. **Plans go stale; the repo doesn't lie.**
+
+## How to apply
+
+1. **Before starting any phase or major piece of work**, read [`docs/roadmap.md`](../../docs/roadmap.md) first — that's the single source of truth. Don't trust the session plan, don't trust memory recall, don't trust "I think this is next." Read the repo.
+2. **In every PR that lands or moves a phase**, update `docs/roadmap.md` in the same commit. ⬜ → 🟡 when a branch opens; 🟡 → ✅ when it merges, with the merge SHA + PR number.
+3. **If you discover the doc is stale**, fix it in a docs-only PR before moving on. Don't pile new work on top of a stale roadmap — it just compounds the drift.
+4. **Status info also surfaces in [`docs/overview.md`](../../docs/overview.md) "What's shipped today" and [`docs/architecture.md`](../../docs/architecture.md) §3 module table.** Keep these in sync with `roadmap.md`; the roadmap is the master, the others are mirrors.
+
+## See also
+
+- [`pr-verification`](pr-verification.mdc) — verify-before-acting principle (same family: check truth on disk)
+- [`upgrade-safe-only`](upgrade-safe-only.mdc) — encoded into the roadmap as a standing constraint at the top

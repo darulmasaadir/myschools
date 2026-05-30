@@ -1,0 +1,50 @@
+---
+description: Only ship customizations that survive `bench update` and live inside the myschools app. No custom SPA, no core forks, no monkey-patching.
+alwaysApply: true
+---
+
+# Upgrade-Safe Only — Standing Constraint
+
+Every customization for MY School must stay inside the `myschools` app, use Frappe's public/fixture primitives, and survive a `bench update` without manual intervention.
+
+## Why
+
+Ali deliberately chose open-source Frappe to inherit upstream maintenance (security patches, browser compat, performance work, new doctypes). Any change that forks core, monkey-patches internals, or stands up a parallel frontend defeats that choice — it converts free upstream work into permanent local maintenance debt.
+
+He stated this explicitly:
+
+> "We don't need custom app which requires maintenance effort... we must stay in safer position where customisations won't stop/break/hard to upgrade to Frappe's newer versions."
+
+## How to apply
+
+When scoping any feature or recommendation, only propose options from the **Safe** list. If the only way to deliver something is from the **Banned** list, surface that constraint to Ali before designing — don't quietly compromise.
+
+### Safe (use freely)
+
+- Custom Fields & Property Setters (fixture-exported via Customize Form)
+- DocTypes in our own app (`myschools/my_school_erp/doctype/`)
+- `hooks.py` keys: `doc_events`, `scheduler_events`, `permission_query_conditions`, `override_doctype_class` (sparingly), `app_include_css`, `web_include_css`, `role_home_page`, `fixtures`
+- Workspace / Module Profile / Workflow / Print Format / Notification / Email Template / Letter Head / Dashboard / Number Card **fixtures**
+- Per-doctype JS (`mys_branch.js`, `mys_branch_list.js`) using documented `frappe.ui.form.on()` / `frappe.listview_settings` APIs
+- Custom Pages (`bench new-page`) for dashboard-style screens
+- **Web Forms + `www/` Jinja templates** for portal flows (this is Frappe's native portal — use it instead of a custom SPA)
+- Server Scripts / Client Scripts (exportable as fixtures)
+- CSS overrides via `app_include_css` that target Frappe's CSS variables (`--primary`, `--text-color`, etc.) — NOT internal class selectors
+
+### Banned
+
+- Editing files inside `apps/frappe/` or `apps/erpnext/`
+- Monkey-patching Frappe/ERPNext modules at runtime
+- Forking ERPNext or Frappe Education to modify core
+- Selecting undocumented internal Frappe DOM classes in custom JS (those change between versions)
+- Separate SPA frontends (Vue/React/Next) that talk to Frappe over REST as a parallel codebase — use Frappe Web Forms + `www/` instead
+- Hardcoding behavior already provided by a Frappe hook or fixture
+
+## Plan implication
+
+**Phase 7 of the roadmap is NOT a custom SPA.** It is Frappe Web Forms + `www/` Jinja templates inside the `myschools` app.
+
+## See also
+
+- [`engineering-standards`](engineering-standards.mdc) — the bar that makes upgrade-safe possible: tests, CI, fixtures-not-manual-changes
+- [`docs/roadmap.md`](../../docs/roadmap.md) — Phase 7 scope explicitly rewritten under this constraint

@@ -1,0 +1,27 @@
+---
+description: Ali expects world-class engineering practices — git from day one, tests, CI, pre-commit, conventional commits. Default to the full toolkit, don't ask whether to add it.
+alwaysApply: true
+---
+
+# Engineering Standards
+
+Develop the MY School ERP (myschools.pk) as if part of a world-class engineering team building a world-class product. Default to the full engineering toolkit, not bolting it on later.
+
+## Why
+
+Ali pushed back when he discovered ~12 DocTypes, royalty logic, and migrations had been built *without ever initialising git*. He framed it as "very basic for development" and said the product should follow "all best practices of development." He explicitly compared the work to a world-class app.
+
+## How to apply
+
+- On any *new* project: initialise git as step 1, **before** writing code. Commit early and often with conventional-commit style messages.
+- Set up the engineering scaffolding up front: `.gitignore`, `LICENSE`, `README`, `CHANGELOG`, `CONTRIBUTING`, pre-commit hooks, linter config, test framework, CI workflow.
+- Write tests for non-trivial logic (rate resolution, permission queries, ID generation) — not just "it runs."
+- Branch per feature/fix. No direct commits to `main` once that workflow is established. Use PRs even when working solo, so there's a reviewable diff.
+- Default to defensive code review: explain trade-offs before making them, flag dependencies/migrations early.
+- When the user has not specified a tool or convention, pick the modern best-practice default (ruff over flake8+black, GitHub Actions for CI, pytest where it fits, conventional commits, semver, etc.).
+- **Do NOT ask "should I add tests" or "should I set up CI" — just do it.** Asking implies it's optional.
+
+## See also
+
+- [`execution-mode`](execution-mode.mdc) — direct execution still applies; this is about the *standard* of execution, not whether to clarify.
+- [`pr-verification`](pr-verification.mdc) — the bar for declaring work merge-ready.
