@@ -1,14 +1,7 @@
-import frappe
+from myschools.api.guardian_portal import populate_guardian_context
 
 
 def get_context(context):
-	context.no_cache = 1
-	context.show_sidebar = 0
-	if frappe.session.user == "Guest":
-		frappe.local.flags.redirect_location = "/login?redirect-to=/guardian"
-		raise frappe.Redirect
-	if "Guardian" not in frappe.get_roles():
-		frappe.throw("You do not have access to the Guardian portal.", frappe.PermissionError)
-	context.portal_title = "Guardian Portal"
-	context.portal_blurb = "Parent portal — children, fees, and receipts land in PR 7b."
+	populate_guardian_context(context)
+	context.portal_title = "My Children"
 	return context

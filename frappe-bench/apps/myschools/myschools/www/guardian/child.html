@@ -1,0 +1,24 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<p><a href="/guardian">&larr; Back to My Children</a></p>
+<h1>{{ portal_title }}</h1>
+<div class="mys-portal__card">
+	<dl class="mys-portal__dl">
+		<dt>MYS Student ID</dt><dd>{{ student.mys_student_id or "—" }}</dd>
+		<dt>Branch</dt><dd>{{ student.mys_branch or "—" }}</dd>
+		<dt>Campus</dt><dd>{{ student.campus_label or student.mys_campus or "—" }}</dd>
+		<dt>Email</dt><dd>{{ student.student_email_id or "—" }}</dd>
+		<dt>Mobile</dt><dd>{{ student.student_mobile_number or "—" }}</dd>
+	</dl>
+	<p class="mys-portal__actions">
+		<a class="mys-portal__btn" href="/guardian/fees">View fees</a>
+		<a class="mys-portal__btn" href="/guardian/attendance">View attendance</a>
+	</p>
+</div>
+{% endblock %}

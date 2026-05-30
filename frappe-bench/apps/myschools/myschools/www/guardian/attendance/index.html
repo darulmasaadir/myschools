@@ -1,0 +1,45 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/guardian/attendance' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">Last 90 days of attendance for your children.</p>
+
+<div class="mys-portal__card mys-portal__summary">
+	<span>Present: <strong>{{ summary.Present }}</strong></span>
+	<span>Absent: <strong>{{ summary.Absent }}</strong></span>
+	<span>Leave: <strong>{{ summary.Leave }}</strong></span>
+	{% if summary.Other %}<span>Other: <strong>{{ summary.Other }}</strong></span>{% endif %}
+</div>
+
+{% if attendance %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Student</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in attendance %}
+			<tr>
+				<td>{{ row.date }}</td>
+				<td>{{ row.student_name }}</td>
+				<td>{{ row.status }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card">
+	<p>No attendance records in the last 90 days.</p>
+</div>
+{% endif %}
+{% endblock %}
