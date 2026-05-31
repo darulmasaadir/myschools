@@ -32,7 +32,7 @@ These bind every phase:
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
-| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b `feature/phase-7b-guardian-portal` |
+| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b ✅ PR #13 · 7c `feature/phase-7c-branch-portal` |
 | 8 | Domain extensions | ⬜ | — |
 
 ---
@@ -206,9 +206,9 @@ Delivered PR [#12](https://github.com/darulmasaadir/myschools/pull/12).
 - `role_home_page` for Guardian; read perms for Guardian role on Guardian / Student / Fees.
 - Tests: `tests/test_portal_shell.py` · process doc [`processes/portals.md`](processes/portals.md).
 
-### 7b — Guardian portal content (in flight)
+### 7b — Guardian portal content ✅
 
-Branch: `feature/phase-7b-guardian-portal`.
+Delivered PR [#13](https://github.com/darulmasaadir/myschools/pull/13) (`f7b5cf7`).
 
 - `/guardian` children list, `/guardian/child`, `/guardian/fees`, `/guardian/attendance`
 - Fee receipt PDF via `download_fee_receipt` whitelist + `MYS Fee Receipt` print format
@@ -216,9 +216,18 @@ Branch: `feature/phase-7b-guardian-portal`.
 - Tests: `tests/test_guardian_portal.py` (4 tests; full app suite 106)
 - Smoke seed: `scripts/seed_portal_guardian.py`
 
-### 7c–7d (planned)
+### 7c — Branch portal (in flight)
 
-- **7c** Branch portal — mobile dashboard: findings, royalty, fee collection.
+Branch: `feature/phase-7c-branch-portal`.
+
+- `/branch` dashboard with branch info + findings / royalty / fees KPIs
+- `/branch/findings`, `/branch/royalty`, `/branch/fees`
+- API: `api/branch_portal.py` — branch resolution via `Employee.user_id`, scoped queries
+- Tests: `tests/test_branch_portal.py`
+- Smoke seed: `scripts/seed_portal_branch.py`
+
+### 7d (planned)
+
 - **7d** Inspection portal — checklist runner; admission enquiry Web Form.
 
 ---
