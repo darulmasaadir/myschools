@@ -224,6 +224,8 @@ FRANCHISE_ROLE_READS = {
 		"Guardian",
 		"Student",
 		"Fees",
+		"Student Attendance",
+		"MYS Communication Log",
 	],
 }
 
@@ -244,6 +246,13 @@ def grant_franchise_role_permissions():
 			# enforce the read=1 flag idempotently.
 			add_permission(doctype, role, 0)
 			update_permission_property(doctype, role, 0, "read", 1)
+
+	# Guardian portal: read attendance + submit feedback via Web Form.
+	if frappe.db.exists("Role", "Guardian"):
+		if frappe.db.exists("DocType", "MYS Communication Log"):
+			add_permission("MYS Communication Log", "Guardian", 0)
+			update_permission_property("MYS Communication Log", "Guardian", 0, "read", 1)
+			update_permission_property("MYS Communication Log", "Guardian", 0, "create", 1)
 
 
 def backfill_module_profiles():

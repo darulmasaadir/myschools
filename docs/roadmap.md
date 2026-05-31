@@ -32,7 +32,7 @@ These bind every phase:
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
-| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | `feature/phase-7a-portal-foundations` (7a in flight) |
+| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b `feature/phase-7b-guardian-portal` |
 | 8 | Domain extensions | ⬜ | — |
 
 ---
@@ -197,19 +197,27 @@ setup_wizard_stages = "myschools.scripts.setup_wizard.get_setup_stages"
 
 **Estimated size:** L (16–24 h), split into 7a–7d PRs.
 
-### 7a — Portal foundations (in flight)
+### 7a — Portal foundations ✅
 
-Branch: `feature/phase-7a-portal-foundations`.
+Delivered PR [#12](https://github.com/darulmasaadir/myschools/pull/12).
 
 - `Guardian` website role + `Guardian.user` custom field + email→User linker (`api/identity.py`).
 - `/portal` dispatcher + stub `/guardian`, `/branch`, `/inspection` pages with shared `mys_portal_base.html` layout.
 - `role_home_page` for Guardian; read perms for Guardian role on Guardian / Student / Fees.
 - Tests: `tests/test_portal_shell.py` · process doc [`processes/portals.md`](processes/portals.md).
 
-### 7b–7d (planned)
+### 7b — Guardian portal content (in flight)
 
-Scope (full phase):
-- **7b** Guardian portal — children, fees, receipt download, attendance, guardian feedback Web Form.
+Branch: `feature/phase-7b-guardian-portal`.
+
+- `/guardian` children list, `/guardian/child`, `/guardian/fees`, `/guardian/attendance`
+- Fee receipt PDF via `download_fee_receipt` whitelist + `MYS Fee Receipt` print format
+- `guardian-feedback` Web Form → `MYS Communication Log`
+- Tests: `tests/test_guardian_portal.py` (4 tests; full app suite 106)
+- Smoke seed: `scripts/seed_portal_guardian.py`
+
+### 7c–7d (planned)
+
 - **7c** Branch portal — mobile dashboard: findings, royalty, fee collection.
 - **7d** Inspection portal — checklist runner; admission enquiry Web Form.
 

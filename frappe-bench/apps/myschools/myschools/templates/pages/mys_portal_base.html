@@ -42,6 +42,78 @@
 		padding: 1rem 1.1rem;
 		margin-top: 1rem;
 	}
+	.mys-portal__muted {
+		color: var(--mys-text-muted, #6b7280);
+		margin-bottom: 0.75rem;
+	}
+	.mys-portal__nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+	.mys-portal__nav-link {
+		padding: 0.35rem 0.75rem;
+		border-radius: 999px;
+		border: 1px solid var(--mys-primary-light, #c8e6d5);
+		color: var(--mys-primary-dark, #0a5a36);
+		text-decoration: none;
+		font-size: 0.9rem;
+	}
+	.mys-portal__nav-link.is-active {
+		background: var(--mys-primary, #0f7a4a);
+		color: #fff;
+		border-color: var(--mys-primary, #0f7a4a);
+	}
+	.mys-portal__table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9rem;
+	}
+	.mys-portal__table th,
+	.mys-portal__table td {
+		padding: 0.5rem 0.4rem;
+		border-bottom: 1px solid #e5e7eb;
+		text-align: left;
+	}
+	.mys-portal__table th {
+		color: var(--mys-primary-dark, #0a5a36);
+		font-weight: 600;
+	}
+	.mys-portal__dl {
+		display: grid;
+		grid-template-columns: 8rem 1fr;
+		gap: 0.35rem 0.75rem;
+		margin: 0;
+	}
+	.mys-portal__dl dt {
+		font-weight: 600;
+		color: var(--mys-text-muted, #6b7280);
+	}
+	.mys-portal__dl dd {
+		margin: 0;
+	}
+	.mys-portal__summary {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.9rem;
+	}
+	.mys-portal__actions {
+		margin-top: 1rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.mys-portal__btn {
+		display: inline-block;
+		padding: 0.4rem 0.85rem;
+		border-radius: 6px;
+		background: var(--mys-primary, #0f7a4a);
+		color: #fff;
+		text-decoration: none;
+		font-size: 0.9rem;
+	}
 </style>
 {% endblock %}
 

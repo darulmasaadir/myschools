@@ -1,0 +1,53 @@
+{
+ "allow_comments": 0,
+ "allow_delete": 0,
+ "allow_edit": 0,
+ "allow_incomplete": 0,
+ "allow_multiple": 1,
+ "allow_print": 0,
+ "apply_document_permissions": 0,
+ "button_label": "Send feedback",
+ "client_script": "",
+ "creation": "2026-05-31 00:00:00.000000",
+ "doc_type": "MYS Communication Log",
+ "docstatus": 0,
+ "doctype": "Web Form",
+ "idx": 0,
+ "introduction_text": "<p>Send a message to your branch office. It is recorded in the MY School communication log.</p>",
+ "is_standard": 0,
+ "login_required": 1,
+ "max_attachment_size": 0,
+ "modified": "2026-05-31 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "guardian-feedback",
+ "owner": "Administrator",
+ "published": 1,
+ "route": "guardian-feedback",
+ "route_to_success_link": 0,
+ "show_attachments": 0,
+ "show_list": 0,
+ "show_sidebar": 0,
+ "success_message": "Thank you — your message has been sent to the school.",
+ "success_url": "/guardian",
+ "title": "Guardian feedback",
+ "web_form_fields": [
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Subject",
+   "max_length": 140,
+   "read_only": 0,
+   "reqd": 1
+  },
+  {
+   "fieldname": "body",
+   "fieldtype": "Small Text",
+   "hidden": 0,
+   "label": "Message",
+   "read_only": 0,
+   "reqd": 1
+  }
+ ]
+}

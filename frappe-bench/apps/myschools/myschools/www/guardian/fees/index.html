@@ -1,0 +1,46 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/guardian/fees' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">Submitted fee invoices for your children. Download branded receipts below.</p>
+
+{% if fees %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Student</th>
+				<th>Date</th>
+				<th>Due</th>
+				<th>Total</th>
+				<th>Paid</th>
+				<th>Outstanding</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for f in fees %}
+			<tr>
+				<td>{{ f.student_name }}</td>
+				<td>{{ f.posting_date }}</td>
+				<td>{{ f.due_date or "—" }}</td>
+				<td>{{ f.grand_total }}</td>
+				<td>{{ f.paid_amount }}</td>
+				<td>{{ f.outstanding_amount }}</td>
+				<td><a href="{{ f.receipt_url }}">Receipt</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card">
+	<p>No submitted fee records found for your children.</p>
+</div>
+{% endif %}
+{% endblock %}

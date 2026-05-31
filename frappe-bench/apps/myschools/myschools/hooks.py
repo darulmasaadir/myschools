@@ -166,6 +166,7 @@ fixtures = [
 	{"dt": "Module Onboarding", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Onboarding Step", "filters": [["name", "like", "MYS %"]]},
 	{"dt": "Report", "filters": [["name", "like", "MYS %"], ["is_standard", "=", "Yes"]]},
+	{"dt": "Web Form", "filters": [["route", "like", "guardian-%"]]},
 	{"dt": "Email Template", "filters": [["name", "like", "MYS - %"]]},
 	{"dt": "Notification", "filters": [["name", "like", "MYS - %"]]},
 	{

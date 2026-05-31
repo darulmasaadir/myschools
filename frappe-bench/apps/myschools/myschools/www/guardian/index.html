@@ -1,9 +1,40 @@
 {% extends "templates/pages/mys_portal_base.html" %}
 
 {% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/guardian' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
 <h1>{{ portal_title }}</h1>
-<p>{{ portal_blurb }}</p>
+<p class="mys-portal__muted">Guardian: {{ guardian_name }}</p>
+
+{% if students %}
 <div class="mys-portal__card">
-	<p><strong>Coming next:</strong> My Children, fees, attendance, and fee receipts.</p>
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>MYS ID</th>
+				<th>Campus</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for s in students %}
+			<tr>
+				<td>{{ s.student_name or s.name }}</td>
+				<td>{{ s.mys_student_id or "—" }}</td>
+				<td>{{ s.mys_campus or "—" }}</td>
+				<td><a href="/guardian/child?student={{ s.name }}">View</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 </div>
+{% else %}
+<div class="mys-portal__card">
+	<p>No students are linked to your guardian profile yet. Please contact your branch office.</p>
+</div>
+{% endif %}
 {% endblock %}

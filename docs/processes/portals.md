@@ -20,9 +20,24 @@ Portals are **Frappe `www/` Jinja pages + Web Forms** inside the `myschools` app
 
 Anonymous `/portal` → `/login`. Logged-in users are redirected to the first matching portal role (Guardian before branch staff).
 
+## Phase 7b — Guardian portal content (in flight)
+
+Branch: `feature/phase-7b-guardian-portal`.
+
+| Route | Purpose |
+|---|---|
+| `/guardian` | My Children list |
+| `/guardian/child?student=` | Child profile |
+| `/guardian/fees` | Fee invoices + receipt download |
+| `/guardian/attendance` | Last 90 days attendance |
+| `/guardian-feedback` | Web Form → `MYS Communication Log` |
+
+Data access lives in [`api/guardian_portal.py`](../../frappe-bench/apps/myschools/myschools/api/guardian_portal.py) — students are resolved via Education's **`Student Guardian`** child table on `Student` (not `Guardian.students`, which Education clears on save).
+
+**Local HTTP smoke user:** `bench --site SITE execute myschools.scripts.seed_portal_guardian.main` → `mys-portal-smoke-guardian@test.local` / `mys-portal-smoke`.
+
 ## Later slices
 
-- **7b** — Guardian portal content (children, fees, receipts, feedback Web Form)
 - **7c** — Branch principal dashboard
 - **7d** — Inspection checklist runner + admission enquiry Web Form
 
