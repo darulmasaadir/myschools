@@ -1,9 +1,15 @@
 {
  "charts": [
-  {"chart_name": "MYS - Royalty by Cluster (YTD)", "label": "Royalty by Cluster (YTD)"},
-  {"chart_name": "MYS - Findings by Severity", "label": "Findings by Severity"}
+  {
+   "chart_name": "MYS - Royalty by Cluster (YTD)",
+   "label": "Royalty by Cluster (YTD)"
+  },
+  {
+   "chart_name": "MYS - Findings by Severity",
+   "label": "Findings by Severity"
+  }
  ],
- "content": "[{\"id\":\"hdr-cluster\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Cluster Overview</b></span>\",\"col\":12}},{\"id\":\"card-1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Active Branches\",\"col\":3}},{\"id\":\"card-2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Outstanding Royalty\",\"col\":3}},{\"id\":\"card-3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Overdue Invoices\",\"col\":3}},{\"id\":\"card-4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Open Findings\",\"col\":3}},{\"id\":\"spacer1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"chart-cluster\",\"type\":\"chart\",\"data\":{\"chart_name\":\"MYS - Royalty by Cluster (YTD)\",\"col\":6}},{\"id\":\"chart-findings\",\"type\":\"chart\",\"data\":{\"chart_name\":\"MYS - Findings by Severity\",\"col\":6}},{\"id\":\"spacer2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hdr-shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"sc-branch\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"My Branches\",\"col\":3}},{\"id\":\"sc-royalty\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Royalty Invoices\",\"col\":3}},{\"id\":\"sc-inspection\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Inspection Visits\",\"col\":3}},{\"id\":\"sc-findings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Open Findings\",\"col\":3}},{\"id\":\"sc-students\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Students\",\"col\":3}}]",
+ "content": "[{\"id\": \"hdr-cluster\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Cluster Overview</b></span>\", \"col\": 12}}, {\"id\": \"card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Active Branches\", \"col\": 3}}, {\"id\": \"card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Outstanding Royalty\", \"col\": 3}}, {\"id\": \"card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Invoices\", \"col\": 3}}, {\"id\": \"card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Findings\", \"col\": 3}}, {\"id\": \"spacer1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"chart-cluster\", \"type\": \"chart\", \"data\": {\"chart_name\": \"MYS - Royalty by Cluster (YTD)\", \"col\": 6}}, {\"id\": \"chart-findings\", \"type\": \"chart\", \"data\": {\"chart_name\": \"MYS - Findings by Severity\", \"col\": 6}}, {\"id\": \"spacer2\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr-shortcuts\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"sc-branch\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"My Branches\", \"col\": 3}}, {\"id\": \"sc-royalty\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Royalty Invoices\", \"col\": 3}}, {\"id\": \"sc-inspection\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Inspection Visits\", \"col\": 3}}, {\"id\": \"sc-findings\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Open Findings\", \"col\": 3}}, {\"id\": \"sc-students\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Students\", \"col\": 3}}]",
  "creation": "2026-05-25 12:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -15,25 +21,112 @@
  "is_hidden": 0,
  "label": "MYS Cluster",
  "links": [
-  {"hidden": 0, "is_query_report": 0, "label": "My Cluster", "link_count": 0, "onboard": 0, "type": "Card Break"},
-  {"hidden": 0, "is_query_report": 0, "label": "Branch", "link_count": 0, "link_to": "MYS Branch", "link_type": "DocType", "onboard": 1, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Campus", "link_count": 0, "link_to": "MYS Campus", "link_type": "DocType", "onboard": 0, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Royalty", "link_count": 0, "onboard": 0, "type": "Card Break"},
-  {"hidden": 0, "is_query_report": 0, "label": "Royalty Invoice", "link_count": 0, "link_to": "MYS Royalty Invoice", "link_type": "DocType", "onboard": 1, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Royalty Payment", "link_count": 0, "link_to": "MYS Royalty Payment", "link_type": "DocType", "onboard": 0, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Inspection", "link_count": 0, "onboard": 0, "type": "Card Break"},
-  {"hidden": 0, "is_query_report": 0, "label": "Inspection Visit", "link_count": 0, "link_to": "MYS Inspection Visit", "link_type": "DocType", "onboard": 1, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Inspection Finding", "link_count": 0, "link_to": "MYS Inspection Finding", "link_type": "DocType", "onboard": 0, "type": "Link"}
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "My Cluster",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Branch",
+   "link_count": 0,
+   "link_to": "MYS Branch",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Campus",
+   "link_count": 0,
+   "link_to": "MYS Campus",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Royalty",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Royalty Invoice",
+   "link_count": 0,
+   "link_to": "MYS Royalty Invoice",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Royalty Payment",
+   "link_count": 0,
+   "link_to": "MYS Royalty Payment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection Visit",
+   "link_count": 0,
+   "link_to": "MYS Inspection Visit",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection Finding",
+   "link_count": 0,
+   "link_to": "MYS Inspection Finding",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
  ],
- "modified": "2026-05-25 12:00:00.000000",
+ "modified": "2026-05-31 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "MY School ERP",
  "name": "mys-cluster",
  "number_cards": [
-  {"number_card_name": "MYS - Active Branches", "label": "Active Branches"},
-  {"number_card_name": "MYS - Outstanding Royalty", "label": "Outstanding Royalty"},
-  {"number_card_name": "MYS - Overdue Invoices", "label": "Overdue Invoices"},
-  {"number_card_name": "MYS - Open Findings", "label": "Open Findings"}
+  {
+   "number_card_name": "MYS - Active Branches",
+   "label": "Active Branches"
+  },
+  {
+   "number_card_name": "MYS - Outstanding Royalty",
+   "label": "Outstanding Royalty"
+  },
+  {
+   "number_card_name": "MYS - Overdue Invoices",
+   "label": "Overdue Invoices"
+  },
+  {
+   "number_card_name": "MYS - Open Findings",
+   "label": "Open Findings"
+  }
  ],
  "owner": "Administrator",
  "parent_page": "",
@@ -41,15 +134,51 @@
  "quick_lists": [],
  "restrict_to_domain": "",
  "roles": [
-  {"role": "Cluster Director"}
+  {
+   "role": "Cluster Director"
+  }
  ],
  "sequence_id": 2.0,
  "shortcuts": [
-  {"color": "Green", "doc_view": "List", "format": "{} Active", "label": "My Branches", "link_to": "MYS Branch", "stats_filter": "{\"is_active\":1}", "type": "DocType"},
-  {"color": "Orange", "doc_view": "List", "label": "Royalty Invoices", "link_to": "MYS Royalty Invoice", "type": "DocType"},
-  {"color": "Yellow", "doc_view": "List", "label": "Inspection Visits", "link_to": "MYS Inspection Visit", "type": "DocType"},
-  {"color": "Red", "doc_view": "List", "format": "{} Open", "label": "Open Findings", "link_to": "MYS Inspection Finding", "stats_filter": "{\"status\":[\"in\",[\"Open\",\"In Progress\"]]}", "type": "DocType"},
-  {"color": "Grey", "doc_view": "List", "label": "Students", "link_to": "Student", "type": "DocType"}
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Active",
+   "label": "My Branches",
+   "link_to": "MYS Branch",
+   "stats_filter": "{\"is_active\":1}",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Royalty Invoices",
+   "link_to": "MYS Royalty Invoice",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "label": "Inspection Visits",
+   "link_to": "MYS Inspection Visit",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Open",
+   "label": "Open Findings",
+   "link_to": "MYS Inspection Finding",
+   "stats_filter": "{\"status\":[\"in\",[\"Open\",\"In Progress\"]]}",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Students",
+   "link_to": "Student",
+   "type": "DocType"
+  }
  ],
  "title": "MYS Cluster"
 }

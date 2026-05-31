@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"hdr-branch\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>My Branch</b></span>\",\"col\":12}},{\"id\":\"card-1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Active Students\",\"col\":3}},{\"id\":\"card-2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - This Month Royalty Invoiced\",\"col\":3}},{\"id\":\"card-3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - This Month Fees Collected\",\"col\":3}},{\"id\":\"card-4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Overdue Findings\",\"col\":3}},{\"id\":\"spacer1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hdr-shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"sc-mobile\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Mobile Dashboard\",\"col\":3}},{\"id\":\"sc-students\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Students\",\"col\":3}},{\"id\":\"sc-fees\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Fees\",\"col\":3}},{\"id\":\"sc-royalty\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Royalty Invoices\",\"col\":3}},{\"id\":\"sc-findings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Open Findings\",\"col\":3}},{\"id\":\"sc-staff\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Staff\",\"col\":3}}]",
+ "content": "[{\"id\":\"hdr-branch\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>My Branch</b></span>\",\"col\":12}},{\"id\":\"card-1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Active Students\",\"col\":3}},{\"id\":\"card-2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"This Month Royalty Invoiced\",\"col\":3}},{\"id\":\"card-3\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"This Month Fees Collected\",\"col\":3}},{\"id\":\"card-4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Overdue Findings\",\"col\":3}},{\"id\":\"spacer1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hdr-shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"sc-mobile\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Mobile Dashboard\",\"col\":3}},{\"id\":\"sc-students\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Students\",\"col\":3}},{\"id\":\"sc-fees\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Fees\",\"col\":3}},{\"id\":\"sc-royalty\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Royalty Invoices\",\"col\":3}},{\"id\":\"sc-findings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Open Findings\",\"col\":3}},{\"id\":\"sc-staff\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Staff\",\"col\":3}}]",
  "creation": "2026-05-25 12:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -29,7 +29,7 @@
   {"hidden": 0, "is_query_report": 0, "label": "Staff", "link_count": 0, "onboard": 0, "type": "Card Break"},
   {"hidden": 0, "is_query_report": 0, "label": "Employee", "link_count": 0, "link_to": "Employee", "link_type": "DocType", "onboard": 1, "type": "Link"}
  ],
- "modified": "2026-05-31 10:00:00.000000",
+ "modified": "2026-05-31 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "MY School ERP",
  "name": "mys-branch",
