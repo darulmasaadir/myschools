@@ -90,9 +90,16 @@ def auto_create_findings_from_failed_results(visit: str) -> list[str]:
 		).insert(ignore_permissions=True)
 		# Findings auto-created from a submitted Visit go straight to Open
 		# (docstatus=1) so they're visible to the branch and the
-		# "Finding Assigned" notification fires. ignore_permissions bypasses
-		# role checks because this runs in the Visit.on_submit hook.
-		apply_workflow(finding, "Submit")
+		# "Finding Assigned" notification fires. The Submit transition is
+		# role-gated (Audit Officer / branch staff) but the inspector who
+		# submitted the visit is often Academic Monitor — run the workflow
+		# step as Administrator inside this system hook.
+		prev_user = frappe.session.user
+		try:
+			frappe.set_user("Administrator")
+			apply_workflow(finding, "Submit")
+		finally:
+			frappe.set_user(prev_user)
 		created.append(finding.name)
 	return created
 

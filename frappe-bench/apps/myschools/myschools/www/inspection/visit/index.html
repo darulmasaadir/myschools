@@ -159,7 +159,12 @@
 			});
 			const data = await r.json();
 			if (data.exc) {
-				msg.textContent = "Submit failed — save all results first.";
+				let errMsg = "Submit failed.";
+				try {
+					const sm = JSON.parse(data._server_messages || "[]")[0];
+					if (sm) errMsg = JSON.parse(sm).message || errMsg;
+				} catch (_) { /* ignore */ }
+				msg.textContent = errMsg;
 				return;
 			}
 			window.location.href = "/inspection/visit?name=" + encodeURIComponent(visitName) + "&submitted=1";
