@@ -7,8 +7,8 @@
 	{% endfor %}
 </nav>
 <h1>{{ portal_title }}</h1>
-{% if error %}<p class="mys-portal__error">{{ error }}</p>{% endif %}
-<form method="post" class="mys-portal__card">
+<p id="form-error" class="mys-portal__error" style="display:none;"></p>
+<form id="new-visit-form" class="mys-portal__card" onsubmit="return false;">
 	<div class="mys-portal__field">
 		<label for="branch">Branch</label>
 		<select name="branch" id="branch" required>
@@ -34,6 +34,59 @@
 		<label for="campus">Campus (optional)</label>
 		<input type="text" name="campus" id="campus" placeholder="Campus name if scoped to one wing">
 	</div>
-	<button type="submit" class="mys-portal__btn">Create draft visit</button>
+	<button type="submit" id="create-visit-btn" class="mys-portal__btn">Create draft visit</button>
 </form>
+
+<script>
+(function () {
+	const form = document.getElementById("new-visit-form");
+	const btn = document.getElementById("create-visit-btn");
+	const err = document.getElementById("form-error");
+	btn.addEventListener("click", async () => {
+		err.style.display = "none";
+		err.textContent = "";
+		const branch = document.getElementById("branch").value;
+		const visit_type = document.getElementById("visit_type").value;
+		const visit_date = document.getElementById("visit_date").value;
+		const campus = document.getElementById("campus").value;
+		if (!branch || !visit_type) {
+			err.textContent = "Branch and visit type are required.";
+			err.style.display = "block";
+			return;
+		}
+		btn.disabled = true;
+		btn.textContent = "Creating…";
+		try {
+			const r = await fetch("/api/method/myschools.api.inspection_portal.create_visit", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+				},
+				body: new URLSearchParams({ branch, visit_type, visit_date, campus }),
+			});
+			const data = await r.json();
+			if (!r.ok || data.exc) {
+				let msg = "Could not create visit.";
+				try {
+					const sm = JSON.parse(data._server_messages || "[]")[0];
+					if (sm) msg = JSON.parse(sm).message || msg;
+				} catch (_) { /* ignore */ }
+				err.textContent = msg;
+				err.style.display = "block";
+				btn.disabled = false;
+				btn.textContent = "Create draft visit";
+				return;
+			}
+			const name = data.message && data.message.name;
+			window.location.href = "/inspection/visit?name=" + encodeURIComponent(name);
+		} catch (e) {
+			err.textContent = "Network error: " + e.message;
+			err.style.display = "block";
+			btn.disabled = false;
+			btn.textContent = "Create draft visit";
+		}
+	});
+})();
+</script>
 {% endblock %}

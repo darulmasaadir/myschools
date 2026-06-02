@@ -147,32 +147,36 @@ def get_visit_detail(visit: str) -> dict:
 	rows = []
 	for idx, row in enumerate(doc.checklist_results or []):
 		rows.append(
-			{
-				"idx": idx,
-				"item_text": row.item_text,
-				"category": row.category,
-				"severity": row.severity,
-				"result": row.result or "",
-				"score": row.score,
-				"max_score": row.max_score,
-				"notes": row.notes or "",
-			}
+			frappe._dict(
+				{
+					"idx": idx,
+					"item_text": row.item_text,
+					"category": row.category,
+					"severity": row.severity,
+					"result": row.result or "",
+					"score": row.score,
+					"max_score": row.max_score,
+					"notes": row.notes or "",
+				}
+			)
 		)
-	return {
-		"name": doc.name,
-		"branch": doc.branch,
-		"branch_label": branch_label,
-		"campus": doc.campus,
-		"visit_date": doc.visit_date,
-		"visit_type": doc.visit_type,
-		"docstatus": doc.docstatus,
-		"checklist_template": doc.checklist_template,
-		"total_items": doc.total_items,
-		"items_passed": doc.items_passed,
-		"items_failed": doc.items_failed,
-		"score_percent": doc.score_percent,
-		"checklist_rows": rows,
-	}
+	return frappe._dict(
+		{
+			"name": doc.name,
+			"branch": doc.branch,
+			"branch_label": branch_label,
+			"campus": doc.campus,
+			"visit_date": doc.visit_date,
+			"visit_type": doc.visit_type,
+			"docstatus": doc.docstatus,
+			"checklist_template": doc.checklist_template,
+			"total_items": doc.total_items,
+			"items_passed": doc.items_passed,
+			"items_failed": doc.items_failed,
+			"score_percent": doc.score_percent,
+			"checklist_rows": rows,
+		}
+	)
 
 
 def get_active_templates(visit_type: str | None = None) -> list[dict]:
@@ -269,9 +273,9 @@ def submit_visit(visit: str) -> dict:
 
 @frappe.whitelist(allow_guest=True)
 def submit_admission_enquiry(
-	branch: str,
 	parent_name: str,
 	phone: str,
+	branch: str = "",
 	email: str = "",
 	child_grade: str = "",
 	message: str = "",
@@ -345,3 +349,15 @@ def create_draft_visit(
 	doc.insert(ignore_permissions=True)
 	frappe.db.commit()
 	return doc.name
+
+
+@frappe.whitelist()
+def create_visit(
+	branch: str,
+	visit_type: str,
+	visit_date: str | None = None,
+	campus: str | None = None,
+) -> dict:
+	"""Whitelist wrapper for portal POST. Returns {ok, name}."""
+	name = create_draft_visit(branch, visit_type, visit_date or None, campus or None)
+	return {"ok": True, "name": name}

@@ -84,7 +84,10 @@
 			msg.textContent = "Applying…";
 			const r = await fetch("/api/method/myschools.api.inspection_portal.apply_template", {
 				method: "POST",
-				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+				},
 				body: new URLSearchParams({ visit: visitName, template }),
 			});
 			const data = await r.json();
@@ -112,7 +115,10 @@
 			msg.textContent = "Saving…";
 			const r = await fetch("/api/method/myschools.api.inspection_portal.save_checklist", {
 				method: "POST",
-				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+				},
 				body: new URLSearchParams({
 					visit: visitName,
 					rows: JSON.stringify(collectRows()),
@@ -134,7 +140,10 @@
 			msg.textContent = "Submitting…";
 			await fetch("/api/method/myschools.api.inspection_portal.save_checklist", {
 				method: "POST",
-				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+				},
 				body: new URLSearchParams({
 					visit: visitName,
 					rows: JSON.stringify(collectRows()),
@@ -142,7 +151,10 @@
 			});
 			const r = await fetch("/api/method/myschools.api.inspection_portal.submit_visit", {
 				method: "POST",
-				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+				},
 				body: new URLSearchParams({ visit: visitName }),
 			});
 			const data = await r.json();

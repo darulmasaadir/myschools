@@ -3,13 +3,11 @@
 {% block portal_content %}
 <h1>{{ portal_title }}</h1>
 <p class="mys-portal__muted">Submit an enquiry to MY School. We will contact you shortly.</p>
-{% if success %}
-<div class="mys-portal__card">
-	<p class="mys-portal__success">Thank you — your enquiry has been received{% if reference %} ({{ reference }}){% endif %}.</p>
+<p id="form-error" class="mys-portal__error" style="display:none;"></p>
+<div id="form-success" class="mys-portal__card" style="display:none;">
+	<p class="mys-portal__success">Thank you — your enquiry has been received <span id="ref"></span>.</p>
 </div>
-{% else %}
-{% if error %}<p class="mys-portal__error">{{ error }}</p>{% endif %}
-<form method="post" class="mys-portal__card">
+<form id="enquiry-form" class="mys-portal__card" onsubmit="return false;">
 	<div class="mys-portal__field">
 		<label for="branch">Preferred branch</label>
 		<select name="branch" id="branch">
@@ -39,7 +37,69 @@
 		<label for="message">Message (optional)</label>
 		<textarea name="message" id="message" rows="3"></textarea>
 	</div>
-	<button type="submit" class="mys-portal__btn">Submit enquiry</button>
+	<button type="submit" id="submit-btn" class="mys-portal__btn">Submit enquiry</button>
 </form>
-{% endif %}
+
+<script>
+(function () {
+	const btn = document.getElementById("submit-btn");
+	const err = document.getElementById("form-error");
+	const success = document.getElementById("form-success");
+	const form = document.getElementById("enquiry-form");
+	btn.addEventListener("click", async () => {
+		err.style.display = "none";
+		err.textContent = "";
+		const body = new URLSearchParams({
+			branch: document.getElementById("branch").value || "",
+			parent_name: document.getElementById("parent_name").value || "",
+			phone: document.getElementById("phone").value || "",
+			email: document.getElementById("email").value || "",
+			child_grade: document.getElementById("child_grade").value || "",
+			message: document.getElementById("message").value || "",
+		});
+		if (!body.get("parent_name") || !body.get("phone")) {
+			err.textContent = "Parent name and phone are required.";
+			err.style.display = "block";
+			return;
+		}
+		btn.disabled = true;
+		btn.textContent = "Submitting…";
+		try {
+			const r = await fetch(
+				"/api/method/myschools.api.inspection_portal.submit_admission_enquiry",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+					},
+					body: body,
+				}
+			);
+			const data = await r.json();
+			if (!r.ok || data.exc) {
+				let msg = "Submit failed.";
+				try {
+					const sm = JSON.parse(data._server_messages || "[]")[0];
+					if (sm) msg = JSON.parse(sm).message || msg;
+				} catch (_) { /* ignore */ }
+				err.textContent = msg;
+				err.style.display = "block";
+				btn.disabled = false;
+				btn.textContent = "Submit enquiry";
+				return;
+			}
+			form.style.display = "none";
+			const name = (data.message && data.message.name) || "";
+			document.getElementById("ref").textContent = name ? "(" + name + ")" : "";
+			success.style.display = "block";
+		} catch (e) {
+			err.textContent = "Network error: " + e.message;
+			err.style.display = "block";
+			btn.disabled = false;
+			btn.textContent = "Submit enquiry";
+		}
+	});
+})();
+</script>
 {% endblock %}
