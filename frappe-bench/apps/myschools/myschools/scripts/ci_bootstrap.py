@@ -66,5 +66,19 @@ def run():
 	for app in ("frappe", "erpnext"):
 		frappe.db.set_value("Installed Application", {"app_name": app}, "is_setup_complete", 1)
 	disable_future_access()
+	_ensure_head_office_is_group()
 	frappe.db.commit()
 	print("CI bootstrap complete: ran ERPNext setup_complete with " f"company={HEAD_OFFICE_COMPANY!r}.")
+
+
+def _ensure_head_office_is_group() -> None:
+	"""seed_demo parents per-cluster Companies under MY School Head Office.
+	ERPNext rejects that unless the parent has ``is_group=1``. setup_complete
+	creates the HO Company as a leaf, so flip it here so seed_demo (and any
+	other downstream parenting) Just Works on a fresh site.
+	"""
+	if not frappe.db.exists("Company", HEAD_OFFICE_COMPANY):
+		return
+	if frappe.db.get_value("Company", HEAD_OFFICE_COMPANY, "is_group"):
+		return
+	frappe.db.set_value("Company", HEAD_OFFICE_COMPANY, "is_group", 1)

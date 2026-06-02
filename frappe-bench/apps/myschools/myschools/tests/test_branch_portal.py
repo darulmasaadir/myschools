@@ -67,9 +67,9 @@ class TestBranchPortalAccess(FrappeTestCase):
 			user.insert(ignore_permissions=True)
 		emp = frappe.db.get_value("Employee", {"user_id": cls.email}, "name")
 		if not emp:
-			company = frappe.db.get_value(
-				"MYS Branch", cls.branch, "company"
-			) or frappe.db.get_value("Company", {}, "name")
+			company = frappe.db.get_value("MYS Branch", cls.branch, "company") or frappe.db.get_value(
+				"Company", {}, "name"
+			)
 			frappe.get_doc(
 				{
 					"doctype": "Employee",
@@ -85,9 +85,7 @@ class TestBranchPortalAccess(FrappeTestCase):
 				}
 			).insert(ignore_permissions=True)
 		else:
-			frappe.db.set_value(
-				"Employee", emp, {"mys_branch": cls.branch, "status": "Active"}
-			)
+			frappe.db.set_value("Employee", emp, {"mys_branch": cls.branch, "status": "Active"})
 
 	def test_branch_resolution(self):
 		frappe.set_user(self.email)

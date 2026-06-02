@@ -35,9 +35,7 @@ def main():
 def _ensure_employee(branch: str) -> str:
 	existing = frappe.db.get_value("Employee", {"user_id": EMAIL}, "name")
 	if existing:
-		frappe.db.set_value(
-			"Employee", existing, {"mys_branch": branch, "status": "Active"}
-		)
+		frappe.db.set_value("Employee", existing, {"mys_branch": branch, "status": "Active"})
 		return existing
 	company = frappe.db.get_value("MYS Branch", branch, "company") or frappe.db.get_value(
 		"Company", {}, "name"
