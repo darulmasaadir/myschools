@@ -1,0 +1,50 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/branch/fees' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">{{ branch.branch_name or branch.name }} · last 90 days</p>
+
+<div class="mys-portal__card">
+	<p class="mys-portal__summary">
+		<span>Collected MTD <strong>{{ frappe.utils.fmt_money(summary.collected_mtd) }}</strong></span>
+		<span>Outstanding <strong>{{ frappe.utils.fmt_money(summary.outstanding_total) }}</strong></span>
+		<span>{{ summary.invoice_count }} invoices · {{ summary.student_count }} students</span>
+	</p>
+</div>
+
+{% if fees %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Student</th>
+				<th>Date</th>
+				<th>Due</th>
+				<th>Total</th>
+				<th>Paid</th>
+				<th>Outstanding</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for f in fees %}
+			<tr>
+				<td>{{ f.student_name or f.student }}</td>
+				<td>{{ f.posting_date }}</td>
+				<td>{{ f.due_date or '—' }}</td>
+				<td>{{ frappe.utils.fmt_money(f.grand_total or 0) }}</td>
+				<td>{{ frappe.utils.fmt_money(f.paid_amount or 0) }}</td>
+				<td>{{ frappe.utils.fmt_money(f.outstanding_amount or 0) }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card"><p>No submitted fee invoices in the last 90 days.</p></div>
+{% endif %}
+{% endblock %}

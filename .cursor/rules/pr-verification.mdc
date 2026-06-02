@@ -7,11 +7,12 @@ alwaysApply: true
 
 Never declare a PR "ready to merge" off the back of unit tests + CI alone. Run the full verification battery first.
 
-## Why (this rule has been triggered THREE times)
+## Why (this rule has been triggered FOUR times)
 
 - **Phase 3 PR #4 round 1:** letterhead missing from rendered HTML (custom Jinja print formats don't auto-wrap with Standard's `{{ letter_head|safe }}`).
 - **Phase 3 PR #4 round 2:** no fresh-install smoke, no browser visual check, no PDF round-trip done before declaring green.
 - **Phase 4 PR #7:** three Notification templates referenced fields that don't exist on their doctypes (`doc.total_royalty`, `doc.title`, `doc.description`), AND `log_outbound_email` rejected `communication_type='Automated Message'` so every Notification-fired email skipped the audit log. **Fixture-import tests passed because Frappe defers Jinja eval until fire time.**
+- **Phase 7c PR #14 follow-up:** MYS Branch desk number cards empty for branch staff. Two compounding causes — Custom Number Cards missing `document_type` (Frappe's `has_permission` returns False), and workspace content blocks keyed by Number Card doc name instead of `Workspace Number Card.label` (`block.js` look-up failed). I verified only as `branch.dir@mys.local`, declared "tested in detail", and missed that **Branch Principal / Branch Admin / Branch Accountant share the same workspace but had different `FRANCHISE_ROLE_READS` grants** — so Principal couldn't see the royalty card, Accountant couldn't see the findings card. Caught only after Ali pushed back **again**. Fix: enumerate the user × surface matrix explicitly, and codify it as a script (`scripts/verify_branch_desk_cards.py`).
 
 CI passing means the code compiles and the assertions you happened to write hold — it does **not** mean the feature works.
 
@@ -24,13 +25,16 @@ CI passing means the code compiles and the assertions you happened to write hold
 5. **Browser visual check** — open the relevant pages (`/app/<workspace>`, `/printview?...`, `/portal`, etc.) and look at them. Screenshots are cheap.
 6. **PDF round-trip** — if a print format ships, generate an actual PDF via `frappe.utils.print_format.download_pdf`. If wkhtmltopdf is broken locally, say so explicitly rather than treating it as "out of scope."
 7. **Plan-level verification list** — the plan often lists numbered E2E checks. Walk them, don't skip them.
+8. **Role × surface matrix** — for any change that touches a *shared surface* (workspace, sidebar, role perms, portal, dashboard, number card, shortcut, web form), **write the matrix down** before declaring done: every relevant test user × every assertion on that surface, and tick each cell with the actual command/HTTP/browser evidence. Verifying as one user is not "tested in detail." Codify the matrix as a `scripts/verify_*.py` bench-execute script (e.g. `scripts/verify_branch_desk_cards.py`) and re-run it on every related change — future regressions then have a one-line repro.
 
-## Hard procedural rules (because the soft version has failed three times)
+## Hard procedural rules (because the soft version has failed four times)
 
 - Before pushing the **first commit** on a feature branch, run the full battery locally — not after pushing, not after CI goes green.
 - When reporting status to Ali, do not write "ready to merge" (or any synonym) unless you can list, in the same message, the actual battery items run and their results. If not yet run, say *"tests + CI green, still need to run [list]"* — never "ready."
 - For Notification/Email Template fixtures specifically, the battery MUST include a Jinja-render-against-real-doc test AND an end-to-end fire smoke (submit a real doc, watch the Communication chain land in `MYS Communication Log`). See [`jinja-render-test`](jinja-render-test.mdc).
 - Treat Ali's pushback *"have you tested it?"* as a signal that you shorted the battery — not as a fresh request. Admit the short and run it.
+- **"Out of scope" is forbidden mid-verification.** If you notice something broken (an empty card, a missing badge, a 500, a stale field) while walking the battery, it is in scope until Ali explicitly says otherwise — do not paper over it in the wrap-up message.
+- **Enumerate the user matrix in writing before claiming done.** For shared surfaces, list every relevant role/user as a checklist in the assistant message; ticking them as evidence comes in is how "tested in detail" is earned. Verifying as a single user on a multi-user surface is a process bug, not a thorough check.
 
 ## Sibling rule — verify before STARTING work, not just before merging
 

@@ -109,16 +109,29 @@ def _ensure_inspector_employee(branch):
 
 
 def _ensure_submitted_invoice():
-	"""Run demo_royalty_invoice if there is no submitted invoice yet."""
+	"""Run demo_royalty_invoice if there is no submitted invoice yet.
+
+	demo_royalty_invoice.run() leaves invoices as Draft (so demos can show
+	the approval flow). For e2e we need a *submitted* invoice so the
+	"Send Reminder" overdue spec runs instead of being skipped. Submit the
+	first Draft if no submitted invoice exists.
+	"""
 	inv = frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 1}, "name")
 	if inv:
 		return inv
-	# demo_royalty_invoice depends on seed_education (Students + Fees).
 	from myschools.scripts import demo_royalty_invoice, seed_education
 
 	seed_education.run()
 	demo_royalty_invoice.run()
-	return frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 1}, "name")
+	inv = frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 1}, "name")
+	if inv:
+		return inv
+	draft = frappe.db.get_value("MYS Royalty Invoice", {"docstatus": 0}, "name")
+	if not draft:
+		return None
+	doc = frappe.get_doc("MYS Royalty Invoice", draft)
+	doc.submit()
+	return doc.name
 
 
 def _ensure_resolved_finding():

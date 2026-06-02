@@ -1,22 +1,15 @@
-import frappe
-
-_BRANCH_ROLES = {
-	"Branch Director",
-	"Branch Principal",
-	"Branch Admin",
-	"Branch Accountant",
-	"Campus Incharge",
-}
+from myschools.api.branch_portal import (
+	get_fees_summary,
+	get_findings_summary,
+	get_royalty_summary,
+	populate_branch_context,
+)
 
 
 def get_context(context):
-	context.no_cache = 1
-	context.show_sidebar = 0
-	if frappe.session.user == "Guest":
-		frappe.local.flags.redirect_location = "/login?redirect-to=/branch"
-		raise frappe.Redirect
-	if not _BRANCH_ROLES & set(frappe.get_roles()):
-		frappe.throw("You do not have access to the Branch portal.", frappe.PermissionError)
-	context.portal_title = "Branch Portal"
-	context.portal_blurb = "Principal dashboard — findings, royalty, and fees land in PR 7c."
+	branch = populate_branch_context(context)
+	context.portal_title = "Branch Dashboard"
+	context.findings_summary = get_findings_summary(branch)
+	context.royalty_summary = get_royalty_summary(branch)
+	context.fees_summary = get_fees_summary(branch)
 	return context

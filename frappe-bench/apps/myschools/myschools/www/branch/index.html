@@ -1,9 +1,59 @@
 {% extends "templates/pages/mys_portal_base.html" %}
 
 {% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/branch' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
 <h1>{{ portal_title }}</h1>
-<p>{{ portal_blurb }}</p>
+<p class="mys-portal__muted">{{ branch.branch_name or branch.name }} · {{ branch.branch_code or '—' }} · {{ branch.city or '' }}</p>
+
 <div class="mys-portal__card">
-	<p><strong>Coming next:</strong> Today's findings, royalty status, and fee collection.</p>
+	<dl class="mys-portal__dl">
+		<dt>Principal</dt><dd>{{ branch.branch_principal or '—' }}</dd>
+		<dt>Director</dt><dd>{{ branch.branch_director or '—' }}</dd>
+		<dt>Campuses</dt><dd>{{ branch.campus_count }}</dd>
+		<dt>Students</dt><dd>{{ branch.student_count }}</dd>
+		<dt>Active staff</dt><dd>{{ branch.staff_count }}</dd>
+	</dl>
+</div>
+
+<div class="mys-portal__card">
+	<h2 style="margin-top:0;font-size:1rem;color:var(--mys-primary-dark,#0a5a36);">Inspection findings</h2>
+	<p class="mys-portal__summary">
+		<span><strong>{{ findings_summary.open_total }}</strong> open</span>
+		<span><strong>{{ findings_summary.overdue_total }}</strong> overdue</span>
+		<span>Critical {{ findings_summary.by_severity.Critical }}</span>
+		<span>Major {{ findings_summary.by_severity.Major }}</span>
+		<span>Minor {{ findings_summary.by_severity.Minor }}</span>
+	</p>
+	<div class="mys-portal__actions">
+		<a class="mys-portal__btn" href="/branch/findings">View findings</a>
+	</div>
+</div>
+
+<div class="mys-portal__card">
+	<h2 style="margin-top:0;font-size:1rem;color:var(--mys-primary-dark,#0a5a36);">Royalty</h2>
+	<p class="mys-portal__summary">
+		<span><strong>{{ frappe.utils.fmt_money(royalty_summary.outstanding, currency=royalty_summary.currency) }}</strong> outstanding</span>
+		<span><strong>{{ frappe.utils.fmt_money(royalty_summary.overdue, currency=royalty_summary.currency) }}</strong> overdue</span>
+		<span>{{ royalty_summary.invoice_count }} invoices</span>
+	</p>
+	<div class="mys-portal__actions">
+		<a class="mys-portal__btn" href="/branch/royalty">View royalty</a>
+	</div>
+</div>
+
+<div class="mys-portal__card">
+	<h2 style="margin-top:0;font-size:1rem;color:var(--mys-primary-dark,#0a5a36);">Fee collection</h2>
+	<p class="mys-portal__summary">
+		<span>Collected MTD <strong>{{ frappe.utils.fmt_money(fees_summary.collected_mtd) }}</strong></span>
+		<span>Outstanding <strong>{{ frappe.utils.fmt_money(fees_summary.outstanding_total) }}</strong></span>
+		<span>{{ fees_summary.invoice_count }} invoices · {{ fees_summary.student_count }} students</span>
+	</p>
+	<div class="mys-portal__actions">
+		<a class="mys-portal__btn" href="/branch/fees">View fees</a>
+	</div>
 </div>
 {% endblock %}

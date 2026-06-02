@@ -36,9 +36,23 @@ Data access lives in [`api/guardian_portal.py`](../../frappe-bench/apps/myschool
 
 **Local HTTP smoke user:** `bench --site SITE execute myschools.scripts.seed_portal_guardian.main` → `mys-portal-smoke-guardian@test.local` / `mys-portal-smoke`.
 
+## Phase 7c — Branch portal (in flight)
+
+Branch: `feature/phase-7c-branch-portal`.
+
+| Route | Purpose |
+|---|---|
+| `/branch` | Dashboard: branch info + findings / royalty / fee KPIs |
+| `/branch/findings` | Open / resolved / all inspection findings |
+| `/branch/royalty` | Last 24 royalty invoices for the branch |
+| `/branch/fees` | Last 90 days fee invoices + outstanding totals |
+
+Branch resolution: `Employee.user_id == frappe.session.user` → `Employee.mys_branch`. Branch staff only (Director / Principal / Admin / Accountant / Campus Incharge). Data is fetched with `ignore_permissions=True` after the explicit branch filter so portal pages render regardless of franchise-scoping wiring on each doctype.
+
+**Local HTTP smoke user:** `bench --site SITE execute myschools.scripts.seed_portal_branch.main` → `mys-portal-smoke-director@test.local` / `mys-portal-smoke-director`.
+
 ## Later slices
 
-- **7c** — Branch principal dashboard
 - **7d** — Inspection checklist runner + admission enquiry Web Form
 
 ## Adding a new portal page

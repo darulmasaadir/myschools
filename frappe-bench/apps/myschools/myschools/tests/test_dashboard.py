@@ -61,6 +61,17 @@ class TestDashboardFixtures(FrappeTestCase):
 		for card_name, method in expected.items():
 			self.assertEqual(frappe.db.get_value("Number Card", card_name, "method"), method)
 
+	def test_custom_number_cards_declare_document_type_for_desk_perm(self):
+		"""Frappe hides Custom Number Cards when `document_type` is unset."""
+		from myschools.setup.install import CUSTOM_NUMBER_CARD_DOCUMENT_TYPES
+
+		for card_name, doctype in CUSTOM_NUMBER_CARD_DOCUMENT_TYPES.items():
+			self.assertEqual(
+				frappe.db.get_value("Number Card", card_name, "document_type"),
+				doctype,
+				msg=card_name,
+			)
+
 	def test_chart_filters_json_is_list_of_lists(self):
 		"""Frappe's `dashboard_chart.get()` calls `.append()` on the parsed
 		`filters_json`. If a chart fixture ships a JSON OBJECT
@@ -120,3 +131,68 @@ class TestDashboardEndpoints(FrappeTestCase):
 		self.assertIn("value", out)
 		self.assertEqual(out["fieldtype"], "Int")
 		self.assertGreaterEqual(out["value"], 0)
+
+
+class TestBranchWorkspaceNumberCards(FrappeTestCase):
+	"""Branch Director must see all four mys-branch workspace number cards."""
+
+	def test_branch_director_has_number_card_perm_when_employee_linked(self):
+		from frappe.desk.doctype.number_card.number_card import has_permission as number_card_has_permission
+
+		email = "_t_nc_branch_dir@mys.local"
+		branch = frappe.db.get_value("MYS Branch", {}, "name")
+		if not branch:
+			self.skipTest("No MYS Branch on site")
+
+		if not frappe.db.exists("User", email):
+			u = frappe.get_doc(
+				{
+					"doctype": "User",
+					"email": email,
+					"first_name": "NC",
+					"last_name": "Director",
+					"send_welcome_email": 0,
+					"enabled": 1,
+					"user_type": "System User",
+				}
+			)
+			u.append("roles", {"role": "Branch Director"})
+			u.insert(ignore_permissions=True)
+
+		emp = frappe.db.get_value("Employee", {"user_id": email}, "name")
+		if not emp:
+			company = frappe.db.get_value("MYS Branch", branch, "company") or frappe.db.get_value(
+				"Company", {}, "name"
+			)
+			frappe.get_doc(
+				{
+					"doctype": "Employee",
+					"first_name": "NC",
+					"last_name": "Director",
+					"gender": "Male",
+					"date_of_birth": "1985-01-01",
+					"date_of_joining": frappe.utils.today(),
+					"status": "Active",
+					"company": company,
+					"user_id": email,
+					"mys_branch": branch,
+				}
+			).insert(ignore_permissions=True)
+
+		previous_user = frappe.session.user
+		frappe.set_user(email)
+		cards = [
+			"MYS - Active Students",
+			"MYS - This Month Royalty Invoiced",
+			"MYS - This Month Fees Collected",
+			"MYS - Overdue Findings",
+		]
+		try:
+			for name in cards:
+				doc = frappe.get_doc("Number Card", name)
+				self.assertTrue(
+					number_card_has_permission(doc, "read", email),
+					msg=f"{name} hidden from Branch Director (check document_type)",
+				)
+		finally:
+			frappe.set_user(previous_user)

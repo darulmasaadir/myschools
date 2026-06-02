@@ -1,8 +1,11 @@
 {
  "charts": [
-  {"chart_name": "MYS - Findings by Severity", "label": "Findings by Severity"}
+  {
+   "chart_name": "MYS - Findings by Severity",
+   "label": "Findings by Severity"
+  }
  ],
- "content": "[{\"id\":\"hdr-insp\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Inspection</b></span>\",\"col\":12}},{\"id\":\"card-1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Open Findings\",\"col\":6}},{\"id\":\"card-2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"MYS - Overdue Findings\",\"col\":6}},{\"id\":\"spacer1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"chart-findings\",\"type\":\"chart\",\"data\":{\"chart_name\":\"MYS - Findings by Severity\",\"col\":12}},{\"id\":\"spacer2\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hdr-shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"sc-templates\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Templates\",\"col\":3}},{\"id\":\"sc-visits\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Visits\",\"col\":3}},{\"id\":\"sc-findings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Findings\",\"col\":3}},{\"id\":\"sc-actions\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Corrective Actions\",\"col\":3}}]",
+ "content": "[{\"id\": \"hdr-insp\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Inspection</b></span>\", \"col\": 12}}, {\"id\": \"card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Open Findings\", \"col\": 6}}, {\"id\": \"card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Overdue Findings\", \"col\": 6}}, {\"id\": \"spacer1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"chart-findings\", \"type\": \"chart\", \"data\": {\"chart_name\": \"MYS - Findings by Severity\", \"col\": 12}}, {\"id\": \"spacer2\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr-shortcuts\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\", \"col\": 12}}, {\"id\": \"sc-templates\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Templates\", \"col\": 3}}, {\"id\": \"sc-visits\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Visits\", \"col\": 3}}, {\"id\": \"sc-findings\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Findings\", \"col\": 3}}, {\"id\": \"sc-actions\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Corrective Actions\", \"col\": 3}}]",
  "creation": "2026-05-25 12:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -14,19 +17,68 @@
  "is_hidden": 0,
  "label": "MYS Inspection",
  "links": [
-  {"hidden": 0, "is_query_report": 0, "label": "Inspection", "link_count": 0, "onboard": 0, "type": "Card Break"},
-  {"hidden": 0, "is_query_report": 0, "label": "Checklist Template", "link_count": 0, "link_to": "MYS Inspection Checklist Template", "link_type": "DocType", "onboard": 1, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Inspection Visit", "link_count": 0, "link_to": "MYS Inspection Visit", "link_type": "DocType", "onboard": 1, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Inspection Finding", "link_count": 0, "link_to": "MYS Inspection Finding", "link_type": "DocType", "onboard": 1, "type": "Link"},
-  {"hidden": 0, "is_query_report": 0, "label": "Corrective Action", "link_count": 0, "link_to": "MYS Corrective Action", "link_type": "DocType", "onboard": 1, "type": "Link"}
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Checklist Template",
+   "link_count": 0,
+   "link_to": "MYS Inspection Checklist Template",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection Visit",
+   "link_count": 0,
+   "link_to": "MYS Inspection Visit",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection Finding",
+   "link_count": 0,
+   "link_to": "MYS Inspection Finding",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Corrective Action",
+   "link_count": 0,
+   "link_to": "MYS Corrective Action",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  }
  ],
- "modified": "2026-05-25 12:00:00.000000",
+ "modified": "2026-05-31 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "MY School ERP",
  "name": "mys-inspection",
  "number_cards": [
-  {"number_card_name": "MYS - Open Findings", "label": "Open Findings"},
-  {"number_card_name": "MYS - Overdue Findings", "label": "Overdue Findings"}
+  {
+   "number_card_name": "MYS - Open Findings",
+   "label": "Open Findings"
+  },
+  {
+   "number_card_name": "MYS - Overdue Findings",
+   "label": "Overdue Findings"
+  }
  ],
  "owner": "Administrator",
  "parent_page": "",
@@ -34,15 +86,45 @@
  "quick_lists": [],
  "restrict_to_domain": "",
  "roles": [
-  {"role": "Academic Monitor"},
-  {"role": "Audit Officer"}
+  {
+   "role": "Academic Monitor"
+  },
+  {
+   "role": "Audit Officer"
+  }
  ],
  "sequence_id": 5.0,
  "shortcuts": [
-  {"color": "Blue", "doc_view": "List", "label": "Templates", "link_to": "MYS Inspection Checklist Template", "type": "DocType"},
-  {"color": "Yellow", "doc_view": "List", "label": "Visits", "link_to": "MYS Inspection Visit", "type": "DocType"},
-  {"color": "Red", "doc_view": "List", "format": "{} Open", "label": "Findings", "link_to": "MYS Inspection Finding", "stats_filter": "{\"status\":[\"in\",[\"Open\",\"In Progress\"]]}", "type": "DocType"},
-  {"color": "Orange", "doc_view": "List", "label": "Corrective Actions", "link_to": "MYS Corrective Action", "type": "DocType"}
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Templates",
+   "link_to": "MYS Inspection Checklist Template",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "label": "Visits",
+   "link_to": "MYS Inspection Visit",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Open",
+   "label": "Findings",
+   "link_to": "MYS Inspection Finding",
+   "stats_filter": "{\"status\":[\"in\",[\"Open\",\"In Progress\"]]}",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "label": "Corrective Actions",
+   "link_to": "MYS Corrective Action",
+   "type": "DocType"
+  }
  ],
  "title": "MYS Inspection"
 }

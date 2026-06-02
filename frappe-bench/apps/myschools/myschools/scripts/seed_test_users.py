@@ -4,12 +4,18 @@
 Creates one System User per franchise role with a known dev password so you can
 manually verify the role-aware shell (workspace landing, sidebar scoping).
 
-Idempotent — re-running keeps existing users and resets their password.
+Branch-scoped users (Director / Principal / Admin / Accountant / Campus Incharge)
+also get an idempotent Employee row linked to the first MYS Branch on the site,
+so the same credentials work on the mobile `/branch` portal — which scopes data
+via `Employee.user_id` + `Employee.mys_branch` (see api/branch_portal.py).
+
+Idempotent — re-running keeps existing users/Employees and resets the password.
 
 DO NOT USE IN PRODUCTION. The shared password is for local development only.
 """
 
 import frappe
+from frappe.utils import today
 
 DEV_PASSWORD = "admin"
 
@@ -25,6 +31,17 @@ TEST_USERS = [
 	("accountant@mys.local", "Aliya", "Accountant", "Branch Accountant"),
 	("campus@mys.local", "Komal", "Incharge", "Campus Incharge"),
 ]
+
+# Roles whose users get a backing Employee row linked to a MYS Branch
+# so they can land on /branch (mobile portal). Campus Incharge is included
+# because the portal's role gate (`require_branch_role`) accepts it too.
+BRANCH_SCOPED_ROLES = {
+	"Branch Director",
+	"Branch Principal",
+	"Branch Admin",
+	"Branch Accountant",
+	"Campus Incharge",
+}
 
 
 def run():
@@ -49,8 +66,52 @@ def run():
 
 		update_password(email, DEV_PASSWORD)
 
+		if role in BRANCH_SCOPED_ROLES:
+			_ensure_employee(email, first_name, last_name)
+
 	frappe.db.commit()
 	_print_summary()
+
+
+def _ensure_employee(email: str, first_name: str, last_name: str) -> str | None:
+	"""Ensure an Employee row linked to `email` exists, joined to a MYS Branch.
+
+	Returns the Employee name, or None if the site has no MYS Branch yet
+	(e.g. a fresh install before seed_demo has run — safe to skip; the user
+	can still log in, they just can't see `/branch` until a branch exists).
+	"""
+	branch = frappe.db.get_value("MYS Branch", {}, "name")
+	if not branch:
+		return None
+	company = frappe.db.get_value("MYS Branch", branch, "company") or frappe.db.get_value(
+		"Company", {}, "name"
+	)
+
+	existing = frappe.db.get_value("Employee", {"user_id": email}, "name")
+	if existing:
+		updates = {"status": "Active"}
+		current_branch = frappe.db.get_value("Employee", existing, "mys_branch")
+		if not current_branch:
+			updates["mys_branch"] = branch
+		frappe.db.set_value("Employee", existing, updates)
+		return existing
+
+	doc = frappe.get_doc(
+		{
+			"doctype": "Employee",
+			"first_name": first_name,
+			"last_name": last_name,
+			"gender": "Male",
+			"date_of_birth": "1985-01-01",
+			"date_of_joining": today(),
+			"status": "Active",
+			"company": company,
+			"user_id": email,
+			"mys_branch": branch,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return doc.name
 
 
 def _print_summary():

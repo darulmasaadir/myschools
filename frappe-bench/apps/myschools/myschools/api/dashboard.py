@@ -11,6 +11,12 @@ Branch scoping:
   through Frappe's `permission_query_conditions` registered in [`hooks.py`](../hooks.py).
 - The custom-method endpoints below apply `_branch_scope_sql` directly so the
   same dashboard works for a Branch Admin (single branch) and the CE (national).
+
+Desk visibility:
+- Custom Number Cards must set `document_type` to a DocType the role can read
+  (e.g. Fees, MYS Royalty Invoice). Frappe's Number Card `has_permission` uses
+  that field to decide whether a workspace card is shown — the whitelisted
+  `method` alone is not enough.
 """
 
 import frappe

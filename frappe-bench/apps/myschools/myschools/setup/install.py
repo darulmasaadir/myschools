@@ -55,10 +55,63 @@ def after_migrate():
 	create_portal_roles()
 	create_custom_franchise_fields()
 	grant_franchise_role_permissions()
+	backfill_custom_number_card_document_types()
+	sync_workspace_number_card_content_labels()
 	backfill_module_profiles()
 	backfill_guardian_user_links()
 	set_default_print_formats()
 	frappe.db.commit()
+
+
+# Frappe's Number Card `has_permission` requires Custom cards to declare which
+# DocType gates visibility (`document_type`). Without it, franchise roles with
+# read on the underlying data still can't see the card on desk workspaces.
+CUSTOM_NUMBER_CARD_DOCUMENT_TYPES = {
+	"MYS - This Month Royalty Invoiced": "MYS Royalty Invoice",
+	"MYS - This Month Fees Collected": "Fees",
+	"MYS - Overdue Findings": "MYS Inspection Finding",
+}
+
+
+def backfill_custom_number_card_document_types():
+	"""Set `document_type` on Custom Number Cards shipped without it (idempotent)."""
+	for name, doctype in CUSTOM_NUMBER_CARD_DOCUMENT_TYPES.items():
+		if not frappe.db.exists("Number Card", name):
+			continue
+		if not frappe.db.exists("DocType", doctype):
+			continue
+		current = frappe.db.get_value("Number Card", name, "document_type")
+		if current != doctype:
+			frappe.db.set_value("Number Card", name, "document_type", doctype, update_modified=False)
+
+
+def sync_workspace_number_card_content_labels():
+	"""Desk workspace blocks match Number Cards by workspace row `label`, not doc name.
+
+	Frappe's workspace `content` JSON stores the value in `number_card_name`, but
+	`block.js` compares it to `Workspace Number Card.label`. Early MYS fixtures
+	used the Number Card document name (e.g. `MYS - Active Students`) — widgets
+	never mounted. Rewrite content blocks to use the child-table label.
+	"""
+	import json
+
+	for ws_name in frappe.get_all("Workspace", filters={"name": ["like", "mys-%"]}, pluck="name"):
+		ws = frappe.get_doc("Workspace", ws_name)
+		if not ws.content or not ws.number_cards:
+			continue
+		name_to_label = {row.number_card_name: (row.label or row.number_card_name) for row in ws.number_cards}
+		content = json.loads(ws.content)
+		changed = False
+		for block in content:
+			if block.get("type") != "number_card":
+				continue
+			current = block.get("data", {}).get("number_card_name")
+			label = name_to_label.get(current)
+			if label and current != label:
+				block["data"]["number_card_name"] = label
+				changed = True
+		if changed:
+			frappe.db.set_value("Workspace", ws_name, "content", json.dumps(content))
 
 
 DEFAULT_PRINT_FORMATS = {
@@ -187,6 +240,8 @@ FRANCHISE_ROLE_READS = {
 		"MYS Branch",
 		"MYS Campus",
 		"MYS Communication Log",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
 		"MYS Inspection Visit",
 		"MYS Inspection Finding",
 		"MYS Corrective Action",
@@ -199,6 +254,10 @@ FRANCHISE_ROLE_READS = {
 		"MYS Branch",
 		"MYS Campus",
 		"MYS Communication Log",
+		"MYS Royalty Invoice",
+		"MYS Royalty Payment",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
 		"Student",
 		"Fees",
 		"Employee",
@@ -210,6 +269,8 @@ FRANCHISE_ROLE_READS = {
 		"MYS Communication Log",
 		"MYS Royalty Invoice",
 		"MYS Royalty Payment",
+		"MYS Inspection Visit",
+		"MYS Inspection Finding",
 		"Student",
 		"Fees",
 	],
