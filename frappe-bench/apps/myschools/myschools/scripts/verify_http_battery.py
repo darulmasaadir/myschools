@@ -23,6 +23,16 @@ BASE = "http://127.0.0.1:8000"
 DEFAULT_HOST = "myschools.localhost"
 
 
+ROLE_LANDING = [
+	("ceo@mys.local", "mys-head-office"),
+	("ho.head@mys.local", "mys-head-office"),
+	("cluster.dir@mys.local", "mys-cluster"),
+	("monitor@mys.local", "mys-inspection"),
+	("audit@mys.local", "mys-inspection"),
+	("campus@mys.local", "mys-campus"),
+]
+
+
 def run(host: str = DEFAULT_HOST):
 	global HOST
 	HOST = host
@@ -35,12 +45,42 @@ def run(host: str = DEFAULT_HOST):
 		"accountant@mys.local",
 	]:
 		_check_branch_user(email, failures)
+	for email, workspace in ROLE_LANDING:
+		_check_role_landing(email, workspace, failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
 		for f in failures:
 			print(f"  ✗ {f}")
 		raise SystemExit(1)
-	print("HTTP BATTERY OK — Administrator + 4 branch users")
+	print(
+		"HTTP BATTERY OK — Administrator + 4 branch users + "
+		f"{len(ROLE_LANDING)} other roles ({', '.join(e for e, _ in ROLE_LANDING)})"
+	)
+
+
+def _check_role_landing(email: str, workspace: str, failures: list[str]) -> None:
+	"""For non-branch roles, prove the user can log in AND open their
+	primary workspace via get_desktop_page without permission errors. The
+	contents are role-shaped; we only assert no error envelope here."""
+	try:
+		op = _login(email, "admin")
+	except urllib.error.HTTPError as exc:
+		failures.append(f"{email}: login failed ({exc.code})")
+		return
+	page = _post_json(
+		op,
+		"/api/method/frappe.desk.desktop.get_desktop_page",
+		{"page": json.dumps({"name": workspace})},
+	)
+	msg = page.get("message") or {}
+	if not isinstance(msg, dict):
+		failures.append(f"{email} {workspace}: unexpected response type {type(msg).__name__}")
+		return
+	if msg.get("error") or msg.get("exc_type"):
+		failures.append(f"{email} {workspace}: {msg.get('error') or msg.get('exc_type')}")
+		return
+	if "shortcuts" not in msg and "number_cards" not in msg and "links" not in msg:
+		failures.append(f"{email} {workspace}: empty desktop page payload")
 
 
 def _login(email: str, password: str) -> urllib.request.OpenerDirector:
