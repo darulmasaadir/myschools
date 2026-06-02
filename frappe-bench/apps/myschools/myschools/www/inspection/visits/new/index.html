@@ -1,0 +1,39 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/inspection/visits' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+{% if error %}<p class="mys-portal__error">{{ error }}</p>{% endif %}
+<form method="post" class="mys-portal__card">
+	<div class="mys-portal__field">
+		<label for="branch">Branch</label>
+		<select name="branch" id="branch" required>
+			<option value="">Select branch</option>
+			{% for b in branches %}
+			<option value="{{ b.name }}">{{ b.branch_name }} ({{ b.branch_code }})</option>
+			{% endfor %}
+		</select>
+	</div>
+	<div class="mys-portal__field">
+		<label for="visit_type">Visit type</label>
+		<select name="visit_type" id="visit_type" required>
+			{% for vt in visit_types %}
+			<option value="{{ vt }}">{{ vt }}</option>
+			{% endfor %}
+		</select>
+	</div>
+	<div class="mys-portal__field">
+		<label for="visit_date">Visit date</label>
+		<input type="date" name="visit_date" id="visit_date" value="{{ frappe.utils.today() }}">
+	</div>
+	<div class="mys-portal__field">
+		<label for="campus">Campus (optional)</label>
+		<input type="text" name="campus" id="campus" placeholder="Campus name if scoped to one wing">
+	</div>
+	<button type="submit" class="mys-portal__btn">Create draft visit</button>
+</form>
+{% endblock %}

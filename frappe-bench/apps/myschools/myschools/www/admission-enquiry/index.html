@@ -1,0 +1,45 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">Submit an enquiry to MY School. We will contact you shortly.</p>
+{% if success %}
+<div class="mys-portal__card">
+	<p class="mys-portal__success">Thank you — your enquiry has been received{% if reference %} ({{ reference }}){% endif %}.</p>
+</div>
+{% else %}
+{% if error %}<p class="mys-portal__error">{{ error }}</p>{% endif %}
+<form method="post" class="mys-portal__card">
+	<div class="mys-portal__field">
+		<label for="branch">Preferred branch</label>
+		<select name="branch" id="branch">
+			<option value="">Any / not sure</option>
+			{% for b in branches %}
+			<option value="{{ b.name }}">{{ b.branch_name }} — {{ b.city or '' }}</option>
+			{% endfor %}
+		</select>
+	</div>
+	<div class="mys-portal__field">
+		<label for="parent_name">Parent / guardian name</label>
+		<input type="text" name="parent_name" id="parent_name" required>
+	</div>
+	<div class="mys-portal__field">
+		<label for="phone">Phone</label>
+		<input type="tel" name="phone" id="phone" required>
+	</div>
+	<div class="mys-portal__field">
+		<label for="email">Email (optional)</label>
+		<input type="email" name="email" id="email">
+	</div>
+	<div class="mys-portal__field">
+		<label for="child_grade">Child grade / age (optional)</label>
+		<input type="text" name="child_grade" id="child_grade">
+	</div>
+	<div class="mys-portal__field">
+		<label for="message">Message (optional)</label>
+		<textarea name="message" id="message" rows="3"></textarea>
+	</div>
+	<button type="submit" class="mys-portal__btn">Submit enquiry</button>
+</form>
+{% endif %}
+{% endblock %}

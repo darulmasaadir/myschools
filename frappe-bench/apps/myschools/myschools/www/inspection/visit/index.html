@@ -1,0 +1,158 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ visit.name }}</h1>
+<p class="mys-portal__muted">{{ visit.branch_label }} · {{ visit.visit_date }} · {{ visit.visit_type }}
+	{% if visit.docstatus == 0 %}<span class="mys-portal__tag">Draft</span>{% else %}<span class="mys-portal__tag">Submitted</span>{% endif %}
+</p>
+{% if saved %}<p class="mys-portal__success">Checklist saved.</p>{% endif %}
+{% if submitted %}<p class="mys-portal__success">Visit submitted.</p>{% endif %}
+
+<div class="mys-portal__card">
+	<p class="mys-portal__summary">
+		<span>Score <strong>{{ visit.score_percent or 0 }}%</strong></span>
+		<span>Passed <strong>{{ visit.items_passed or 0 }}</strong></span>
+		<span>Failed <strong>{{ visit.items_failed or 0 }}</strong></span>
+	</p>
+</div>
+
+{% if visit.docstatus == 0 and templates %}
+<div class="mys-portal__card">
+	<h2 style="margin-top:0;font-size:1rem;">Apply checklist template</h2>
+	<form id="apply-template-form" class="mys-portal__actions">
+		<select id="template-select" required>
+			<option value="">Choose template</option>
+			{% for t in templates %}
+			<option value="{{ t.name }}">{{ t.template_name }} (v{{ t.version }})</option>
+			{% endfor %}
+		</select>
+		<button type="submit" class="mys-portal__btn">Apply</button>
+	</form>
+	<p id="template-msg" class="mys-portal__muted"></p>
+</div>
+{% endif %}
+
+{% if visit.checklist_rows %}
+<form id="checklist-form">
+	{% for row in visit.checklist_rows %}
+	<div class="mys-portal__check-item" data-idx="{{ row.idx }}">
+		<p><strong>{{ row.item_text }}</strong> · {{ row.category }} · {{ row.severity }}</p>
+		<div class="mys-portal__field">
+			<label>Result</label>
+			<select name="result_{{ row.idx }}" class="check-result" {% if visit.docstatus != 0 %}disabled{% endif %}>
+				<option value="">—</option>
+				<option value="Pass" {% if row.result == 'Pass' %}selected{% endif %}>Pass</option>
+				<option value="Fail" {% if row.result == 'Fail' %}selected{% endif %}>Fail</option>
+				<option value="N/A" {% if row.result == 'N/A' %}selected{% endif %}>N/A</option>
+			</select>
+		</div>
+		<div class="mys-portal__field">
+			<label>Notes</label>
+			<textarea name="notes_{{ row.idx }}" class="check-notes" rows="2" {% if visit.docstatus != 0 %}readonly{% endif %}>{{ row.notes }}</textarea>
+		</div>
+	</div>
+	{% endfor %}
+	{% if visit.docstatus == 0 %}
+	<div class="mys-portal__actions">
+		<button type="button" id="save-checklist" class="mys-portal__btn">Save checklist</button>
+		<button type="button" id="submit-visit" class="mys-portal__btn mys-portal__btn--secondary">Submit visit</button>
+	</div>
+	<p id="checklist-msg" class="mys-portal__muted"></p>
+	{% endif %}
+</form>
+{% elif visit.docstatus == 0 %}
+<p class="mys-portal__muted">Apply a template above to load checklist items.</p>
+{% else %}
+<p class="mys-portal__muted">No checklist items on this visit.</p>
+{% endif %}
+
+<script>
+(function () {
+	const visitName = {{ visit.name | tojson }};
+	const applyForm = document.getElementById("apply-template-form");
+	if (applyForm) {
+		applyForm.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			const template = document.getElementById("template-select").value;
+			if (!template) return;
+			const msg = document.getElementById("template-msg");
+			msg.textContent = "Applying…";
+			const r = await fetch("/api/method/myschools.api.inspection_portal.apply_template", {
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({ visit: visitName, template }),
+			});
+			const data = await r.json();
+			if (data.exc) {
+				msg.textContent = data._server_messages || "Failed";
+				return;
+			}
+			window.location.reload();
+		});
+	}
+	function collectRows() {
+		return Array.from(document.querySelectorAll(".mys-portal__check-item")).map((el) => {
+			const idx = el.dataset.idx;
+			return {
+				idx: parseInt(idx, 10),
+				result: el.querySelector(".check-result").value,
+				notes: el.querySelector(".check-notes").value,
+			};
+		});
+	}
+	const saveBtn = document.getElementById("save-checklist");
+	if (saveBtn) {
+		saveBtn.addEventListener("click", async () => {
+			const msg = document.getElementById("checklist-msg");
+			msg.textContent = "Saving…";
+			const r = await fetch("/api/method/myschools.api.inspection_portal.save_checklist", {
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({
+					visit: visitName,
+					rows: JSON.stringify(collectRows()),
+				}),
+			});
+			const data = await r.json();
+			if (data.exc) {
+				msg.textContent = "Save failed";
+				return;
+			}
+			window.location.href = "/inspection/visit?name=" + encodeURIComponent(visitName) + "&saved=1";
+		});
+	}
+	const submitBtn = document.getElementById("submit-visit");
+	if (submitBtn) {
+		submitBtn.addEventListener("click", async () => {
+			if (!confirm("Submit this visit? Failed Critical/Major items will create findings.")) return;
+			const msg = document.getElementById("checklist-msg");
+			msg.textContent = "Submitting…";
+			await fetch("/api/method/myschools.api.inspection_portal.save_checklist", {
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({
+					visit: visitName,
+					rows: JSON.stringify(collectRows()),
+				}),
+			});
+			const r = await fetch("/api/method/myschools.api.inspection_portal.submit_visit", {
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({ visit: visitName }),
+			});
+			const data = await r.json();
+			if (data.exc) {
+				msg.textContent = "Submit failed — save all results first.";
+				return;
+			}
+			window.location.href = "/inspection/visit?name=" + encodeURIComponent(visitName) + "&submitted=1";
+		});
+	}
+})();
+</script>
+{% endblock %}

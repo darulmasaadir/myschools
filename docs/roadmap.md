@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-05-31
-**Up next:** Phase 7 — Portals (Guardian / Branch / Inspection) via Frappe Web Forms + `www/`
+**Last updated:** 2026-06-02
+**Up next:** Phase 7d — Inspection portal + admission enquiry (then Phase 8)
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -32,7 +32,7 @@ These bind every phase:
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
-| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b ✅ PR #13 · 7c `feature/phase-7c-branch-portal` |
+| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b ✅ PR #13 · 7c ✅ PR #14 · 7d in flight |
 | 8 | Domain extensions | ⬜ | — |
 
 ---
@@ -216,19 +216,27 @@ Delivered PR [#13](https://github.com/darulmasaadir/myschools/pull/13) (`f7b5cf7
 - Tests: `tests/test_guardian_portal.py` (4 tests; full app suite 106)
 - Smoke seed: `scripts/seed_portal_guardian.py`
 
-### 7c — Branch portal (in flight)
+### 7c — Branch portal ✅
 
-Branch: `feature/phase-7c-branch-portal`.
+Delivered PR [#14](https://github.com/darulmasaadir/myschools/pull/14) (`e4432df`).
 
 - `/branch` dashboard with branch info + findings / royalty / fees KPIs
 - `/branch/findings`, `/branch/royalty`, `/branch/fees`
 - API: `api/branch_portal.py` — branch resolution via `Employee.user_id`, scoped queries
-- Tests: `tests/test_branch_portal.py`
+- Desk: Mobile Dashboard shortcut on `mys-branch` workspace; number-card fixes for all branch staff
+- Tests: `tests/test_branch_portal.py` · `scripts/verify_branch_desk_cards.py` · `scripts/verify_http_battery.py`
 - Smoke seed: `scripts/seed_portal_branch.py`
+- Fresh-install: `ci_bootstrap` marks Head Office as group company so `seed_demo` works on greenfield sites
 
-### 7d (planned)
+### 7d — Inspection portal (in flight)
 
-- **7d** Inspection portal — checklist runner; admission enquiry Web Form.
+Branch: `feature/phase-7d-inspection-portal`.
+
+- `/inspection` dashboard, `/inspection/visits`, `/inspection/visit` checklist runner
+- API: `api/inspection_portal.py` — cluster-scoped visits + checklist save/submit
+- Public `/admission-enquiry` (or Web Form) → `MYS Communication Log`
+- Tests: `tests/test_inspection_portal.py`
+- Smoke seed: `scripts/seed_portal_inspection.py`
 
 ---
 

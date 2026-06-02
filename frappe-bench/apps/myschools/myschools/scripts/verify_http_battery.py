@@ -47,15 +47,40 @@ def run(host: str = DEFAULT_HOST):
 		_check_branch_user(email, failures)
 	for email, workspace in ROLE_LANDING:
 		_check_role_landing(email, workspace, failures)
+	for email in ["monitor@mys.local", "audit@mys.local"]:
+		_check_inspection_user(email, failures)
+	_check_admission_enquiry_public(failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
 		for f in failures:
 			print(f"  ✗ {f}")
 		raise SystemExit(1)
 	print(
-		"HTTP BATTERY OK — Administrator + 4 branch users + "
-		f"{len(ROLE_LANDING)} other roles ({', '.join(e for e, _ in ROLE_LANDING)})"
+		"HTTP BATTERY OK — Administrator + 4 branch + "
+		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + /admission-enquiry"
 	)
+
+
+def _check_inspection_user(email: str, failures: list[str]) -> None:
+	op = _login(email, "admin")
+	for path in ["/inspection", "/inspection/visits", "/inspection/visits/new"]:
+		status, body = _get(op, path)
+		if status != 200:
+			failures.append(f"{email} {path}: HTTP {status}")
+		elif "You do not have access" in body:
+			failures.append(f"{email} {path}: permission denied in body")
+
+
+def _check_admission_enquiry_public(failures: list[str]) -> None:
+	req = urllib.request.Request(f"{BASE}/admission-enquiry", headers={"Host": HOST})
+	try:
+		resp = urllib.request.urlopen(req, timeout=30)
+		body = resp.read().decode("utf-8", errors="replace")
+	except urllib.error.HTTPError as exc:
+		failures.append(f"/admission-enquiry: HTTP {exc.code}")
+		return
+	if "Admission enquiry" not in body:
+		failures.append("/admission-enquiry: missing page title marker")
 
 
 def _check_role_landing(email: str, workspace: str, failures: list[str]) -> None:
