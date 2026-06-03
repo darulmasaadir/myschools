@@ -244,9 +244,7 @@ def apply_resolved_fee_structure_on_fees(doc, method=None):
 	if not doc.student:
 		return
 
-	branch, campus = frappe.db.get_value(
-		"Student", doc.student, ["mys_branch", "mys_campus"]
-	) or (None, None)
+	branch, campus = frappe.db.get_value("Student", doc.student, ["mys_branch", "mys_campus"]) or (None, None)
 	if not branch:
 		return
 
@@ -298,6 +296,179 @@ def _fees_program_and_year(doc) -> tuple[str | None, str | None]:
 	return program, academic_year
 
 
+@frappe.whitelist()
+def generate_bulk_fees_for_run(run: str) -> dict:
+	"""Create submitted `Fees` rows for students in a Student Group (8a-4).
+
+	Uses `resolve_fee_structure` per student (campus/branch override). Skips students
+	who already have a submitted Fee for the same enrollment + posting_date.
+	"""
+	run_doc = frappe.get_doc("MYS Bulk Fee Run", run)
+	if run_doc.status == "In Process":
+		frappe.throw(_("This run is already in progress"))
+	if not run_doc.company:
+		frappe.throw(_("Branch has no Company linked"))
+
+	run_doc.status = "In Process"
+	run_doc.save(ignore_permissions=True)
+	frappe.db.commit()
+
+	receivable = _company_receivable(run_doc.company)
+	rows = _students_for_bulk_run(run_doc)
+	lines = []
+	counts = {"created": 0, "skipped": 0, "failed": 0}
+
+	for row in rows:
+		line = {
+			"student": row.student,
+			"program_enrollment": row.enrollment,
+			"status": "Failed",
+			"message": "",
+		}
+		try:
+			existing = _existing_submitted_fee_for_enrollment(row.enrollment, run_doc.posting_date)
+			if existing:
+				line["status"] = "Skipped"
+				line["fees"] = existing
+				line["message"] = _("Already billed for this enrollment on {0}").format(run_doc.posting_date)
+				counts["skipped"] += 1
+				lines.append(line)
+				continue
+
+			fs, _source = resolve_fee_structure(
+				run_doc.branch,
+				row.program,
+				run_doc.academic_year,
+				run_doc.company,
+				campus=row.campus or None,
+			)
+			if not fs:
+				line["message"] = _("No Fee Structure for program/year/company")
+				counts["failed"] += 1
+				lines.append(line)
+				continue
+
+			components = _fee_structure_components(fs)
+			if not components:
+				line["message"] = _("Fee Structure has no components")
+				counts["failed"] += 1
+				lines.append(line)
+				continue
+
+			fee = frappe.get_doc(
+				{
+					"doctype": "Fees",
+					"student": row.student,
+					"program_enrollment": row.enrollment,
+					"program": row.program,
+					"fee_structure": fs,
+					"company": run_doc.company,
+					"receivable_account": receivable,
+					"academic_year": run_doc.academic_year,
+					"academic_term": run_doc.academic_term or row.academic_term,
+					"posting_date": run_doc.posting_date,
+					"due_date": run_doc.due_date,
+					"components": components,
+				}
+			)
+			fee.insert(ignore_permissions=True)
+			if run_doc.submit_fees:
+				fee.submit()
+
+			line["status"] = "Created"
+			line["fees"] = fee.name
+			line["fee_structure"] = fs
+			line["message"] = _("OK")
+			counts["created"] += 1
+		except Exception as exc:
+			line["message"] = str(exc)
+			counts["failed"] += 1
+		lines.append(line)
+
+	run_doc.lines = []
+	for line in lines:
+		run_doc.append("lines", line)
+
+	total = len(rows)
+	if counts["failed"] == total and total:
+		run_doc.status = "Failed"
+	elif counts["failed"] or counts["skipped"]:
+		run_doc.status = "Partial" if counts["created"] else "Failed"
+	else:
+		run_doc.status = "Completed"
+
+	run_doc.summary = _("Created: {created}, Skipped: {skipped}, Failed: {failed}").format(**counts)
+	run_doc.save(ignore_permissions=True)
+	frappe.db.commit()
+
+	return {"status": run_doc.status, "summary": run_doc.summary, **counts}
+
+
+def _students_for_bulk_run(run) -> list[frappe._dict]:
+	"""Active group members with submitted enrollment on this branch."""
+	term_clause = ""
+	params: list = [run.academic_year, run.student_group, run.branch]
+	if run.academic_term:
+		term_clause = " AND pe.academic_term = %s"
+		params.append(run.academic_term)
+	program_clause = ""
+	if run.program:
+		program_clause = " AND pe.program = %s"
+		params.append(run.program)
+
+	return frappe.db.sql(
+		f"""
+		SELECT
+			pe.student AS student,
+			pe.name AS enrollment,
+			pe.program AS program,
+			pe.academic_term AS academic_term,
+			stu.mys_campus AS campus
+		FROM `tabStudent Group Student` sgs
+		INNER JOIN `tabProgram Enrollment` pe
+			ON pe.student = sgs.student
+			AND pe.docstatus = 1
+			AND pe.academic_year = %s
+		INNER JOIN `tabStudent` stu ON stu.name = pe.student
+		WHERE sgs.parent = %s
+			AND IFNULL(sgs.active, 0) = 1
+			AND stu.mys_branch = %s
+			{term_clause}
+			{program_clause}
+		""",
+		tuple(params),
+		as_dict=True,
+	)
+
+
+def _fee_structure_components(fee_structure: str) -> list[dict]:
+	fs = frappe.get_doc("Fee Structure", fee_structure)
+	return [{"fees_category": row.fees_category, "amount": row.amount} for row in fs.components]
+
+
+def _existing_submitted_fee_for_enrollment(enrollment: str, posting_date) -> str | None:
+	return frappe.db.get_value(
+		"Fees",
+		{
+			"program_enrollment": enrollment,
+			"posting_date": posting_date,
+			"docstatus": 1,
+		},
+		"name",
+	)
+
+
+def _company_receivable(company: str) -> str:
+	acc = frappe.db.get_value(
+		"Account",
+		{"company": company, "account_type": "Receivable", "is_group": 0},
+		"name",
+	)
+	if not acc:
+		frappe.throw(_("No receivable account for company {0}").format(company))
+	return acc
+
+
 def fee_structure_override_query(user):
 	from myschools.api.permissions import _user_scope
 
@@ -320,3 +491,15 @@ def late_fee_policy_query(user):
 		return "`tabMYS Late Fee Policy`.branch = '__none__'"
 	in_list = ", ".join(frappe.db.escape(b) for b in branches)
 	return f"`tabMYS Late Fee Policy`.branch IN ({in_list})"
+
+
+def bulk_fee_run_query(user):
+	from myschools.api.permissions import _user_scope
+
+	scope, branches = _user_scope(user)
+	if scope == "global":
+		return ""
+	if scope == "none" or not branches:
+		return "`tabMYS Bulk Fee Run`.branch = '__none__'"
+	in_list = ", ".join(frappe.db.escape(b) for b in branches)
+	return f"`tabMYS Bulk Fee Run`.branch IN ({in_list})"

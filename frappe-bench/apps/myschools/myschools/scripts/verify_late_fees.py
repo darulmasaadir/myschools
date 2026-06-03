@@ -301,7 +301,9 @@ def _teardown(created: dict) -> None:
 			frappe.delete_doc("Fees", name, force=True, ignore_permissions=True)
 
 	_del_fee(created.get("late_fee"))
-	for late in frappe.get_all("Fees", {"mys_late_fee_for": created.get("parent_fee") or "__x__"}, pluck="name"):
+	for late in frappe.get_all(
+		"Fees", {"mys_late_fee_for": created.get("parent_fee") or "__x__"}, pluck="name"
+	):
 		_del_fee(late)
 	_del_fee(created.get("parent_fee"))
 

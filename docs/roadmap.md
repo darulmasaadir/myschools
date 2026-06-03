@@ -263,8 +263,9 @@ What shipped:
 - Tests: [`tests/test_fees.py`](../frappe-bench/apps/myschools/myschools/tests/test_fees.py).
 - **`resolve_fee_structure()` wired on `Fees.validate`** (8a-3) — defaults `fee_structure` from campus/branch override; warns if operator picks a different structure while an override is active.
 - **Billing safety** (8a-2) — `Accounts` module blocked on MYS Branch/Cluster profiles; franchise roles denied create on `Fee Schedule` / `Sales Invoice` via `restrict_split_brain_billing_paths()` in install/migrate.
+- **Bulk Fees** (8a-4) — `MYS Bulk Fee Run` + `generate_bulk_fees_for_run` (student group → submitted `Fees`, override resolution, duplicate skip).
 
-### 8a follow-ups ⬜
+### 8a follow-ups ✅ (in branch)
 
 Decision record: [processes/billing-model.md](processes/billing-model.md). Canonical object = Education **`Fees`**.
 
@@ -272,7 +273,7 @@ Decision record: [processes/billing-model.md](processes/billing-model.md). Canon
 |----|--------|--------|
 | **8a-2** | ✅ in branch | Module profile + `restrict_split_brain_billing_paths()` |
 | **8a-3** | ✅ in branch | `Fees` validate → `apply_resolved_fee_structure_on_fees` |
-| **8a-4** | ⬜ | **Bulk `Fees` generator** — student-group scale tool (not Sales Invoice) |
+| **8a-4** | ✅ in branch | **`MYS Bulk Fee Run`** — student group + term → N submitted `Fees` via `generate_bulk_fees_for_run`; uses `resolve_fee_structure`; tests `test_bulk_fee_run.py` |
 
 ### 8b–8e (planned)
 

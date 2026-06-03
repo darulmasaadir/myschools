@@ -99,6 +99,7 @@ permission_query_conditions = {
 	"MYS Royalty Payment": "myschools.api.royalty.royalty_payment_query",
 	"MYS Fee Structure Override": "myschools.api.fees.fee_structure_override_query",
 	"MYS Late Fee Policy": "myschools.api.fees.late_fee_policy_query",
+	"MYS Bulk Fee Run": "myschools.api.fees.bulk_fee_run_query",
 }
 
 has_permission = {

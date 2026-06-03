@@ -13,9 +13,7 @@ from myschools.setup.install import restrict_split_brain_billing_paths
 
 class TestBillingSafety(FrappeTestCase):
 	def test_branch_module_profile_blocks_accounts(self):
-		fixture = (
-			Path(__file__).resolve().parents[1] / "fixtures" / "module_profile.json"
-		)
+		fixture = Path(__file__).resolve().parents[1] / "fixtures" / "module_profile.json"
 		profiles = json.loads(fixture.read_text())
 		branch = next(p for p in profiles if p["name"] == "MYS Branch")
 		blocked = {row["module"] for row in branch.get("block_modules", [])}

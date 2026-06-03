@@ -66,14 +66,9 @@ run; portals would show gaps.
 
 ## 4. Gaps (honest)
 
-1. **No bulk generator for `Fees`.** Education’s only bulk tool emits Sales
-   Invoices. At scale, branches either create `Fees` one-by-one or need a
-   custom bulk tool (roadmap **8a-4**).
-2. **`resolve_fee_structure()` is API-only until wired** (roadmap **8a-3**).
-   Overrides in `MYS Fee Structure Override` are stored and tested; new `Fees`
-   rows do not yet default `fee_structure` from the resolver.
-3. **Split-brain risk.** Fee Schedule / Sales Invoice are still reachable in a
-   vanilla Education install if module profiles are not trimmed (roadmap **8a-2**).
+1. ~~**No bulk generator for `Fees`.**~~ Addressed by **8a-4** (`MYS Bulk Fee Run`).
+2. ~~**`resolve_fee_structure()` API-only.**~~ Addressed by **8a-3** (`Fees.validate`).
+3. ~~**Split-brain risk.**~~ Mitigated by **8a-2** (module profiles + `restrict_split_brain_billing_paths()`).
 
 Phase **8a** (overrides, late-fee policy, scheduler) is **correct on `Fees`**;
 these gaps are follow-ups, not reasons to rework 8a.
@@ -86,18 +81,19 @@ these gaps are follow-ups, not reasons to rework 8a.
 |----|------|------------------------|
 | **8a-2** | ✅ **Billing safety** — `Accounts` blocked on MYS Branch/Cluster module profiles; `restrict_split_brain_billing_paths()` denies franchise roles create on `Fee Schedule` / `Sales Invoice`. | `module_profile.json` + `setup/install.py`; tests in `test_billing_safety.py`. |
 | **8a-3** | ✅ **Wire overrides** — `Fees.validate` → `apply_resolved_fee_structure_on_fees` sets `fee_structure` from `resolve_fee_structure()`; orange alert on mismatch with active override. | `hooks.py` `doc_events` + `test_fees.py`. |
-| **8a-4** | **Bulk `Fees` generator** — custom DocType or whitelisted tool (student group + program + term → N submitted `Fees`), mirroring Fee Schedule ergonomics but emitting **`Fees`**. Reuse resolver from 8a-3. | New doctype/API in `myschools` app only. |
+| **8a-4** | ✅ **Bulk `Fees` generator** — `MYS Bulk Fee Run` + `generate_bulk_fees_for_run` (student group + program/term filters → submitted `Fees`; resolver + duplicate skip). | `my_school_erp/doctype/mys_bulk_fee_run/`, `api/fees.py`, `tests/test_bulk_fee_run.py`. |
 
-**Order:** 8a-2 (quick, reduces operational risk) → 8a-3 (makes overrides live) →
-8a-4 (scale). Optional: role×surface test for override/policy doctype permissions
+**Order:** 8a-2 → 8a-3 → 8a-4 — **complete on branch `feature/phase-8a-fee-overrides-late-fees`.** Optional: role×surface test for override/policy doctype permissions
 (Branch Director write, Accountant read, Monitor denied — already correct by JSON).
 
 ---
 
-## 6. Operator guidance (until 8a-4 ships)
+## 6. Operator guidance
 
-- Create and submit student invoices as **`Fees`**, linked to **Program
-  Enrollment** and the correct **Fee Structure** (or rely on 8a-3 once shipped).
+- For a class/batch at term start: open **MYS Bulk Fee Run**, pick branch, **Student Group**,
+  academic year/term, posting/due dates, then **Generate Fees** (creates submitted `Fees`).
+- For one-off invoices: create **`Fees`** linked to **Program Enrollment**; **8a-3** defaults
+  `fee_structure` from campus/branch override when blank.
 - **Do not** use **Fee Schedule → Create fees** for franchise billing; that
   path creates Sales Invoices MY School does not read.
 - Configure **MYS Fee Structure Override** / **MYS Late Fee Policy** per branch
@@ -117,7 +113,6 @@ these gaps are follow-ups, not reasons to rework 8a.
 
 ## 8. Verification
 
-- Unit: `tests/test_fees.py`, `tests/test_royalty_from_fees.py`
+- Unit: `tests/test_fees.py`, `tests/test_bulk_fee_run.py`, `tests/test_royalty_from_fees.py`
 - Live scheduler: `scripts/verify_late_fees.py` (real `scheduled_apply_late_fees`)
-- After 8a-3: add test that inserting `Fees` picks campus/branch override structure
-- After 8a-4: e2e bulk run → N `Fees` visible in royalty roll-up for the period
+- Bulk: `test_bulk_fee_run` — override structure applied; duplicate enrollment skipped on same posting date

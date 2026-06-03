@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 8a-4 — bulk Fees generator.** `MYS Bulk Fee Run` doctype with **Generate Fees**
+  action; `generate_bulk_fees_for_run` creates submitted `Fees` per active student-group
+  member (override resolution, duplicate skip); `tests/test_bulk_fee_run.py`.
+- **Phase 8a-2/8a-3 (in branch).** Billing safety (module profile + `restrict_split_brain_billing_paths`);
+  `Fees.validate` → `apply_resolved_fee_structure_on_fees`.
 - **Phase 8a — fee overrides + late fees (in flight).** `MYS Fee Structure Override` and
   `MYS Late Fee Policy` doctypes; [`api/fees.py`](frappe-bench/apps/myschools/myschools/api/fees.py)
   with `resolve_fee_structure`, `apply_late_fees`, and daily scheduler; custom fields on `Fees`
