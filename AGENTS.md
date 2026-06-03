@@ -38,10 +38,10 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - Build scripts (source-of-truth for fixtures): [`frappe-bench/apps/myschools/myschools/scripts/`](frappe-bench/apps/myschools/myschools/scripts/)
 - Process docs: [`docs/processes/`](docs/processes/)
 
-## Status snapshot (as of 2026-05-31)
+## Status snapshot (as of 2026-06-03)
 
 - ✅ Phases 0–6: foundations, branding, workspaces, print formats, notifications, workflows, setup wizard + reports
-- 🟡 **Phase 7 (in flight)**: Portals — 7a foundations on `feature/phase-7a-portal-foundations`; 7b–7d content slices follow
+- 🟡 **Phase 7 (in flight)**: Portals — 7a ✅ · 7b ✅ · 7c ✅ PR #14 · **7d** inspection portal + admission enquiry 🟡 PR #15 (CI green; flip to ✅ at merge)
 - ⬜ Phase 8: Domain extensions (per-branch Fee Structure, student lifecycle, SMS adapters, HR scaffolding, payment gateways)
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

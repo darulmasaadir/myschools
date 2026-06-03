@@ -1,9 +1,42 @@
 {% extends "templates/pages/mys_portal_base.html" %}
 
 {% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/inspection' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
 <h1>{{ portal_title }}</h1>
-<p>{{ portal_blurb }}</p>
+<p class="mys-portal__muted">Cluster-scoped visits and findings for your inspector role.</p>
+
 <div class="mys-portal__card">
-	<p><strong>Coming next:</strong> Open visits and mobile checklist submission.</p>
+	<p class="mys-portal__summary">
+		<span><strong>{{ summary.open_findings }}</strong> open findings</span>
+		<span><strong>{{ summary.overdue_findings }}</strong> overdue</span>
+		<span><strong>{{ summary.draft_visits }}</strong> draft visits</span>
+	</p>
+	<div class="mys-portal__actions">
+		<a class="mys-portal__btn" href="/inspection/visits">All visits</a>
+		<a class="mys-portal__btn" href="/inspection/visits/new">New visit</a>
+	</div>
 </div>
+
+{% if summary.recent_visits %}
+<div class="mys-portal__card">
+	<h2 style="margin-top:0;font-size:1rem;color:var(--mys-primary-dark,#0a5a36);">Recent visits</h2>
+	<ul class="mys-portal__list">
+		{% for v in summary.recent_visits %}
+		<li>
+			<a href="/inspection/visit?name={{ v.name }}">{{ v.name }}</a>
+			— {{ v.branch_label }} · {{ v.visit_date }} · {{ v.visit_type }}
+			{% if v.docstatus == 0 %}<span class="mys-portal__tag">Draft</span>{% else %}<span class="mys-portal__tag">Submitted</span>{% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+{% else %}
+<div class="mys-portal__card">
+	<p class="mys-portal__muted">No visits yet. <a href="/inspection/visits/new">Create a visit</a> to run a checklist.</p>
+</div>
+{% endif %}
 {% endblock %}

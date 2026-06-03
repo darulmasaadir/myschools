@@ -6,7 +6,7 @@
 
 Portals are **Frappe `www/` Jinja pages + Web Forms** inside the `myschools` app. No Vue/React SPA, no separate auth service. See [upgrade-safe-only](../../.cursor/rules/upgrade-safe-only.mdc).
 
-## Phase 7a — foundations (shipped first)
+## Phase 7a — foundations ✅
 
 | Piece | Location |
 |---|---|
@@ -20,9 +20,9 @@ Portals are **Frappe `www/` Jinja pages + Web Forms** inside the `myschools` app
 
 Anonymous `/portal` → `/login`. Logged-in users are redirected to the first matching portal role (Guardian before branch staff).
 
-## Phase 7b — Guardian portal content (in flight)
+## Phase 7b — Guardian portal content ✅
 
-Branch: `feature/phase-7b-guardian-portal`.
+Delivered PR [#13](https://github.com/darulmasaadir/myschools/pull/13).
 
 | Route | Purpose |
 |---|---|
@@ -32,13 +32,13 @@ Branch: `feature/phase-7b-guardian-portal`.
 | `/guardian/attendance` | Last 90 days attendance |
 | `/guardian-feedback` | Web Form → `MYS Communication Log` |
 
-Data access lives in [`api/guardian_portal.py`](../../frappe-bench/apps/myschools/myschools/api/guardian_portal.py) — students are resolved via Education's **`Student Guardian`** child table on `Student` (not `Guardian.students`, which Education clears on save).
+Data access: [`api/guardian_portal.py`](../../frappe-bench/apps/myschools/myschools/api/guardian_portal.py).
 
-**Local HTTP smoke user:** `bench --site SITE execute myschools.scripts.seed_portal_guardian.main` → `mys-portal-smoke-guardian@test.local` / `mys-portal-smoke`.
+**Local smoke:** `bench --site SITE execute myschools.scripts.seed_portal_guardian.main`
 
-## Phase 7c — Branch portal (in flight)
+## Phase 7c — Branch portal ✅
 
-Branch: `feature/phase-7c-branch-portal`.
+Delivered PR [#14](https://github.com/darulmasaadir/myschools/pull/14).
 
 | Route | Purpose |
 |---|---|
@@ -47,13 +47,28 @@ Branch: `feature/phase-7c-branch-portal`.
 | `/branch/royalty` | Last 24 royalty invoices for the branch |
 | `/branch/fees` | Last 90 days fee invoices + outstanding totals |
 
-Branch resolution: `Employee.user_id == frappe.session.user` → `Employee.mys_branch`. Branch staff only (Director / Principal / Admin / Accountant / Campus Incharge). Data is fetched with `ignore_permissions=True` after the explicit branch filter so portal pages render regardless of franchise-scoping wiring on each doctype.
+Branch resolution: `Employee.user_id == frappe.session.user` → `Employee.mys_branch`. Branch staff only (Director / Principal / Admin / Accountant / Campus Incharge).
 
-**Local HTTP smoke user:** `bench --site SITE execute myschools.scripts.seed_portal_branch.main` → `mys-portal-smoke-director@test.local` / `mys-portal-smoke-director`.
+**Local smoke:** `bench --site SITE execute myschools.scripts.seed_portal_branch.main`
 
-## Later slices
+**Desk verify:** `bench --site SITE execute myschools.scripts.verify_branch_desk_cards.run`
 
-- **7d** — Inspection checklist runner + admission enquiry Web Form
+**HTTP battery:** `cd frappe-bench && ./env/bin/python -c "from myschools.scripts.verify_http_battery import run; run()"`
+
+## Phase 7d — Inspection portal (in flight)
+
+Branch: `feature/phase-7d-inspection-portal`.
+
+| Route | Purpose |
+|---|---|
+| `/inspection` | Dashboard: open findings + recent visits |
+| `/inspection/visits` | Visits list (cluster-scoped) |
+| `/inspection/visit?name=` | Draft checklist runner (apply template, save results, submit) |
+| `/admission-enquiry` | Public admission form → `MYS Communication Log` |
+
+Inspectors: Academic Monitor, Audit Officer (cluster-scoped via `Employee.mys_branch` → cluster branches).
+
+**Local smoke:** `bench --site SITE execute myschools.scripts.seed_portal_inspection.main`
 
 ## Adding a new portal page
 

@@ -47,15 +47,92 @@ def run(host: str = DEFAULT_HOST):
 		_check_branch_user(email, failures)
 	for email, workspace in ROLE_LANDING:
 		_check_role_landing(email, workspace, failures)
+	for email in ["monitor@mys.local", "audit@mys.local"]:
+		_check_inspection_user(email, failures)
+	_check_admission_enquiry_public(failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
 		for f in failures:
 			print(f"  ✗ {f}")
 		raise SystemExit(1)
 	print(
-		"HTTP BATTERY OK — Administrator + 4 branch users + "
-		f"{len(ROLE_LANDING)} other roles ({', '.join(e for e, _ in ROLE_LANDING)})"
+		"HTTP BATTERY OK — Administrator + 4 branch + "
+		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + /admission-enquiry"
 	)
+
+
+def _check_inspection_user(email: str, failures: list[str]) -> None:
+	op = _login(email, "admin")
+	for path in ["/inspection", "/inspection/visits", "/inspection/visits/new"]:
+		status, body = _get(op, path)
+		if status != 200:
+			failures.append(f"{email} {path}: HTTP {status}")
+		elif "You do not have access" in body:
+			failures.append(f"{email} {path}: permission denied in body")
+	# Exercise the whitelist that the portal's "Create draft visit" button calls.
+	# A 400/500 here is the bug that GET-only HTTP smoke would miss.
+	branch = _find_branch_for_inspector(op)
+	if branch:
+		resp = _post_json(
+			op,
+			"/api/method/myschools.api.inspection_portal.create_visit",
+			{"branch": branch, "visit_type": "Routine"},
+		)
+		msg = resp.get("message") or {}
+		if not isinstance(msg, dict) or not msg.get("name"):
+			failures.append(f"{email} create_visit: unexpected response {resp}")
+
+
+def _find_branch_for_inspector(opener) -> str | None:
+	resp = _post_json(
+		opener,
+		"/api/method/frappe.client.get_list",
+		{"doctype": "MYS Branch", "limit_page_length": 1, "fields": json.dumps(["name"])},
+	)
+	rows = resp.get("message") or []
+	return rows[0].get("name") if rows else None
+
+
+def _check_admission_enquiry_public(failures: list[str]) -> None:
+	# 1. GET renders
+	req = urllib.request.Request(f"{BASE}/admission-enquiry", headers={"Host": HOST})
+	try:
+		resp = urllib.request.urlopen(req, timeout=30)
+		body = resp.read().decode("utf-8", errors="replace")
+	except urllib.error.HTTPError as exc:
+		failures.append(f"/admission-enquiry GET: HTTP {exc.code}")
+		return
+	if "Admission enquiry" not in body:
+		failures.append("/admission-enquiry: missing page title marker")
+		return
+	# 2. POST as guest hits the whitelist and writes a Communication Log row.
+	#    This catches the CSRF / route gap that HTTP-only smoke kept hiding.
+	cj = http.cookiejar.CookieJar()
+	guest_opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+	# Frappe accepts guest POSTs to allow_guest whitelists without a CSRF
+	# token if the request has no session — that mirrors the JS form using
+	# window.csrf_token (which is null for guests). Verify the call succeeds.
+	post = urllib.request.Request(
+		f"{BASE}/api/method/myschools.api.inspection_portal.submit_admission_enquiry",
+		data=urllib.parse.urlencode(
+			{
+				"parent_name": "HTTP Battery Parent",
+				"phone": "03000000000",
+				"message": "from verify_http_battery",
+			}
+		).encode(),
+		headers={"Host": HOST},
+		method="POST",
+	)
+	try:
+		r = guest_opener.open(post, timeout=30)
+		data = json.loads(r.read())
+	except urllib.error.HTTPError as exc:
+		failures.append(f"/admission-enquiry POST: HTTP {exc.code}")
+		return
+	msg = data.get("message") or {}
+	if not isinstance(msg, dict) or not msg.get("name"):
+		failures.append(f"/admission-enquiry POST: unexpected response {data}")
 
 
 def _check_role_landing(email: str, workspace: str, failures: list[str]) -> None:

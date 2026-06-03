@@ -184,8 +184,9 @@ npm ci
 npx playwright install chromium      # or: npm run test:e2e:install
 
 # Seed deterministic test data — creates two test users
-# (e2e_audit@mys.local, e2e_director@mys.local), a Resolved Inspection
-# Finding, and an Overdue Royalty Invoice. Idempotent, but it DOES
+# (e2e_audit@mys.local, e2e_director@mys.local, e2e_monitor@mys.local), a
+# Resolved Inspection Finding, an E2E checklist template, and an Overdue
+# Royalty Invoice. Idempotent, but it DOES
 # mutate your dev site. Run only on disposable sites.
 bench --site myschools.localhost execute myschools.scripts.seed_e2e.main
 
@@ -218,7 +219,8 @@ Every push and PR runs three jobs:
 1. **Lint** — `ruff check` + `ruff format --check` via pre-commit.
 2. **Tests (Frappe + pytest)** — spins up MariaDB + Redis services in
    GitHub Actions, builds the bench, installs erpnext/education/myschools,
-   runs `bench run-tests --app myschools --coverage`.
+   runs `bench run-tests --app myschools --coverage`, then enforces the
+   ratcheting floor in `coverage_floor.json` via `check_coverage_floor.py`.
 3. **E2E (Playwright)** — separate job that builds the bench, runs
    `ci_bootstrap.run` + `seed_e2e.main`, starts `bench serve` in the
    background, and runs the Playwright spec against it. On failure it
@@ -227,6 +229,9 @@ Every push and PR runs three jobs:
 
 Workflow: [.github/workflows/ci.yml](../.github/workflows/ci.yml). All
 three jobs must pass before a PR can merge.
+
+Flaky-test quarantine rules and the Phase 7d Playwright matrix are documented
+in [processes/e2e-and-flaky-tests.md](processes/e2e-and-flaky-tests.md).
 
 ---
 

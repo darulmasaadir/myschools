@@ -43,6 +43,13 @@ BRANCH_SCOPED_ROLES = {
 	"Campus Incharge",
 }
 
+# Cluster inspection roles need Employee.mys_branch for portal + permission scope.
+INSPECTION_SCOPED_ROLES = {
+	"Academic Monitor",
+	"Audit Officer",
+	"Cluster Director",
+}
+
 
 def run():
 	for email, first_name, last_name, role in TEST_USERS:
@@ -66,7 +73,7 @@ def run():
 
 		update_password(email, DEV_PASSWORD)
 
-		if role in BRANCH_SCOPED_ROLES:
+		if role in BRANCH_SCOPED_ROLES or role in INSPECTION_SCOPED_ROLES:
 			_ensure_employee(email, first_name, last_name)
 
 	frappe.db.commit()

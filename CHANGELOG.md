@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+- **Phase 7d Playwright regression** (`tests/e2e/phase7d_inspection_portal.spec.ts`) — inspection
+  portal happy path, fail→finding, role denial, guest admission; extends `seed_e2e` with
+  `e2e_monitor@mys.local` and checklist template.
+- **Coverage ratchet** — `coverage_floor.json` + `check_coverage_floor.py` enforced in CI
+  after `run-tests --coverage`.
+- **E2E / flaky policy** — [docs/processes/e2e-and-flaky-tests.md](docs/processes/e2e-and-flaky-tests.md).
+- **HTTP battery + branch-desk matrix in CI** — `verify_http_battery.py` and
+  `verify_branch_desk_cards.py` (previously run by hand) now execute in the
+  e2e job after a `seed_test_users` step, so the full role × surface check is
+  automated on every push.
+- **Unit regression** — `test_fail_critical_as_academic_monitor_creates_open_finding` (workflow
+  Submit as Monitor).
 - **Setup Wizard, Module Onboarding & Reports (Phase 6).** Three
   independent slices that close out the operator-onboarding gap:
   - **Setup Wizard.** New JS slide
