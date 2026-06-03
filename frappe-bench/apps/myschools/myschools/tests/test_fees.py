@@ -12,6 +12,7 @@ from frappe.utils import add_days, today
 
 from myschools.api.fees import (
 	apply_late_fees,
+	apply_resolved_fee_structure_on_fees,
 	compute_late_fee_amount,
 	resolve_fee_structure,
 	resolve_late_fee_policy,
@@ -283,6 +284,51 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 		fs, source = resolve_fee_structure(BRANCH, PROGRAM, ACADEMIC_YEAR, self.company, campus=CAMPUS)
 		self.assertEqual(fs, campus_fs.name)
 		self.assertEqual(source, "campus_override")
+
+	def test_validate_applies_branch_override_fee_structure(self):
+		email = "_TEST_8A_apply@example.test"
+		self._purge_test_student(email)
+		student = frappe.get_doc(
+			{
+				"doctype": "Student",
+				"first_name": "Override",
+				"last_name": "Apply",
+				"student_email_id": email,
+				"mys_cluster": CLUSTER,
+				"mys_branch": BRANCH,
+				"mys_campus": CAMPUS,
+			}
+		).insert(ignore_permissions=True)
+		pe = frappe.get_doc(
+			{
+				"doctype": "Program Enrollment",
+				"student": student.name,
+				"program": PROGRAM,
+				"academic_year": ACADEMIC_YEAR,
+				"academic_term": ACADEMIC_TERM,
+				"enrollment_date": today(),
+			}
+		)
+		pe.insert(ignore_permissions=True)
+		fee = frappe.get_doc(
+			{
+				"doctype": "Fees",
+				"student": student.name,
+				"program_enrollment": pe.name,
+				"program": PROGRAM,
+				"academic_year": ACADEMIC_YEAR,
+				"academic_term": ACADEMIC_TERM,
+				"company": self.company,
+				"receivable_account": self.receivable,
+				"posting_date": today(),
+				"due_date": today(),
+				"components": [{"fees_category": FEE_CATEGORY, "amount": 5_000}],
+			}
+		)
+		apply_resolved_fee_structure_on_fees(fee)
+		self.assertEqual(fee.fee_structure, self.override_fs)
+		frappe.delete_doc("Program Enrollment", pe.name, force=True, ignore_permissions=True)
+		frappe.delete_doc("Student", student.name, force=True, ignore_permissions=True)
 
 	def test_compute_late_fee_respects_minimum(self):
 		policy = resolve_late_fee_policy(BRANCH)

@@ -261,17 +261,18 @@ What shipped:
 - [`api/fees.py`](../frappe-bench/apps/myschools/myschools/api/fees.py) — `resolve_fee_structure`, `apply_late_fees`, daily scheduler `0 6 * * *`.
 - Custom fields on `Fees`: `mys_late_fee_for`, `mys_late_fee_applied` (idempotent late-fee generation).
 - Tests: [`tests/test_fees.py`](../frappe-bench/apps/myschools/myschools/tests/test_fees.py).
-- **Override resolution is API-only until 8a-3** — `resolve_fee_structure()` is implemented and tested but not yet applied when operators create `Fees`. See [billing-model.md](processes/billing-model.md).
+- **`resolve_fee_structure()` wired on `Fees.validate`** (8a-3) — defaults `fee_structure` from campus/branch override; warns if operator picks a different structure while an override is active.
+- **Billing safety** (8a-2) — `Accounts` module blocked on MYS Branch/Cluster profiles; franchise roles denied create on `Fee Schedule` / `Sales Invoice` via `restrict_split_brain_billing_paths()` in install/migrate.
 
-### 8a follow-ups ⬜ (billing model — decision locked)
+### 8a follow-ups ⬜
 
-Decision record: [processes/billing-model.md](processes/billing-model.md). Canonical object = Education **`Fees`**; do **not** use Fee Schedule → Sales Invoice for franchise billing.
+Decision record: [processes/billing-model.md](processes/billing-model.md). Canonical object = Education **`Fees`**.
 
-| ID | Scope |
-|----|--------|
-| **8a-2** | **Billing safety** — trim franchise Module Profiles so Fee Schedule / stock Sales Invoice bulk path are not exposed (prevents invisible invoices). |
-| **8a-3** | **Wire `resolve_fee_structure()`** — `doc_events` on `Fees` so new invoices default to campus/branch override `Fee Structure`. |
-| **8a-4** | **Bulk `Fees` generator** — student-group scale tool that emits submitted `Fees` (not Sales Invoice); reuses 8a-3 resolver. |
+| ID | Status | Scope |
+|----|--------|--------|
+| **8a-2** | ✅ in branch | Module profile + `restrict_split_brain_billing_paths()` |
+| **8a-3** | ✅ in branch | `Fees` validate → `apply_resolved_fee_structure_on_fees` |
+| **8a-4** | ⬜ | **Bulk `Fees` generator** — student-group scale tool (not Sales Invoice) |
 
 ### 8b–8e (planned)
 

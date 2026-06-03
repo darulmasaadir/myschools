@@ -63,6 +63,9 @@ doc_events = {
 	"Communication": {
 		"after_insert": "myschools.api.notifications.log_outbound_email",
 	},
+	"Fees": {
+		"validate": "myschools.api.fees.apply_resolved_fee_structure_on_fees",
+	},
 }
 
 # Role-based landing pages

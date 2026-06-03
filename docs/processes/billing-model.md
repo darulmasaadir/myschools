@@ -84,8 +84,8 @@ these gaps are follow-ups, not reasons to rework 8a.
 
 | ID | What | Upgrade-safe approach |
 |----|------|------------------------|
-| **8a-2** | **Billing safety** — hide `Fee Schedule` and stock bulk Sales Invoice paths from franchise **Module Profile** fixtures so operators cannot create invisible invoices. | Fixture-only (`module_profile.json`); no core edits. |
-| **8a-3** | **Wire overrides** — on `Fees` `before_insert` / `validate`, set or validate `fee_structure` via `resolve_fee_structure(branch, program, academic_year, company, campus)` from `Student` franchise links. | `doc_events` in `hooks.py` + tests; no fork of Education. |
+| **8a-2** | ✅ **Billing safety** — `Accounts` blocked on MYS Branch/Cluster module profiles; `restrict_split_brain_billing_paths()` denies franchise roles create on `Fee Schedule` / `Sales Invoice`. | `module_profile.json` + `setup/install.py`; tests in `test_billing_safety.py`. |
+| **8a-3** | ✅ **Wire overrides** — `Fees.validate` → `apply_resolved_fee_structure_on_fees` sets `fee_structure` from `resolve_fee_structure()`; orange alert on mismatch with active override. | `hooks.py` `doc_events` + `test_fees.py`. |
 | **8a-4** | **Bulk `Fees` generator** — custom DocType or whitelisted tool (student group + program + term → N submitted `Fees`), mirroring Fee Schedule ergonomics but emitting **`Fees`**. Reuse resolver from 8a-3. | New doctype/API in `myschools` app only. |
 
 **Order:** 8a-2 (quick, reduces operational risk) → 8a-3 (makes overrides live) →

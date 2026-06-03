@@ -33,6 +33,7 @@ def after_install():
 	create_custom_franchise_fields()
 	create_default_head_office_departments()
 	grant_franchise_role_permissions()
+	restrict_split_brain_billing_paths()
 	backfill_module_profiles()
 	# NOTE: `set_default_print_formats` is intentionally NOT called here.
 	# Frappe runs `after_install` BEFORE `sync_fixtures`, so the Print Format
@@ -55,6 +56,7 @@ def after_migrate():
 	create_portal_roles()
 	create_custom_franchise_fields()
 	grant_franchise_role_permissions()
+	restrict_split_brain_billing_paths()
 	backfill_custom_number_card_document_types()
 	sync_workspace_number_card_content_labels()
 	backfill_module_profiles()
@@ -289,6 +291,32 @@ FRANCHISE_ROLE_READS = {
 		"MYS Communication Log",
 	],
 }
+
+
+# Education bulk billing paths that create Sales Invoice — not read by MY School.
+SPLIT_BRAIN_BILLING_DOCTYPES = ("Fee Schedule", "Sales Invoice")
+SPLIT_BRAIN_DENIED_PERMS = ("create", "write", "submit", "cancel", "amend", "delete", "import")
+
+
+def restrict_split_brain_billing_paths():
+	"""Deny franchise roles create/write on Fee Schedule and Sales Invoice (8a-2).
+
+	Canonical billing is Education `Fees` (see docs/processes/billing-model.md).
+	Module profiles also hide the Accounts module from branch/cluster sidebars;
+	this hook ensures roles cannot create bulk SI / fee schedules even if they
+	inherit stock ERPNext roles like Accounts User.
+	"""
+	from frappe.permissions import add_permission, update_permission_property
+
+	for doctype in SPLIT_BRAIN_BILLING_DOCTYPES:
+		if not frappe.db.exists("DocType", doctype):
+			continue
+		for role in FRANCHISE_ROLES:
+			if not frappe.db.exists("Role", role):
+				continue
+			add_permission(doctype, role, 0)
+			for perm in SPLIT_BRAIN_DENIED_PERMS:
+				update_permission_property(doctype, role, 0, perm, 0)
 
 
 def grant_franchise_role_permissions():

@@ -231,6 +231,73 @@ def scheduled_apply_late_fees():
 	apply_late_fees(dry_run=False)
 
 
+def apply_resolved_fee_structure_on_fees(doc, method=None):
+	"""Default `Fees.fee_structure` from MYS override resolution (8a-3).
+
+	Skips late-fee rows (they copy the parent's structure). When blank, sets the
+	resolved structure. When set but differs from an active campus/branch override,
+	shows a non-blocking alert so operators know MY School will not see Sales
+	Invoices from Fee Schedule (see billing-model.md).
+	"""
+	if doc.get("mys_late_fee_for"):
+		return
+	if not doc.student:
+		return
+
+	branch, campus = frappe.db.get_value(
+		"Student", doc.student, ["mys_branch", "mys_campus"]
+	) or (None, None)
+	if not branch:
+		return
+
+	program, academic_year = _fees_program_and_year(doc)
+	if not program or not academic_year or not doc.company:
+		return
+
+	resolved, source = resolve_fee_structure(
+		branch, program, academic_year, doc.company, campus=campus or None
+	)
+	if not resolved:
+		return
+
+	if not doc.fee_structure:
+		doc.fee_structure = resolved
+		return
+
+	if doc.fee_structure == resolved:
+		return
+
+	if source in ("campus_override", "branch_override"):
+		frappe.msgprint(
+			_(
+				"Fee Structure {0} does not match the active {1} override ({2}). "
+				"MY School billing uses Fees — not Fee Schedule → Sales Invoice."
+			).format(
+				frappe.bold(doc.fee_structure),
+				source.replace("_", " "),
+				frappe.bold(resolved),
+			),
+			indicator="orange",
+			alert=True,
+		)
+
+
+def _fees_program_and_year(doc) -> tuple[str | None, str | None]:
+	program = doc.get("program")
+	academic_year = doc.get("academic_year")
+	if doc.get("program_enrollment"):
+		pe = frappe.db.get_value(
+			"Program Enrollment",
+			doc.program_enrollment,
+			["program", "academic_year"],
+			as_dict=True,
+		)
+		if pe:
+			program = program or pe.program
+			academic_year = academic_year or pe.academic_year
+	return program, academic_year
+
+
 def fee_structure_override_query(user):
 	from myschools.api.permissions import _user_scope
 
