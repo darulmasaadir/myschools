@@ -92,15 +92,15 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
   fixtures (royalty generated/overdue, finding assigned/overdue, corrective
   action overdue, agreement expiring); outbound system emails mirrored into
   `MYS Communication Log`; provider-agnostic SMS adapter stub
-- ⬜ Formal workflows + list-view polish — Phase 5 (next)
-- ⬜ Setup Wizard, onboarding tours, Query Reports — Phase 6
-- ⬜ Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7
+- ✅ Formal workflows + list-view polish — Phase 5
+- ✅ Setup Wizard, onboarding tours, Query Reports — Phase 6
+- 🟡 Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7: 7a/7b/7c ✅ merged, 7d (inspection portal + public admission enquiry) in flight on PR #15
 - ⬜ Pakistani payment gateways (JazzCash, Easypaisa, HBL), HR scaffolding, fee overrides — Phase 8
 
 The system is **live for one demo branch network** (BR001 + BR014, three
 campuses each, one fully-submitted royalty invoice on file). It is **not yet
-live for real franchisees** — that's pending the workflow polish and
-Pakistani-payment-gateway modules (Phases 5 + 8).
+live for real franchisees** — that's pending the Phase 8 domain extensions
+(per-branch fee overrides, student lifecycle, Pakistani payment gateways, HR).
 
 ## How is it built — briefly
 

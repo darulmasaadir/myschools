@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-06-02
-**Up next:** Phase 7d — Inspection portal + admission enquiry (then Phase 8)
+**Last updated:** 2026-06-03
+**Up next:** Merge Phase 7d (PR #15) → start Phase 8
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -32,7 +32,7 @@ These bind every phase:
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
-| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b ✅ PR #13 · 7c ✅ PR #14 · 7d in flight |
+| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b ✅ PR #13 · 7c ✅ PR #14 · 7d 🟡 PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (branch `feature/phase-7d-inspection-portal`) |
 | 8 | Domain extensions | ⬜ | — |
 
 ---
@@ -228,15 +228,23 @@ Delivered PR [#14](https://github.com/darulmasaadir/myschools/pull/14) (`e4432df
 - Smoke seed: `scripts/seed_portal_branch.py`
 - Fresh-install: `ci_bootstrap` marks Head Office as group company so `seed_demo` works on greenfield sites
 
-### 7d — Inspection portal (in flight)
+### 7d — Inspection portal 🟡
 
-Branch: `feature/phase-7d-inspection-portal`.
+**In flight:** PR [#15](https://github.com/darulmasaadir/myschools/pull/15), branch `feature/phase-7d-inspection-portal`. CI green (Lint · Tests · E2E). Flip to ✅ + merge SHA when it lands on `develop`.
 
-- `/inspection` dashboard, `/inspection/visits`, `/inspection/visit` checklist runner
-- API: `api/inspection_portal.py` — cluster-scoped visits + checklist save/submit
-- Public `/admission-enquiry` (or Web Form) → `MYS Communication Log`
-- Tests: `tests/test_inspection_portal.py`
-- Smoke seed: `scripts/seed_portal_inspection.py`
+Shipped on the branch:
+- `/inspection` dashboard, `/inspection/visits`, `/inspection/visits/new`, `/inspection/visit` mobile checklist runner (apply template → save → submit), cluster-scoped via `Employee.mys_branch`.
+- API: [`api/inspection_portal.py`](../frappe-bench/apps/myschools/myschools/api/inspection_portal.py) — `create_visit`, `apply_template`, `save_checklist`, `submit_visit`, all whitelisted and scope-checked.
+- Public `/admission-enquiry` → `MYS Communication Log` (guest POST, optional branch).
+- Auto-finding on submit runs the `Submit` workflow step as Administrator so an Academic Monitor inspector isn't blocked by the Audit-Officer-gated transition.
+- Tests: [`tests/test_inspection_portal.py`](../frappe-bench/apps/myschools/myschools/tests/test_inspection_portal.py) (incl. Academic-Monitor fail-Critical → Open finding regression).
+
+**Engineering hardening shipped in the same PR** (process-debt paydown, not 7d feature scope):
+- Playwright matrix [`tests/e2e/phase7d_inspection_portal.spec.ts`](../frappe-bench/apps/myschools/tests/e2e/phase7d_inspection_portal.spec.ts) — monitor happy path, fail→finding, audit access, branch-director denial, guest admission validation.
+- `seed_e2e` extended with `e2e_monitor@mys.local` + a Routine checklist template.
+- **CI now auto-runs the full role × surface battery** on every push: `verify_http_battery.py` (all franchise roles + guest admission POST) and `verify_branch_desk_cards.py` (branch number-card matrix), after a `seed_test_users` step.
+- **Coverage ratchet** — `coverage_floor.json` (63%) enforced by `scripts/check_coverage_floor.py` in the Tests job.
+- Process doc [`processes/e2e-and-flaky-tests.md`](processes/e2e-and-flaky-tests.md) — test pyramid (which layers are CI-enforced vs the shrinking manual list) + flaky-test quarantine policy.
 
 ---
 

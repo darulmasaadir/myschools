@@ -71,6 +71,9 @@ This table is the architectural view — module by module, what it ships:
 | Central Monitoring Dashboard | ✅ | `Dashboard` + 8 `Number Card` + 3 `Dashboard Chart` shipped as JSON under `my_school_erp/` | Single role-aware dashboard — same view for every role, rows filtered through `permission_query_conditions`. Custom-method cards in [`api/dashboard.py`](../frappe-bench/apps/myschools/myschools/api/dashboard.py) |
 | Navigation shell (Phases 1+2) | ✅ | 5 `Workspace`, 5 `Module Profile`, `Letter Head` `MYS Default`; brand CSS + assets; `app_logo_url` / `brand_html` / `role_home_page` hooks | All 10 franchise roles land on a tier-specific workspace with a trimmed sidebar. [process](processes/navigation-and-roles.md) · §9 below |
 | Print Formats (Phase 3) | ✅ | 4 branded Jinja Print Formats: `MYS Royalty Invoice`, `MYS Inspection Report`, `MYS Fee Receipt`, `MYS Franchise Agreement`; Property Setters mark each as default | All inherit `MYS Default` Letter Head. [process](processes/print-formats.md) |
+| Workflows + list polish (Phase 5) | ✅ | `Workflow` + `Workflow State`/`Action` fixtures for inspection finding + royalty invoice; list-view JS settings | Role-gated transitions (e.g. Verify = Audit Officer). [process](processes/workflows.md) |
+| Setup Wizard, Onboarding, Reports (Phase 6) | ✅ | `setup_wizard.js` slide + `setup_wizard_stages`; `MYS Franchise Setup` Module Onboarding; 4 Query Reports | Operator onboarding + ops reporting. |
+| Portals — Guardian / Branch / Inspection (Phase 7) | 🟡 | `www/` Jinja pages + `api/{guardian,branch,inspection}_portal.py`; `Guardian` website role; `/admission-enquiry` | Frappe Web Forms + `www/`, not a custom SPA. 7a/b/c ✅ merged; 7d inspection portal in flight (PR #15). [process](processes/portals.md) |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 
