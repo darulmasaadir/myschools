@@ -1,8 +1,12 @@
 """Enforce a ratcheting line-coverage floor after `bench run-tests --coverage`.
 
 Reads ``coverage_floor.json`` in the app root and fails if total line
-coverage for ``myschools/*`` (excluding tests) drops below the minimum.
-Bump the floor only when coverage improves in the same PR.
+coverage for the ``myschools`` app (excluding ``tests/`` and ``scripts/``)
+drops below the minimum. Bump the floor only when coverage improves in the
+same PR.
+
+``bench run-tests --coverage`` writes ``frappe-bench/sites/.coverage`` with
+**absolute** file paths, so the include glob must match anywhere in the path.
 
 Run from bench root (CI):
     ./env/bin/python apps/myschools/myschools/scripts/check_coverage_floor.py
@@ -10,7 +14,6 @@ Run from bench root (CI):
 
 from __future__ import annotations
 
-import contextlib
 import io
 import json
 import sys
@@ -22,30 +25,21 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 APP_ROOT = SCRIPT_DIR.parent.parent
 FLOOR_FILE = APP_ROOT / "coverage_floor.json"
 
+INCLUDE = ["*/myschools/myschools/*"]
+OMIT = ["*/tests/*", "*/myschools/scripts/*"]
+
 
 def _find_data_file() -> Path | None:
 	for path in (
 		Path.cwd() / ".coverage",
+		Path.cwd() / "sites" / ".coverage",
 		Path.cwd() / "apps" / "myschools" / ".coverage",
+		APP_ROOT.parent.parent.parent / "sites" / ".coverage",
 		APP_ROOT / ".coverage",
 	):
 		if path.is_file():
 			return path
 	return None
-
-
-def _line_percent(cov: coverage.Coverage) -> float:
-	buf = io.StringIO()
-	with contextlib.redirect_stdout(buf):
-		cov.report(
-			include=["myschools/*"],
-			omit=["*/tests/*", "*/myschools/scripts/*"],
-			skip_empty=True,
-		)
-	for line in buf.getvalue().splitlines():
-		if line.startswith("TOTAL"):
-			return float(line.split()[-1].rstrip("%"))
-	raise RuntimeError("TOTAL row not found in coverage report")
 
 
 def main() -> int:
@@ -62,7 +56,9 @@ def main() -> int:
 		return 1
 	cov = coverage.Coverage(data_file=str(data_file))
 	cov.load()
-	pct = _line_percent(cov)
+	# report() returns the total line-coverage percentage. Suppress its table
+	# output (we only want the number) by sending it to a throwaway buffer.
+	pct = cov.report(include=INCLUDE, omit=OMIT, skip_empty=True, file=io.StringIO())
 	print(f"Line coverage: {pct:.1f}% (floor {floor_pct:.1f}%)")
 	if pct + 1e-6 < floor_pct:
 		print(

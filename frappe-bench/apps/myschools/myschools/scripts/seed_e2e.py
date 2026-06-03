@@ -284,9 +284,7 @@ def main():
 		_ensure_user(email, spec)
 	if branch:
 		_ensure_monitor_employee(branch)
-		_ensure_cluster_inspector_employee(
-			"e2e_audit@mys.local", branch, "E2E", "Audit Inspector"
-		)
+		_ensure_cluster_inspector_employee("e2e_audit@mys.local", branch, "E2E", "Audit Inspector")
 	template = _ensure_e2e_checklist_template()
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()

@@ -40,8 +40,11 @@ CI runs the full suite after `seed_e2e.main` on `test_site`.
 
 After unit tests with `--coverage`, CI runs
 `myschools/scripts/check_coverage_floor.py`, which compares line coverage for
-`myschools/*` (excluding `tests/` and `scripts/`) against
-`frappe-bench/apps/myschools/coverage_floor.json`.
+the `myschools` app (excluding `tests/` and `scripts/`) against
+`frappe-bench/apps/myschools/coverage_floor.json`. The floor is **65%**
+(measured 67% on 2026-06-03). `bench run-tests --coverage` writes
+`frappe-bench/sites/.coverage` with absolute paths, so the script matches the
+include glob anywhere in the path.
 
 - **Do not lower the floor** without an explicit product decision.
 - **Raise the floor** in the same PR when you add tests that increase coverage.
