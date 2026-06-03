@@ -6,12 +6,21 @@ engineering standard. Complements [development.md §5](../development.md) and
 
 ## Test pyramid (default)
 
-| Layer | Tool | When to add |
-|-------|------|-------------|
-| Unit / API | `bench run-tests --app myschools` | Every non-trivial bug fix and new whitelist |
-| HTTP battery | `scripts/verify_http_battery.py` | Portal routes and role landing (not a substitute for browser) |
-| Playwright | `tests/e2e/*.spec.ts` | User-visible flows that broke in production or manual battery |
-| Manual battery | PR verification template | Shrinks as Playwright absorbs stable paths |
+| Layer | Tool | Runs in CI? | When to add |
+|-------|------|-------------|-------------|
+| Unit / API | `bench run-tests --app myschools` | ✅ test job | Every non-trivial bug fix and new whitelist |
+| Coverage floor | `scripts/check_coverage_floor.py` | ✅ test job | Ratchet — never lower |
+| HTTP battery | `scripts/verify_http_battery.py` | ✅ e2e job | Portal routes and role landing (not a substitute for browser) |
+| Branch desk matrix | `scripts/verify_branch_desk_cards.py` | ✅ e2e job | Role × number-card surface regressions |
+| Playwright | `tests/e2e/*.spec.ts` | ✅ e2e job | User-visible flows that broke in production or manual battery |
+| Manual battery | PR verification template | ❌ by hand | Net-new feature's *first* walk, PDF round-trip, anything no spec covers yet |
+
+**Everything marked ✅ runs automatically on every push/PR — no one has to ask.**
+The manual battery is now only: (a) the first browser walk of a brand-new
+surface before a spec exists, and (b) PDF round-trip when a print format
+changes. Each manual check should be converted into an automated layer the
+first time it's run (add a Playwright spec / verify script), so the manual
+list keeps shrinking.
 
 **Rule:** Every production bug gets a regression test at the **cheapest layer
 that would have caught it**. Browser-only bugs (CSRF, `confirm()`, form POST)

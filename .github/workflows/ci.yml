@@ -242,6 +242,19 @@ jobs:
         # demo_royalty_invoice. Idempotent — re-running it is a no-op.
         run: bench --site test_site execute myschools.scripts.seed_e2e.main
 
+      - name: Seed role test users (for HTTP battery + branch desk matrix)
+        working-directory: frappe-bench
+        # Creates one System User per franchise role (password: admin) plus
+        # backing Employee rows, which verify_http_battery and
+        # verify_branch_desk_cards log in as. Idempotent.
+        run: bench --site test_site execute myschools.scripts.seed_test_users.run
+
+      - name: Verify branch desk number cards (role × surface matrix)
+        working-directory: frappe-bench
+        # bench-execute check (no HTTP): asserts every branch role sees its
+        # number cards. Fails the job via frappe.throw on any missing card.
+        run: bench --site test_site execute myschools.scripts.verify_branch_desk_cards.run
+
       - name: Make test_site resolve to loopback
         run: |
           echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts
@@ -264,6 +277,14 @@ jobs:
           echo "bench failed to start within 60s — log follows:"
           cat /tmp/bench-serve.log
           exit 1
+
+      - name: Run HTTP verification battery
+        working-directory: frappe-bench
+        # Live HTTP smoke against the running server as every franchise role
+        # (desk landing, branch portal, inspection portal, guest admission
+        # POST). Exits non-zero on any failure. host=test_site matches the
+        # default site bench serve is binding.
+        run: ./env/bin/python -c "from myschools.scripts.verify_http_battery import run; run(host='test_site')"
 
       - name: Install Playwright deps
         working-directory: frappe-bench/apps/myschools
