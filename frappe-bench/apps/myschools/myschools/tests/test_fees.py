@@ -85,9 +85,7 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 	@classmethod
 	def _ensure_fee_category(cls, name: str):
 		if not frappe.db.exists("Fee Category", name):
-			frappe.get_doc({"doctype": "Fee Category", "category_name": name}).insert(
-				ignore_permissions=True
-			)
+			frappe.get_doc({"doctype": "Fee Category", "category_name": name}).insert(ignore_permissions=True)
 
 	@classmethod
 	def _build_tree(cls):
@@ -207,9 +205,7 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 		frappe.db.commit()
 
 	def test_resolve_fee_structure_branch_override(self):
-		fs, source = resolve_fee_structure(
-			BRANCH, PROGRAM, ACADEMIC_YEAR, self.company, campus=None
-		)
+		fs, source = resolve_fee_structure(BRANCH, PROGRAM, ACADEMIC_YEAR, self.company, campus=None)
 		self.assertEqual(fs, self.override_fs)
 		self.assertEqual(source, "branch_override")
 
@@ -236,9 +232,7 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 				"is_active": 1,
 			}
 		).insert(ignore_permissions=True)
-		fs, source = resolve_fee_structure(
-			BRANCH, PROGRAM, ACADEMIC_YEAR, self.company, campus=CAMPUS
-		)
+		fs, source = resolve_fee_structure(BRANCH, PROGRAM, ACADEMIC_YEAR, self.company, campus=CAMPUS)
 		self.assertEqual(fs, campus_fs.name)
 		self.assertEqual(source, "campus_override")
 
