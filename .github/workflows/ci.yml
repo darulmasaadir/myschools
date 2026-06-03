@@ -2,7 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    # Run the FULL battery (incl. fresh-install + Playwright e2e) on every
+    # feature push, not just main/develop — so a branch is end-to-end tested
+    # BEFORE its PR is opened. scripts/pr_battery.sh gates `gh pr create` on
+    # this run being terminal-green for the exact commit.
+    branches: [main, develop, "feature/**", "fix/**", "hotfix/**", "chore/**"]
   pull_request:
     branches: [main, develop]
 
