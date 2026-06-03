@@ -157,6 +157,36 @@ class TestInspectionPortalAccess(FrappeTestCase):
 		visit.reload()
 		self.assertEqual(visit.docstatus, 1)
 
+	def test_fail_critical_as_academic_monitor_creates_open_finding(self):
+		"""Regression: auto-finding workflow Submit must not be role-gated for Monitor."""
+		frappe.set_user(self.email)
+		inspector = frappe.db.get_value("Employee", {"user_id": self.email}, "name")
+		visit = frappe.get_doc(
+			{
+				"doctype": "MYS Inspection Visit",
+				"branch": self.branch,
+				"visit_type": "Routine",
+				"visit_date": today(),
+				"inspector": inspector,
+			}
+		).insert(ignore_permissions=True)
+		apply_template(visit.name, self.template)
+		rows = [
+			{"idx": 0, "result": "Fail", "notes": "e2e critical fail"},
+			{"idx": 1, "result": "Pass", "notes": ""},
+		]
+		save_checklist(visit.name, json.dumps(rows))
+		submit_visit(visit.name)
+		finding = frappe.db.get_value(
+			"MYS Inspection Finding",
+			{"visit": visit.name, "severity": "Critical"},
+			["name", "status", "docstatus"],
+			as_dict=True,
+		)
+		self.assertTrue(finding)
+		self.assertEqual(finding.status, "Open")
+		self.assertEqual(finding.docstatus, 1)
+
 	def test_admission_enquiry_guest(self):
 		frappe.set_user("Guest")
 		try:

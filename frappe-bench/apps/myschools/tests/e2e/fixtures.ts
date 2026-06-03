@@ -8,6 +8,8 @@ export interface SeedState {
 	visit: string | null;
 	finding: string | null;
 	invoice: string | null;
+	branch: string | null;
+	checklist_template: string | null;
 }
 
 export function loadSeed(): SeedState {
@@ -36,6 +38,23 @@ export async function loginAs(page: Page, email: string, password: string) {
 	await expect(page.locator(".navbar, .standard-sidebar, .layout-side-section").first()).toBeVisible({
 		timeout: 15_000,
 	});
+}
+
+/** Website portal login (inspection / admission). */
+export async function loginPortal(
+	page: Page,
+	email: string,
+	password: string,
+	redirect = "/inspection",
+) {
+	await page.goto(`/login?redirect-to=${encodeURIComponent(redirect)}`);
+	await page.fill('input[name="login_email"], input#login_email', email);
+	await page.fill('input[name="login_password"], input#login_password', password);
+	await page.locator('button.btn-login, button:has-text("Login")').first().click();
+	await page.waitForURL((url) => url.pathname.startsWith(redirect.split("?")[0]), {
+		timeout: 20_000,
+	});
+	await expect(page.locator(".mys-portal").first()).toBeVisible({ timeout: 15_000 });
 }
 
 export { base as test, expect };

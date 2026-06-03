@@ -1,0 +1,4 @@
+{
+  "line_percent": 55.0,
+  "_comment": "Ratchet only upward when coverage improves. CI enforces via check_coverage_floor.py."
+}

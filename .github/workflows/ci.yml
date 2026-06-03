@@ -138,6 +138,10 @@ jobs:
         working-directory: frappe-bench
         run: bench --site test_site run-tests --app myschools --coverage
 
+      - name: Enforce coverage floor (ratchet)
+        working-directory: frappe-bench
+        run: ./env/bin/python apps/myschools/myschools/scripts/check_coverage_floor.py
+
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-22.04

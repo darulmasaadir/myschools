@@ -39,7 +39,14 @@ USERS = {
 		"roles": ["Branch Director"],
 		"password": "mys-e2e-director",
 	},
+	"e2e_monitor@mys.local": {
+		"first_name": "E2E Monitor",
+		"roles": ["Academic Monitor"],
+		"password": "mys-e2e-monitor",
+	},
 }
+
+E2E_CHECKLIST_TAG = "e2e portal checklist"
 
 
 def _ensure_user(email, spec):
@@ -82,6 +89,79 @@ def _ensure_franchise_tree():
 		frappe.db.set_value("Company", seed_demo.HEAD_OFFICE_COMPANY, "is_group", 1)
 	seed_demo.run()
 	return frappe.db.get_value("MYS Branch", {}, "name")
+
+
+def _ensure_cluster_inspector_employee(email: str, branch: str, first_name: str, last_name: str) -> str:
+	"""Link a cluster-role user to an Employee on ``branch`` for portal scope."""
+	emp = frappe.db.get_value("Employee", {"user_id": email}, "name")
+	if emp:
+		frappe.db.set_value(
+			"Employee",
+			emp,
+			{"mys_branch": branch, "status": "Active", "user_id": email},
+		)
+		return emp
+	company = frappe.db.get_value("MYS Branch", branch, "company") or frappe.db.get_value(
+		"Company", {}, "name"
+	)
+	doc = frappe.get_doc(
+		{
+			"doctype": "Employee",
+			"first_name": first_name,
+			"last_name": last_name,
+			"gender": "Male",
+			"date_of_birth": "1990-01-01",
+			"date_of_joining": today(),
+			"status": "Active",
+			"company": company,
+			"user_id": email,
+			"mys_branch": branch,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return doc.name
+
+
+def _ensure_monitor_employee(branch: str) -> str:
+	return _ensure_cluster_inspector_employee("e2e_monitor@mys.local", branch, "E2E", "Monitor")
+
+
+def _ensure_e2e_checklist_template() -> str:
+	"""Routine template with Critical + Minor rows for portal happy/fail paths."""
+	existing = frappe.db.get_value(
+		"MYS Inspection Checklist Template",
+		{"template_name": E2E_CHECKLIST_TAG, "is_active": 1},
+		"name",
+	)
+	if existing:
+		return existing
+	doc = frappe.get_doc(
+		{
+			"doctype": "MYS Inspection Checklist Template",
+			"template_name": E2E_CHECKLIST_TAG,
+			"visit_type": "Routine",
+			"version": 1,
+			"is_active": 1,
+			"items": [
+				{
+					"item_text": "E2E fire extinguisher accessible",
+					"category": "Safety",
+					"severity": "Critical",
+					"weight": 1,
+					"max_score": 1,
+				},
+				{
+					"item_text": "E2E classrooms clean",
+					"category": "Cleanliness",
+					"severity": "Minor",
+					"weight": 1,
+					"max_score": 1,
+				},
+			],
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return doc.name
 
 
 def _ensure_inspector_employee(branch):
@@ -199,8 +279,15 @@ def _ensure_overdue_invoice():
 
 
 def main():
+	branch = _ensure_franchise_tree()
 	for email, spec in USERS.items():
 		_ensure_user(email, spec)
+	if branch:
+		_ensure_monitor_employee(branch)
+		_ensure_cluster_inspector_employee(
+			"e2e_audit@mys.local", branch, "E2E", "Audit Inspector"
+		)
+	template = _ensure_e2e_checklist_template()
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()
@@ -211,6 +298,8 @@ def main():
 		"visit": visit,
 		"finding": finding,
 		"invoice": invoice,
+		"branch": branch,
+		"checklist_template": template,
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)
