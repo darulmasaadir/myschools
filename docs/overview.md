@@ -94,7 +94,7 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
   `MYS Communication Log`; provider-agnostic SMS adapter stub
 - ✅ Formal workflows + list-view polish — Phase 5
 - ✅ Setup Wizard, onboarding tours, Query Reports — Phase 6
-- 🟡 Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7: 7a/7b/7c ✅ merged, 7d (inspection portal + public admission enquiry) in flight on PR #15
+- ✅ Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7 complete (PR #15 `9b02a81`)
 - ⬜ Pakistani payment gateways (JazzCash, Easypaisa, HBL), HR scaffolding, fee overrides — Phase 8
 
 The system is **live for one demo branch network** (BR001 + BR014, three

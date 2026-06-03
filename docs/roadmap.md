@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-03
-**Up next:** Merge Phase 7d (PR #15) → start Phase 8
+**Up next:** Phase 8 — Domain extensions
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -32,7 +32,7 @@ These bind every phase:
 | 4 | Notifications & Communication wiring | ✅ | PR [#7](https://github.com/darulmasaadir/myschools/pull/7) (`ff4dc38`) |
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
-| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | 🟡 | 7a ✅ PR #12 · 7b ✅ PR #13 · 7c ✅ PR #14 · 7d 🟡 PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (branch `feature/phase-7d-inspection-portal`) |
+| 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
 | 8 | Domain extensions | ⬜ | — |
 
 ---
@@ -191,7 +191,7 @@ setup_wizard_stages = "myschools.scripts.setup_wizard.get_setup_stages"
 
 ---
 
-## Phase 7 — Portals: Guardian / Branch / Inspection 🟡
+## Phase 7 — Portals: Guardian / Branch / Inspection ✅
 
 **Important rewrite from the original plan.** The original scoped a Vue/React SPA frontend; per the **upgrade-safe-only** standing constraint, this is now **Frappe Web Forms + `www/` Jinja templates inside the `myschools` app**. No parallel codebase, no separate auth, no separate build pipeline.
 
@@ -228,11 +228,11 @@ Delivered PR [#14](https://github.com/darulmasaadir/myschools/pull/14) (`e4432df
 - Smoke seed: `scripts/seed_portal_branch.py`
 - Fresh-install: `ci_bootstrap` marks Head Office as group company so `seed_demo` works on greenfield sites
 
-### 7d — Inspection portal 🟡
+### 7d — Inspection portal ✅
 
-**In flight:** PR [#15](https://github.com/darulmasaadir/myschools/pull/15), branch `feature/phase-7d-inspection-portal`. CI green (Lint · Tests · E2E). Flip to ✅ + merge SHA when it lands on `develop`.
+**Delivered:** PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (merge `9b02a81` on `develop`).
 
-Shipped on the branch:
+What shipped:
 - `/inspection` dashboard, `/inspection/visits`, `/inspection/visits/new`, `/inspection/visit` mobile checklist runner (apply template → save → submit), cluster-scoped via `Employee.mys_branch`.
 - API: [`api/inspection_portal.py`](../frappe-bench/apps/myschools/myschools/api/inspection_portal.py) — `create_visit`, `apply_template`, `save_checklist`, `submit_visit`, all whitelisted and scope-checked.
 - Public `/admission-enquiry` → `MYS Communication Log` (guest POST, optional branch).

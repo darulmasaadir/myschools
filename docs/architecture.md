@@ -73,7 +73,7 @@ This table is the architectural view — module by module, what it ships:
 | Print Formats (Phase 3) | ✅ | 4 branded Jinja Print Formats: `MYS Royalty Invoice`, `MYS Inspection Report`, `MYS Fee Receipt`, `MYS Franchise Agreement`; Property Setters mark each as default | All inherit `MYS Default` Letter Head. [process](processes/print-formats.md) |
 | Workflows + list polish (Phase 5) | ✅ | `Workflow` + `Workflow State`/`Action` fixtures for inspection finding + royalty invoice; list-view JS settings | Role-gated transitions (e.g. Verify = Audit Officer). [process](processes/workflows.md) |
 | Setup Wizard, Onboarding, Reports (Phase 6) | ✅ | `setup_wizard.js` slide + `setup_wizard_stages`; `MYS Franchise Setup` Module Onboarding; 4 Query Reports | Operator onboarding + ops reporting. |
-| Portals — Guardian / Branch / Inspection (Phase 7) | 🟡 | `www/` Jinja pages + `api/{guardian,branch,inspection}_portal.py`; `Guardian` website role; `/admission-enquiry` | Frappe Web Forms + `www/`, not a custom SPA. 7a/b/c ✅ merged; 7d inspection portal in flight (PR #15). [process](processes/portals.md) |
+| Portals — Guardian / Branch / Inspection (Phase 7) | ✅ | `www/` Jinja pages + `api/{guardian,branch,inspection}_portal.py`; `Guardian` website role; `/admission-enquiry` | Frappe Web Forms + `www/`, not a custom SPA. Delivered 7a–7d; merge `9b02a81` (PR #15). [process](processes/portals.md) |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 
