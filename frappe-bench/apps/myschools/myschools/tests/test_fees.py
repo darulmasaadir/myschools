@@ -4,6 +4,8 @@ Run:
     bench --site SITE run-tests --app myschools --module myschools.tests.test_fees
 """
 
+from datetime import date
+
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, today
@@ -18,21 +20,25 @@ from myschools.api.fees import (
 CLUSTER = "_TEST_8A_FEE_CL"
 BRANCH = "_TEST_8A_FEE_BR"
 CAMPUS = f"{BRANCH}-Kids"
-PROGRAM = "MYS Kids"
-ACADEMIC_YEAR = "2025-2026"
-ACADEMIC_TERM = "2025-2026 (May 2026)"
-FEE_CATEGORY = "Tuition"
-LATE_CATEGORY = "Late Fee"
-COMPANY = "MY School Sindh"
+ACADEMIC_YEAR = "_TEST_8A_AY"
+ACADEMIC_TERM_NAME = "_TEST_8A_TERM"
+ACADEMIC_TERM = f"{ACADEMIC_YEAR} ({ACADEMIC_TERM_NAME})"
+PROGRAM = "_TEST_8A_PROG"
+FEE_CATEGORY = "_TEST_8A_TUITION"
+LATE_CATEGORY = "_TEST_8A_LATE"
+YEAR_START = date(2025, 8, 1)
+YEAR_END = date(2026, 7, 31)
+TERM_START = date(2025, 9, 1)
+TERM_END = date(2025, 12, 31)
 
 
 class TestFeeOverridesAndLateFees(FrappeTestCase):
 	@classmethod
 	def setUpClass(cls):
 		super().setUpClass()
-		cls._ensure_fee_category(LATE_CATEGORY)
 		cls._build_tree()
 		cls.company = cls._resolve_company()
+		cls._build_education_prereqs()
 		cls.receivable = cls._resolve_receivable()
 		cls.default_fs, cls.override_fs = cls._ensure_fee_structures()
 		cls._ensure_override()
@@ -63,6 +69,15 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 			frappe.delete_doc("MYS Branch", BRANCH, force=True, ignore_permissions=True)
 		if frappe.db.exists("MYS Cluster", CLUSTER):
 			frappe.delete_doc("MYS Cluster", CLUSTER, force=True, ignore_permissions=True)
+		for cat in [FEE_CATEGORY, LATE_CATEGORY]:
+			if frappe.db.exists("Fee Category", cat):
+				frappe.delete_doc("Fee Category", cat, force=True, ignore_permissions=True)
+		if frappe.db.exists("Academic Term", ACADEMIC_TERM):
+			frappe.delete_doc("Academic Term", ACADEMIC_TERM, force=True, ignore_permissions=True)
+		if frappe.db.exists("Academic Year", ACADEMIC_YEAR):
+			frappe.delete_doc("Academic Year", ACADEMIC_YEAR, force=True, ignore_permissions=True)
+		if frappe.db.exists("Program", PROGRAM):
+			frappe.delete_doc("Program", PROGRAM, force=True, ignore_permissions=True)
 		frappe.db.commit()
 		super().tearDownClass()
 
@@ -88,6 +103,38 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 			frappe.get_doc({"doctype": "Fee Category", "category_name": name}).insert(ignore_permissions=True)
 
 	@classmethod
+	def _build_education_prereqs(cls):
+		cls._ensure_fee_category(FEE_CATEGORY)
+		cls._ensure_fee_category(LATE_CATEGORY)
+		if not frappe.db.exists("Academic Year", ACADEMIC_YEAR):
+			frappe.get_doc(
+				{
+					"doctype": "Academic Year",
+					"academic_year_name": ACADEMIC_YEAR,
+					"year_start_date": YEAR_START,
+					"year_end_date": YEAR_END,
+				}
+			).insert(ignore_permissions=True)
+		if not frappe.db.exists("Academic Term", ACADEMIC_TERM):
+			frappe.get_doc(
+				{
+					"doctype": "Academic Term",
+					"academic_year": ACADEMIC_YEAR,
+					"term_name": ACADEMIC_TERM_NAME,
+					"term_start_date": TERM_START,
+					"term_end_date": TERM_END,
+				}
+			).insert(ignore_permissions=True)
+		if not frappe.db.exists("Program", PROGRAM):
+			frappe.get_doc(
+				{
+					"doctype": "Program",
+					"program_name": PROGRAM,
+					"program_code": PROGRAM,
+				}
+			).insert(ignore_permissions=True)
+
+	@classmethod
 	def _build_tree(cls):
 		if not frappe.db.exists("MYS Cluster", CLUSTER):
 			frappe.get_doc(
@@ -108,6 +155,7 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 					"city": "Test",
 					"province": "Test",
 					"is_active": 1,
+					"company": frappe.db.get_value("Company", {}, "name"),
 				}
 			).insert(ignore_permissions=True)
 		if not frappe.db.exists("MYS Campus", CAMPUS):
