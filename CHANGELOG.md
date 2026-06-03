@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 8a — fee overrides + late fees (in flight).** `MYS Fee Structure Override` and
+  `MYS Late Fee Policy` doctypes; [`api/fees.py`](frappe-bench/apps/myschools/myschools/api/fees.py)
+  with `resolve_fee_structure`, `apply_late_fees`, and daily scheduler; custom fields on `Fees`
+  (`mys_late_fee_for`, `mys_late_fee_applied`); tests in `tests/test_fees.py`.
 - **Phase 7d Playwright regression** (`tests/e2e/phase7d_inspection_portal.spec.ts`) — inspection
   portal happy path, fail→finding, role denial, guest admission; extends `seed_e2e` with
   `e2e_monitor@mys.local` and checklist template.

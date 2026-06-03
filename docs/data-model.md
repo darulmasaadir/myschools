@@ -332,6 +332,41 @@ on every `bench migrate`.
 |---|---|---|---|
 | `income_account` | Link | Account | Workaround for upstream v15.5.3 bug: `Fees.income_account` declares `fetch_from: "fee_structure.income_account"` but the column was missing. Optional; leave blank to use the Company default. |
 
+### Fees (upstream `education.Fees`) — Phase 8a
+
+| Field | Type | Target | Notes |
+|---|---|---|---|
+| `mys_late_fee_for` | Link | Fees | Parent invoice this late-fee row was generated from |
+| `mys_late_fee_applied` | Check | | Set on parent after `apply_late_fees` creates the linked late invoice (idempotency) |
+
+### MYS Fee Structure Override (Phase 8a)
+
+| Field | Type | Notes |
+|---|---|---|
+| `branch` | Link → MYS Branch | * |
+| `campus` | Link → MYS Campus | optional; campus row wins over branch-only row |
+| `program` | Link → Program | * |
+| `academic_year` | Link → Academic Year | * |
+| `fee_structure` | Link → Fee Structure | * alternate structure for this scope |
+| `effective_from` / `effective_to` | Date | active window |
+| `is_active` | Check | |
+
+Resolved by [`api/fees.resolve_fee_structure`](../frappe-bench/apps/myschools/myschools/api/fees.py): campus override → branch override → default `Fee Structure` for program/year/company.
+
+### MYS Late Fee Policy (Phase 8a)
+
+| Field | Type | Notes |
+|---|---|---|
+| `branch` | Link → MYS Branch | * |
+| `grace_days` | Int | days after `due_date` before late fee applies |
+| `late_fee_percent` | Percent | of outstanding on parent invoice |
+| `late_fee_minimum` | Currency | floor for computed late amount |
+| `fees_category` | Link → Fee Category | line item on generated late `Fees` |
+| `effective_from` / `effective_to` | Date | |
+| `is_active` | Check | |
+
+Daily cron (`0 6 * * *`) calls `scheduled_apply_late_fees` → `apply_late_fees`.
+
 ---
 
 ## ID generation

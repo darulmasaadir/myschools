@@ -41,7 +41,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 ## Status snapshot (as of 2026-06-03)
 
 - ✅ Phases 0–6: foundations, branding, workspaces, print formats, notifications, workflows, setup wizard + reports
-- ✅ **Phase 7**: Portals — 7a–7d complete (inspection portal + admission enquiry in PR #15, `9b02a81`)
-- ⬜ **Phase 8 (next)**: Domain extensions (per-branch Fee Structure, student lifecycle, SMS adapters, HR scaffolding, payment gateways)
+- ✅ **Phase 7**: Portals — 7a–7d merged (PR #15, `9b02a81`)
+- 🟡 **Phase 8**: Domain extensions — **8a** fee overrides + late fees in flight; 8b–8e ⬜
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

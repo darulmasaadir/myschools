@@ -502,12 +502,34 @@ def create_custom_franchise_fields():
 		},
 	]
 
+	fees_fields = [
+		{
+			"fieldname": "mys_late_fee_for",
+			"label": "Late Fee For",
+			"fieldtype": "Link",
+			"options": "Fees",
+			"insert_after": "due_date",
+			"read_only": 1,
+			"description": "Set on late-fee invoices — points to the overdue parent Fees.",
+		},
+		{
+			"fieldname": "mys_late_fee_applied",
+			"label": "Late Fee Applied",
+			"fieldtype": "Check",
+			"insert_after": "mys_late_fee_for",
+			"read_only": 1,
+			"default": "0",
+			"description": "Set when a late-fee invoice has been generated for this Fees.",
+		},
+	]
+
 	create_custom_fields(
 		{
 			"Student": student_fields,
 			"Employee": employee_fields,
 			"Guardian": guardian_fields,
 			"Fee Structure": fee_structure_fields,
+			"Fees": fees_fields,
 		},
 		ignore_validate=True,
 		update=True,

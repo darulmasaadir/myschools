@@ -94,6 +94,8 @@ permission_query_conditions = {
 	"MYS Royalty Rate Override": "myschools.api.royalty.rate_override_query",
 	"MYS Royalty Invoice": "myschools.api.royalty.royalty_invoice_query",
 	"MYS Royalty Payment": "myschools.api.royalty.royalty_payment_query",
+	"MYS Fee Structure Override": "myschools.api.fees.fee_structure_override_query",
+	"MYS Late Fee Policy": "myschools.api.fees.late_fee_policy_query",
 }
 
 has_permission = {
@@ -107,6 +109,10 @@ scheduler_events = {
 		# 03:00 on the 1st of every month — generate prior-month royalty invoices
 		"0 3 1 * *": [
 			"myschools.api.royalty.scheduled_monthly_royalty_run",
+		],
+		# 06:00 daily — late fees on overdue student invoices
+		"0 6 * * *": [
+			"myschools.api.fees.scheduled_apply_late_fees",
 		],
 	},
 }
