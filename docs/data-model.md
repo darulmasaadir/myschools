@@ -334,6 +334,10 @@ on every `bench migrate`.
 
 ### Fees (upstream `education.Fees`) — Phase 8a
 
+**Canonical billing document** for MY School — royalty, dashboards, portals, and
+late-fee automation all read `tabFees`. Not Sales Invoice from Fee Schedule. See
+[processes/billing-model.md](processes/billing-model.md).
+
 | Field | Type | Target | Notes |
 |---|---|---|---|
 | `mys_late_fee_for` | Link | Fees | Parent invoice this late-fee row was generated from |

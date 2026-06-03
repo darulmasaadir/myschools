@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `MYS Late Fee Policy` doctypes; [`api/fees.py`](frappe-bench/apps/myschools/myschools/api/fees.py)
   with `resolve_fee_structure`, `apply_late_fees`, and daily scheduler; custom fields on `Fees`
   (`mys_late_fee_for`, `mys_late_fee_applied`); tests in `tests/test_fees.py`.
+- **Billing model decision** — [docs/processes/billing-model.md](docs/processes/billing-model.md):
+  canonical student billing = Education `Fees`; Fee Schedule → Sales Invoice is out of
+  scope; roadmap follow-ups **8a-2** (module profile trim), **8a-3** (wire
+  `resolve_fee_structure` on Fees creation), **8a-4** (bulk Fees generator).
 - **Late-fee scheduler e2e** (`scripts/verify_late_fees.py`) — fires the real
   `scheduled_apply_late_fees()` entrypoint against a self-contained overdue scenario and asserts
   the linked late fee, parent flag, and idempotency. Wired into `scripts/pr_battery.sh` and the CI

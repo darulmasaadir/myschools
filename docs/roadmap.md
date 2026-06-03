@@ -261,6 +261,17 @@ What shipped:
 - [`api/fees.py`](../frappe-bench/apps/myschools/myschools/api/fees.py) — `resolve_fee_structure`, `apply_late_fees`, daily scheduler `0 6 * * *`.
 - Custom fields on `Fees`: `mys_late_fee_for`, `mys_late_fee_applied` (idempotent late-fee generation).
 - Tests: [`tests/test_fees.py`](../frappe-bench/apps/myschools/myschools/tests/test_fees.py).
+- **Override resolution is API-only until 8a-3** — `resolve_fee_structure()` is implemented and tested but not yet applied when operators create `Fees`. See [billing-model.md](processes/billing-model.md).
+
+### 8a follow-ups ⬜ (billing model — decision locked)
+
+Decision record: [processes/billing-model.md](processes/billing-model.md). Canonical object = Education **`Fees`**; do **not** use Fee Schedule → Sales Invoice for franchise billing.
+
+| ID | Scope |
+|----|--------|
+| **8a-2** | **Billing safety** — trim franchise Module Profiles so Fee Schedule / stock Sales Invoice bulk path are not exposed (prevents invisible invoices). |
+| **8a-3** | **Wire `resolve_fee_structure()`** — `doc_events` on `Fees` so new invoices default to campus/branch override `Fee Structure`. |
+| **8a-4** | **Bulk `Fees` generator** — student-group scale tool that emits submitted `Fees` (not Sales Invoice); reuses 8a-3 resolver. |
 
 ### 8b–8e (planned)
 

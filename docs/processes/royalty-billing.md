@@ -7,7 +7,8 @@ The monthly cycle that turns a branch's fee collection into a submitted royalty
 invoice, a payment, and a settled ledger.
 
 > **API reference**: [../api/royalty.md](../api/royalty.md) ·
-> **Doctypes referenced**: [../data-model.md §2](../data-model.md#2-royalty)
+> **Doctypes referenced**: [../data-model.md §2](../data-model.md#2-royalty) ·
+> **Billing source**: [billing-model.md](billing-model.md) — royalty sums submitted **`Fees`**, not Sales Invoices from Fee Schedule.
 
 ---
 
