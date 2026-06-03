@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `MYS Late Fee Policy` doctypes; [`api/fees.py`](frappe-bench/apps/myschools/myschools/api/fees.py)
   with `resolve_fee_structure`, `apply_late_fees`, and daily scheduler; custom fields on `Fees`
   (`mys_late_fee_for`, `mys_late_fee_applied`); tests in `tests/test_fees.py`.
+- **Late-fee scheduler e2e** (`scripts/verify_late_fees.py`) — fires the real
+  `scheduled_apply_late_fees()` entrypoint against a self-contained overdue scenario and asserts
+  the linked late fee, parent flag, and idempotency. Wired into `scripts/pr_battery.sh` and the CI
+  e2e job so the 8a scheduler path is covered automatically, not by hand.
 - **Phase 7d Playwright regression** (`tests/e2e/phase7d_inspection_portal.spec.ts`) — inspection
   portal happy path, fail→finding, role denial, guest admission; extends `seed_e2e` with
   `e2e_monitor@mys.local` and checklist template.

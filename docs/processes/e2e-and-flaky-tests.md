@@ -29,6 +29,7 @@ browser, PDF, CI terminal-green) to tick in the PR body.
 | Coverage floor | `scripts/check_coverage_floor.py` | ✅ test job | Ratchet — never lower |
 | HTTP battery | `scripts/verify_http_battery.py` | ✅ e2e job | Portal routes and role landing (not a substitute for browser) |
 | Branch desk matrix | `scripts/verify_branch_desk_cards.py` | ✅ e2e job | Role × number-card surface regressions |
+| Late-fee scheduler e2e | `scripts/verify_late_fees.py` | ✅ e2e job | Fires real `scheduled_apply_late_fees()` on a self-contained overdue scenario; asserts linked late fee + idempotency. Self-cleaning |
 | Playwright | `tests/e2e/*.spec.ts` | ✅ e2e job | User-visible flows that broke in production or manual battery |
 | Manual battery | PR verification template | ❌ by hand | Net-new feature's *first* walk, PDF round-trip, anything no spec covers yet |
 

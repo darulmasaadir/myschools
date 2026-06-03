@@ -259,6 +259,13 @@ jobs:
         # number cards. Fails the job via frappe.throw on any missing card.
         run: bench --site test_site execute myschools.scripts.verify_branch_desk_cards.run
 
+      - name: Verify late-fee scheduler e2e (Phase 8a)
+        working-directory: frappe-bench
+        # Fires the real scheduled_apply_late_fees() entrypoint against a
+        # self-contained overdue-fee scenario and asserts the linked late fee
+        # is created, the parent flagged, and the run idempotent. Self-cleaning.
+        run: bench --site test_site execute myschools.scripts.verify_late_fees.run
+
       - name: Make test_site resolve to loopback
         run: |
           echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts
