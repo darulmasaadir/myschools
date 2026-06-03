@@ -7,6 +7,24 @@ alwaysApply: true
 
 Never declare a PR "ready to merge" off the back of unit tests + CI alone. Run the full verification battery first.
 
+## AUTOMATED ENFORCEMENT (run this, don't rely on memory)
+
+This rule was missed more than a dozen times because it depended on the agent *remembering* to walk the battery. It no longer does. The battery is now mechanical:
+
+1. **One command runs the whole automatable battery:**
+
+   ```bash
+   scripts/pr_battery.sh            # default site myschools.localhost
+   ```
+
+   It runs lint/pre-commit, unit tests + coverage, the role×surface branch-desk matrix, the coverage floor, and the live HTTP smoke — in order — and prints the status table. On success it writes a sentinel `.cursor/.pr-battery-pass` stamped with the **current commit SHA**. On any failure it clears the sentinel and exits non-zero.
+
+2. **A Cursor hook blocks PR finalisation without it.** `.cursor/hooks.json` → `.cursor/hooks/require-battery.sh` gates `gh pr create`, `gh pr merge`, and `gh pr ready` (`failClosed: true`). If the sentinel SHA ≠ HEAD SHA, the command is held with `permission: ask` and a message telling you to run the battery on the exact commit. **Do not bypass the prompt** — re-run `scripts/pr_battery.sh` instead.
+
+3. **The runner prints the REQUIRES-JUDGEMENT items it can't auto-run** (fresh-install smoke #4, fresh-install browser #4b, dev browser visual #5, PDF round-trip #6, CI terminal-green #9). These are never dropped silently — tick each in the PR body with evidence or an explicit one-line n/a justification.
+
+**Workflow:** make changes → commit → `scripts/pr_battery.sh` → address the judgement items → `gh pr create`/`merge`. If you amended/added commits, the sentinel no longer matches HEAD and the gate re-fires — that is intended; re-run the battery on the new commit.
+
 ## Why (this rule has been triggered FIVE times)
 
 - **Phase 3 PR #4 round 1:** letterhead missing from rendered HTML (custom Jinja print formats don't auto-wrap with Standard's `{{ letter_head|safe }}`).

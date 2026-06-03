@@ -63,6 +63,11 @@ frappe-bench/apps/myschools/playwright/.cache/
 !.cursor/rules/
 !.cursor/rules/**
 !.cursor/mcp.json
+# Shared agent tooling: the PR-battery gate hook is version-controlled so the
+# enforcement travels with the repo (the per-commit sentinel below stays local).
+!.cursor/hooks.json
+!.cursor/hooks/
+!.cursor/hooks/**
 
 # -----------------------------------------------------------------------------
 # Secrets / env
@@ -85,3 +90,4 @@ tmp/
 # Workspaces
 # -----------------------------------------------------------------------------
 myschools.code-workspace
+.cursor/.pr-battery-pass

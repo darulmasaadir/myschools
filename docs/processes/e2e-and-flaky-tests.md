@@ -4,6 +4,23 @@ How browser automation, coverage floors, and quarantine fit the MY School
 engineering standard. Complements [development.md §5](../development.md) and
 [pr-verification](../../.cursor/rules/pr-verification.mdc).
 
+## Local gate before finalising a PR
+
+Run the whole automatable battery with **one command**:
+
+```bash
+scripts/pr_battery.sh
+```
+
+It runs lint, unit tests + coverage, the role×surface branch-desk matrix, the
+coverage floor, and the HTTP smoke, then writes `.cursor/.pr-battery-pass`
+stamped with the current commit SHA. A Cursor hook
+(`.cursor/hooks/require-battery.sh`, wired in `.cursor/hooks.json`) **blocks
+`gh pr create` / `gh pr merge` / `gh pr ready`** unless that sentinel matches
+HEAD — so a PR can't be finalised without the battery having run green on the
+exact commit. The runner also prints the judgement-only items (fresh-install,
+browser, PDF, CI terminal-green) to tick in the PR body.
+
 ## Test pyramid (default)
 
 | Layer | Tool | Runs in CI? | When to add |

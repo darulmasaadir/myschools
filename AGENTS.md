@@ -20,7 +20,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 
 - **[Upgrade-safe only](.cursor/rules/upgrade-safe-only.mdc)** — no custom SPA, no core forks, no monkey-patching. Customizations live inside the `myschools` app and survive `bench update`. Phase 7 portals are Frappe Web Forms + `www/`, not Vue/React.
 - **[Engineering standards](.cursor/rules/engineering-standards.mdc)** — git from day one, tests, CI, pre-commit, conventional commits, branch-per-feature, PRs even when solo. Don't ask whether to add them — just add them.
-- **[PR verification](.cursor/rules/pr-verification.mdc)** — never say "ready to merge" off unit tests + CI alone. Walk the full battery: HTTP smoke, fresh-install smoke, browser visual check, PDF round-trip if applicable. CI green is necessary but not sufficient.
+- **[PR verification](.cursor/rules/pr-verification.mdc)** — never say "ready to merge" off unit tests + CI alone. **Run `scripts/pr_battery.sh`** (lint, tests+coverage, role×surface matrix, coverage floor, HTTP smoke); it stamps a per-commit sentinel and a Cursor hook (`.cursor/hooks/require-battery.sh`) **blocks `gh pr create`/`merge`/`ready`** until it passes for the current commit. Still tick the judgement items it can't auto-run (fresh-install, browser, PDF, CI terminal-green) in the PR body. CI green is necessary but not sufficient.
 - **[Jinja render test](.cursor/rules/jinja-render-test.mdc)** — Notification / Email Template fixtures need a render-against-real-doc test. Fixture-import alone misses field typos because Frappe defers Jinja eval until the alert fires.
 - **[Roadmap in repo](.cursor/rules/roadmap-in-repo.mdc)** — phase status lives in `docs/roadmap.md`, updated in the same PR that lands the phase.
 
