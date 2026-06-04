@@ -51,6 +51,7 @@ belong in Playwright.
 | `workflows.spec.ts` | Phase 5 desk workflow buttons |
 | `phase6_smoke.spec.ts` | Setup wizard, reports, brand assets |
 | `phase7d_inspection_portal.spec.ts` | Inspection portal matrix + guest admission |
+| `phase8a_bulk_fee_run.spec.ts` | Bulk Fee Run desk: Generate Fees + role denial |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally
@@ -100,6 +101,14 @@ include glob anywhere in the path.
 | Branch Director denied | `Branch Director is denied…` |
 | Guest admission validation | `requires parent name and phone…` |
 | Guest admission success | `guest submission succeeds` |
+
+## Phase 8a matrix (automated)
+
+| Cell | Playwright test |
+|------|-----------------|
+| Branch Accountant → Generate Fees | `Branch Accountant: save run, Generate Fees…` |
+| Academic Monitor denied | `Academic Monitor is denied on Bulk Fee Run list` |
+| Bulk API / override / skip | `tests/test_bulk_fee_run.py` + `verify_late_fees.py` |
 
 Not automated here (stay in manual battery until needed): fresh-install browser
 walk, every role × desk surface, PDF round-trip.

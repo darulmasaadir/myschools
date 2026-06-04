@@ -44,7 +44,17 @@ USERS = {
 		"roles": ["Academic Monitor"],
 		"password": "mys-e2e-monitor",
 	},
+	"e2e_accountant@mys.local": {
+		"first_name": "E2E Accountant",
+		"roles": ["Branch Accountant"],
+		"password": "mys-e2e-accountant",
+	},
 }
+
+E2E_BULK_FEE_GROUP = "E2E Bulk Fee BR014"
+# Distinct from seed_education.POSTING_DATE so Generate Fees creates rows (not skip).
+E2E_BULK_POSTING_DATE = "2026-06-04"
+E2E_BULK_DUE_DATE = "2026-06-18"
 
 E2E_CHECKLIST_TAG = "e2e portal checklist"
 
@@ -266,6 +276,100 @@ def _ensure_resolved_finding():
 	return v.name, f.name
 
 
+def _ensure_e2e_bulk_fee_prerequisites(branch: str) -> dict | None:
+	"""Student group + enrollments for Phase 8a bulk-fee Playwright (no Fees on E2E date)."""
+	if not branch:
+		return None
+	from myschools.scripts import seed_education
+
+	seed_education.run()
+	program = seed_education.PROGRAMS["Kids"]
+	academic_year = seed_education.ACADEMIC_YEAR
+	academic_term = seed_education.ACADEMIC_TERM
+	campus = f"{branch}-Kids"
+
+	if not frappe.db.exists("Student Group", E2E_BULK_FEE_GROUP):
+		frappe.get_doc(
+			{
+				"doctype": "Student Group",
+				"student_group_name": E2E_BULK_FEE_GROUP,
+				"group_based_on": "Batch",
+				"program": program,
+				"academic_year": academic_year,
+				"academic_term": academic_term,
+				"max_strength": 50,
+			}
+		).insert(ignore_permissions=True)
+
+	sg = frappe.get_doc("Student Group", E2E_BULK_FEE_GROUP)
+	students = frappe.get_all(
+		"Student",
+		{"mys_branch": branch, "mys_campus": campus},
+		pluck="name",
+		limit=3,
+	)
+	if not students:
+		return None
+	added = False
+	for student in students:
+		if not frappe.db.exists("Student Group Student", {"parent": E2E_BULK_FEE_GROUP, "student": student}):
+			sg.append("students", {"student": student, "active": 1})
+			added = True
+	if added:
+		sg.save(ignore_permissions=True)
+
+	# Remove any prior e2e bulk fees on this posting date so Generate Fees is repeatable.
+	for student in students:
+		for fee_name in frappe.get_all(
+			"Fees",
+			{"student": student, "posting_date": E2E_BULK_POSTING_DATE},
+			pluck="name",
+		):
+			fee = frappe.get_doc("Fees", fee_name)
+			if fee.docstatus == 1:
+				fee.cancel()
+			frappe.delete_doc("Fees", fee_name, force=True, ignore_permissions=True)
+
+	meta = {
+		"branch": branch,
+		"student_group": E2E_BULK_FEE_GROUP,
+		"program": program,
+		"academic_year": academic_year,
+		"academic_term": academic_term,
+		"posting_date": E2E_BULK_POSTING_DATE,
+		"due_date": E2E_BULK_DUE_DATE,
+		"student_count": len(students),
+	}
+	company = frappe.db.get_value("MYS Branch", branch, "company")
+	if not company:
+		return meta
+
+	for old in frappe.get_all(
+		"MYS Bulk Fee Run",
+		{"branch": branch, "student_group": E2E_BULK_FEE_GROUP, "posting_date": E2E_BULK_POSTING_DATE},
+		pluck="name",
+	):
+		frappe.delete_doc("MYS Bulk Fee Run", old, force=True, ignore_permissions=True)
+
+	run = frappe.get_doc(
+		{
+			"doctype": "MYS Bulk Fee Run",
+			"branch": branch,
+			"company": company,
+			"student_group": E2E_BULK_FEE_GROUP,
+			"academic_year": academic_year,
+			"academic_term": academic_term,
+			"posting_date": E2E_BULK_POSTING_DATE,
+			"due_date": E2E_BULK_DUE_DATE,
+			"submit_fees": 1,
+			"status": "Draft",
+		}
+	)
+	run.insert(ignore_permissions=True)
+	meta["run"] = run.name
+	return meta
+
+
 def _ensure_overdue_invoice():
 	inv = _ensure_submitted_invoice()
 	if not inv:
@@ -285,7 +389,9 @@ def main():
 	if branch:
 		_ensure_monitor_employee(branch)
 		_ensure_cluster_inspector_employee("e2e_audit@mys.local", branch, "E2E", "Audit Inspector")
+		_ensure_cluster_inspector_employee("e2e_accountant@mys.local", branch, "E2E", "Accountant")
 	template = _ensure_e2e_checklist_template()
+	bulk_fee = _ensure_e2e_bulk_fee_prerequisites(branch)
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()
@@ -298,6 +404,7 @@ def main():
 		"invoice": invoice,
 		"branch": branch,
 		"checklist_template": template,
+		"bulk_fee": bulk_fee,
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

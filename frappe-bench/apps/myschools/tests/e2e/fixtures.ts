@@ -3,6 +3,18 @@ import * as fs from "fs";
 
 const STATE_FILE = process.env.MYS_STATE_FILE ?? "/tmp/mys_e2e_state.json";
 
+export interface BulkFeeSeed {
+	branch: string;
+	student_group: string;
+	program: string;
+	academic_year: string;
+	academic_term: string;
+	posting_date: string;
+	due_date: string;
+	student_count: number;
+	run: string;
+}
+
 export interface SeedState {
 	users: Record<string, { password: string; roles: string[] }>;
 	visit: string | null;
@@ -10,6 +22,7 @@ export interface SeedState {
 	invoice: string | null;
 	branch: string | null;
 	checklist_template: string | null;
+	bulk_fee: BulkFeeSeed | null;
 }
 
 export function loadSeed(): SeedState {
@@ -55,6 +68,41 @@ export async function loginPortal(
 		timeout: 20_000,
 	});
 	await expect(page.locator(".mys-portal").first()).toBeVisible({ timeout: 15_000 });
+}
+
+/** Set a Frappe desk Link field (v15 combobox + listbox options). */
+export async function setDeskLinkField(page: Page, fieldname: string, value: string) {
+	const control = page.locator(`.frappe-control[data-fieldname="${fieldname}"]`);
+	await control.scrollIntoViewIfNeeded();
+	const input = control.locator('input, [role="combobox"]').first();
+	await input.click();
+	await input.fill(value);
+	const option = page.getByRole("option", { name: value, exact: true });
+	try {
+		await option.click({ timeout: 3_000 });
+	} catch {
+		// Single-result link fields: keyboard select is more stable than portaled listboxes.
+		await input.press("ArrowDown");
+		await input.press("Enter");
+	}
+}
+
+/** Set a Frappe desk Date field (YYYY-MM-DD). */
+export async function setDeskDateField(page: Page, fieldname: string, isoDate: string) {
+	const control = page.locator(`.frappe-control[data-fieldname="${fieldname}"]`);
+	await control.scrollIntoViewIfNeeded();
+	const input = control.locator("input").first();
+	await input.click();
+	await input.fill(isoDate);
+	await input.press("Tab");
+}
+
+export async function saveDeskForm(page: Page) {
+	await page.locator('.btn-primary[data-label="Save"], button:has-text("Save")').first().click();
+	await page.waitForURL(/\/app\/mys-bulk-fee-run\/BFR-/, { timeout: 30_000 });
+	await expect(page.locator(".indicator-pill, .indicator").first()).toBeVisible({
+		timeout: 15_000,
+	});
 }
 
 export { base as test, expect };
