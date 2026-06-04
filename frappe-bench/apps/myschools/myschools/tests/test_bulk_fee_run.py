@@ -153,9 +153,9 @@ class TestBulkFeeRun(FrappeTestCase):
 				}
 			).insert(ignore_permissions=True)
 		if not frappe.db.exists("Program", PROGRAM):
-			frappe.get_doc(
-				{"doctype": "Program", "program_name": PROGRAM, "program_code": PROGRAM}
-			).insert(ignore_permissions=True)
+			frappe.get_doc({"doctype": "Program", "program_name": PROGRAM, "program_code": PROGRAM}).insert(
+				ignore_permissions=True
+			)
 
 	@classmethod
 	def _ensure_fee_structure(cls, amount: int) -> str:
@@ -212,9 +212,7 @@ class TestBulkFeeRun(FrappeTestCase):
 				.name
 			)
 		sg = frappe.get_doc("Student Group", GROUP)
-		if not frappe.db.exists(
-			"Student Group Student", {"parent": GROUP, "student": student}
-		):
+		if not frappe.db.exists("Student Group Student", {"parent": GROUP, "student": student}):
 			sg.append("students", {"student": student, "active": 1})
 			sg.save(ignore_permissions=True)
 

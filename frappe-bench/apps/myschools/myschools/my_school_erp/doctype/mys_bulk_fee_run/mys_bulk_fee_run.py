@@ -12,9 +12,7 @@ class MYSBulkFeeRun(Document):
 			sg_program = frappe.db.get_value("Student Group", self.student_group, "program")
 			if sg_program and sg_program != self.program:
 				frappe.msgprint(
-					_("Student Group program {0} differs from filter {1}").format(
-						sg_program, self.program
-					),
+					_("Student Group program {0} differs from filter {1}").format(sg_program, self.program),
 					indicator="orange",
 					alert=True,
 				)
