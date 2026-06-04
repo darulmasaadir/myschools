@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-06-03
-**Up next:** Phase 8a merge → 8b student lifecycle
+**Last updated:** 2026-06-04
+**Up next:** Phase 8b — student lifecycle
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -33,7 +33,7 @@ These bind every phase:
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
-| 8 | Domain extensions | 🟡 | 8a in flight · 8b–8e ⬜ |
+| 8 | Domain extensions | 🟡 | 8a ✅ · 8b–8e ⬜ |
 
 ---
 
@@ -252,9 +252,9 @@ What shipped:
 
 **Estimated size:** XL (30–50 h), split into sub-PRs 8a–8e.
 
-### 8a — Fee overrides + late fees 🟡
+### 8a — Fee overrides + late fees ✅
 
-**In flight:** branch `feature/phase-8a-fee-overrides-late-fees`.
+**Delivered:** PR [#16](https://github.com/darulmasaadir/myschools/pull/16) (merge `3b4fc7a`).
 
 - `MYS Fee Structure Override` — branch/campus + program + academic year → alternate `Fee Structure` (campus wins over branch, same precedence as royalty rates).
 - `MYS Late Fee Policy` — grace days, late-fee % of outstanding, minimum amount, fee category.
@@ -266,15 +266,13 @@ What shipped:
 - **Bulk Fees** (8a-4) — `MYS Bulk Fee Run` + `generate_bulk_fees_for_run` (student group → submitted `Fees`, override resolution, duplicate skip).
 - **Branch desk + role×surface** — Bulk Fee Run / override / policy on the MYS Branch workspace (shortcut + links); `scripts/verify_fee_admin_surfaces.py` matrix; Playwright `phase8a_bulk_fee_run` + `phase8a_fee_admin_forms`.
 
-### 8a follow-ups ✅ (in branch)
-
 Decision record: [processes/billing-model.md](processes/billing-model.md). Canonical object = Education **`Fees`**.
 
 | ID | Status | Scope |
 |----|--------|--------|
-| **8a-2** | ✅ in branch | Module profile + `restrict_split_brain_billing_paths()` |
-| **8a-3** | ✅ in branch | `Fees` validate → `apply_resolved_fee_structure_on_fees` |
-| **8a-4** | ✅ in branch | **`MYS Bulk Fee Run`** — student group + term → N submitted `Fees` via `generate_bulk_fees_for_run`; uses `resolve_fee_structure`; tests `test_bulk_fee_run.py` |
+| **8a-2** | ✅ | Module profile + `restrict_split_brain_billing_paths()` |
+| **8a-3** | ✅ | `Fees` validate → `apply_resolved_fee_structure_on_fees` |
+| **8a-4** | ✅ | **`MYS Bulk Fee Run`** — student group + term → N submitted `Fees` via `generate_bulk_fees_for_run`; uses `resolve_fee_structure`; tests `test_bulk_fee_run.py` |
 
 ### 8b–8e (planned)
 
