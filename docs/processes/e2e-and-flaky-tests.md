@@ -4,6 +4,23 @@ How browser automation, coverage floors, and quarantine fit the MY School
 engineering standard. Complements [development.md §5](../development.md) and
 [pr-verification](../../.cursor/rules/pr-verification.mdc).
 
+## Local gate before finalising a PR
+
+Run the whole automatable battery with **one command**:
+
+```bash
+scripts/pr_battery.sh
+```
+
+It runs lint, unit tests + coverage, the role×surface branch-desk matrix, the
+coverage floor, and the HTTP smoke, then writes `.cursor/.pr-battery-pass`
+stamped with the current commit SHA. A Cursor hook
+(`.cursor/hooks/require-battery.sh`, wired in `.cursor/hooks.json`) **blocks
+`gh pr create` / `gh pr merge` / `gh pr ready`** unless that sentinel matches
+HEAD — so a PR can't be finalised without the battery having run green on the
+exact commit. The runner also prints the judgement-only items (fresh-install,
+browser, PDF, CI terminal-green) to tick in the PR body.
+
 ## Test pyramid (default)
 
 | Layer | Tool | Runs in CI? | When to add |
@@ -12,6 +29,8 @@ engineering standard. Complements [development.md §5](../development.md) and
 | Coverage floor | `scripts/check_coverage_floor.py` | ✅ test job | Ratchet — never lower |
 | HTTP battery | `scripts/verify_http_battery.py` | ✅ e2e job | Portal routes and role landing (not a substitute for browser) |
 | Branch desk matrix | `scripts/verify_branch_desk_cards.py` | ✅ e2e job | Role × number-card surface regressions |
+| Fee-admin matrix | `scripts/verify_fee_admin_surfaces.py` | ✅ e2e job | Role × override/policy/bulk-run permission regressions |
+| Late-fee scheduler e2e | `scripts/verify_late_fees.py` | ✅ e2e job | Fires real `scheduled_apply_late_fees()` on a self-contained overdue scenario; asserts linked late fee + idempotency. Self-cleaning |
 | Playwright | `tests/e2e/*.spec.ts` | ✅ e2e job | User-visible flows that broke in production or manual battery |
 | Manual battery | PR verification template | ❌ by hand | Net-new feature's *first* walk, PDF round-trip, anything no spec covers yet |
 
@@ -33,6 +52,8 @@ belong in Playwright.
 | `workflows.spec.ts` | Phase 5 desk workflow buttons |
 | `phase6_smoke.spec.ts` | Setup wizard, reports, brand assets |
 | `phase7d_inspection_portal.spec.ts` | Inspection portal matrix + guest admission |
+| `phase8a_bulk_fee_run.spec.ts` | Bulk Fee Run desk: Generate Fees (seeded + from blank) + role denial |
+| `phase8a_fee_admin_forms.spec.ts` | Override / late-fee-policy forms: Director create, Principal denial |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally
@@ -82,6 +103,19 @@ include glob anywhere in the path.
 | Branch Director denied | `Branch Director is denied…` |
 | Guest admission validation | `requires parent name and phone…` |
 | Guest admission success | `guest submission succeeds` |
+
+## Phase 8a matrix (automated)
+
+| Cell | Playwright test |
+|------|-----------------|
+| Branch Accountant → Generate Fees (seeded draft) | `Branch Accountant: Generate Fees on seeded draft` |
+| Branch Accountant → new run from blank → Generate | `Branch Accountant: new run from blank…` |
+| Branch Director → create override / policy | `Branch Director creates a Fee Structure Override` / `… Late Fee Policy` |
+| Branch Accountant → Fees override orange alert | `Branch Accountant: Fees orange alert when fee structure mismatches override` |
+| Branch Principal denied (override) | `Branch Principal is denied on Fee Structure Override` |
+| Academic Monitor denied (bulk run) | `Academic Monitor is denied on Bulk Fee Run list` |
+| Role × surface permission matrix | `scripts/verify_fee_admin_surfaces.py` |
+| Bulk API / override / skip | `tests/test_bulk_fee_run.py` + `verify_late_fees.py` |
 
 Not automated here (stay in manual battery until needed): fresh-install browser
 walk, every role × desk surface, PDF round-trip.

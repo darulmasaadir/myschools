@@ -1,0 +1,162 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:LFP-{####}",
+ "creation": "2026-06-03 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "branch",
+  "campus",
+  "column_break_terms",
+  "grace_days",
+  "late_fee_percent",
+  "late_fee_minimum",
+  "fees_category",
+  "column_break_dates",
+  "effective_from",
+  "effective_to",
+  "is_active",
+  "section_break_meta",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "MYS Branch",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "campus",
+   "fieldtype": "Link",
+   "label": "Campus (optional)",
+   "options": "MYS Campus",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Campus-specific policy wins over branch-wide policy."
+  },
+  {
+   "fieldname": "column_break_terms",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "grace_days",
+   "fieldtype": "Int",
+   "label": "Grace Days After Due Date",
+   "default": "7",
+   "reqd": 1,
+   "description": "Late fee applies when today is after due_date + grace days."
+  },
+  {
+   "fieldname": "late_fee_percent",
+   "fieldtype": "Percent",
+   "label": "Late Fee % of Outstanding",
+   "reqd": 1,
+   "description": "One-time charge as a percent of the parent fee's outstanding amount."
+  },
+  {
+   "fieldname": "late_fee_minimum",
+   "fieldtype": "Currency",
+   "label": "Minimum Late Fee",
+   "default": "0",
+   "description": "Floor amount when percent yields less than this."
+  },
+  {
+   "fieldname": "fees_category",
+   "fieldtype": "Link",
+   "label": "Fee Category",
+   "options": "Fee Category",
+   "default": "Late Fee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_dates",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "effective_from",
+   "fieldtype": "Date",
+   "label": "Effective From",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "effective_to",
+   "fieldtype": "Date",
+   "label": "Effective To"
+  },
+  {
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active",
+   "default": "1"
+  },
+  {
+   "fieldname": "section_break_meta",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-03 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Late Fee Policy",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Chief Executive",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HO Dept Head"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Director",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Accountant",
+   "write": 1
+  }
+ ],
+ "sort_field": "effective_from",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

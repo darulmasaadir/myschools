@@ -41,6 +41,7 @@
    {"doctype": "Block Module", "module": "Projects"},
    {"doctype": "Block Module", "module": "Utilities"},
    {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "Accounts"},
    {"doctype": "Block Module", "module": "CRM"},
    {"doctype": "Block Module", "module": "Selling"}
   ]
@@ -65,6 +66,7 @@
    {"doctype": "Block Module", "module": "Projects"},
    {"doctype": "Block Module", "module": "Utilities"},
    {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "Accounts"},
    {"doctype": "Block Module", "module": "CRM"},
    {"doctype": "Block Module", "module": "Selling"}
   ]

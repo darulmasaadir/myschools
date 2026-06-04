@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/require-battery.sh",
+        "matcher": "gh\\s+pr\\s+(create|merge|ready)",
+        "failClosed": true
+      }
+    ]
+  }
+}

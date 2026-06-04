@@ -9,6 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 8a — fee-admin desk polish.** Bulk Fee Run / Fee Structure Override / Late
+  Fee Policy added to the MYS Branch workspace (shortcut + links); fee-admin link-target
+  reads (Program/Academic Year/Term/Fee Structure/Student Group/Fee Category) granted to
+  Branch Director/Accountant/Admin so the desk forms are fillable; role × surface guard
+  `scripts/verify_fee_admin_surfaces.py` (wired into battery + CI); Playwright
+  `phase8a_bulk_fee_run` (seeded + from-blank) and `phase8a_fee_admin_forms`.
+
+### Fixed
+
+- **Late Fee Policy validate `TypeError`.** `grace_days` compared against `int` raised
+  `'<' not supported between 'str' and 'int'` when set as a string (client `set_value`,
+  API, import); now `cint`-guarded with a regression test.
+
+### Added (cont.)
+
+- **Phase 8a-4 — bulk Fees generator.** `MYS Bulk Fee Run` doctype with **Generate Fees**
+  action; `generate_bulk_fees_for_run` creates submitted `Fees` per active student-group
+  member (override resolution, duplicate skip); `tests/test_bulk_fee_run.py`.
+- **Phase 8a-2/8a-3 (in branch).** Billing safety (module profile + `restrict_split_brain_billing_paths`);
+  `Fees.validate` → `apply_resolved_fee_structure_on_fees`.
+- **Phase 8a — fee overrides + late fees (in flight).** `MYS Fee Structure Override` and
+  `MYS Late Fee Policy` doctypes; [`api/fees.py`](frappe-bench/apps/myschools/myschools/api/fees.py)
+  with `resolve_fee_structure`, `apply_late_fees`, and daily scheduler; custom fields on `Fees`
+  (`mys_late_fee_for`, `mys_late_fee_applied`); tests in `tests/test_fees.py`.
+- **Billing model decision** — [docs/processes/billing-model.md](docs/processes/billing-model.md):
+  canonical student billing = Education `Fees`; Fee Schedule → Sales Invoice is out of
+  scope; roadmap follow-ups **8a-2** (module profile trim), **8a-3** (wire
+  `resolve_fee_structure` on Fees creation), **8a-4** (bulk Fees generator).
+- **Late-fee scheduler e2e** (`scripts/verify_late_fees.py`) — fires the real
+  `scheduled_apply_late_fees()` entrypoint against a self-contained overdue scenario and asserts
+  the linked late fee, parent flag, and idempotency. Wired into `scripts/pr_battery.sh` and the CI
+  e2e job so the 8a scheduler path is covered automatically, not by hand.
 - **Phase 7d Playwright regression** (`tests/e2e/phase7d_inspection_portal.spec.ts`) — inspection
   portal happy path, fail→finding, role denial, guest admission; extends `seed_e2e` with
   `e2e_monitor@mys.local` and checklist template.

@@ -7,6 +7,27 @@ alwaysApply: true
 
 Never declare a PR "ready to merge" off the back of unit tests + CI alone. Run the full verification battery first.
 
+## AUTOMATED ENFORCEMENT (run this, don't rely on memory)
+
+This rule was missed more than a dozen times because it depended on the agent *remembering* to walk the battery. It no longer does. The battery is now mechanical:
+
+The branch must be **fully end-to-end tested BEFORE its PR is created** — not after. One command enforces the whole thing:
+
+```bash
+scripts/pr_battery.sh            # default site myschools.localhost
+```
+
+It runs in two stages and only writes the sentinel `.cursor/.pr-battery-pass` (stamped with the **current commit SHA**) when BOTH pass:
+
+- **STAGE 1 — local fast checks:** lint/pre-commit, unit tests + coverage, role×surface branch-desk matrix, coverage floor, live HTTP smoke on the dev site. Fast feedback before spending CI minutes.
+- **STAGE 2 — CI end-to-end gate:** requires the branch to be pushed and the **CI workflow to be terminal-green for the EXACT current commit**. CI *is* the full battery — fresh-install (drop → new-site → install-app → migrate), seed, branch matrix, live HTTP battery, and **Playwright browser e2e**. We do not fake fresh-install/browser locally; we require the real CI run to be green for this commit. CI now triggers on `feature/**` pushes (see `.github/workflows/ci.yml`) precisely so this runs **before** the PR exists.
+
+**A Cursor hook blocks PR finalisation without it.** `.cursor/hooks.json` → `.cursor/hooks/require-battery.sh` gates `gh pr create`, `gh pr merge`, `gh pr ready` (`failClosed: true`). If the sentinel SHA ≠ HEAD SHA the command is held with `permission: ask`. **Do not bypass** — re-run `scripts/pr_battery.sh`.
+
+**Workflow:** make changes → commit → `git push` → `scripts/pr_battery.sh` (Stage 1 local, then waits for CI green on this commit) → `gh pr create`. Any new commit invalidates the sentinel and re-fires the gate — intended; re-run on the new commit. `SKIP_CI_WAIT=1` runs Stage 1 only and does **not** write the sentinel (so it can't satisfy the gate).
+
+**Judgement-only items** (not auto-gated, confirm in the PR body): PDF round-trip *if* a print format changed; the first manual browser walk of a brand-new surface that has no Playwright spec yet — then add the spec so next time it's covered by Stage 2.
+
 ## Why (this rule has been triggered FIVE times)
 
 - **Phase 3 PR #4 round 1:** letterhead missing from rendered HTML (custom Jinja print formats don't auto-wrap with Standard's `{{ letter_head|safe }}`).

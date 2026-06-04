@@ -17,9 +17,12 @@ that doc is the single source of truth before starting any new piece of work.
 
 You probably want a process walkthrough:
 
+- **[processes/billing-model.md](processes/billing-model.md)** — why student
+  billing uses Education **`Fees`** (not Fee Schedule → Sales Invoice), what
+  MY School reads for royalty/portals/late fees, and the 8a-2/8a-3/8a-4 follow-ups.
 - **[processes/royalty-billing.md](processes/royalty-billing.md)** — how monthly
   royalty invoices come to exist, how the rate is computed, what to do when a
-  franchisee disputes a number.
+  franchisee disputes a number. Royalty collection is summed from submitted **`Fees`**.
 - **[processes/inspection-workflow.md](processes/inspection-workflow.md)** — how
   to run an inspection from booking to verification, what auto-creates findings,
   how corrective actions close out.
