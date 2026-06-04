@@ -11,8 +11,16 @@ export interface BulkFeeSeed {
 	academic_term: string;
 	posting_date: string;
 	due_date: string;
+	posting_date_2: string;
+	due_date_2: string;
 	student_count: number;
 	run: string;
+	fee_structure: string | null;
+	default_fee_structure: string | null;
+	sample_student: string | null;
+	company: string | null;
+	program_enrollment: string | null;
+	fee_category: string;
 }
 
 export interface SeedState {
@@ -70,39 +78,46 @@ export async function loginPortal(
 	await expect(page.locator(".mys-portal").first()).toBeVisible({ timeout: 15_000 });
 }
 
-/** Set a Frappe desk Link field (v15 combobox + listbox options). */
-export async function setDeskLinkField(page: Page, fieldname: string, value: string) {
-	const control = page.locator(`.frappe-control[data-fieldname="${fieldname}"]`);
-	await control.scrollIntoViewIfNeeded();
-	const input = control.locator('input, [role="combobox"]').first();
-	await input.click();
-	await input.fill(value);
-	const option = page.getByRole("option", { name: value, exact: true });
-	try {
-		await option.click({ timeout: 3_000 });
-	} catch {
-		// Single-result link fields: keyboard select is more stable than portaled listboxes.
-		await input.press("ArrowDown");
-		await input.press("Enter");
-	}
-}
-
-/** Set a Frappe desk Date field (YYYY-MM-DD). */
-export async function setDeskDateField(page: Page, fieldname: string, isoDate: string) {
-	const control = page.locator(`.frappe-control[data-fieldname="${fieldname}"]`);
-	await control.scrollIntoViewIfNeeded();
-	const input = control.locator("input").first();
-	await input.click();
-	await input.fill(isoDate);
-	await input.press("Tab");
-}
-
-export async function saveDeskForm(page: Page) {
-	await page.locator('.btn-primary[data-label="Save"], button:has-text("Save")').first().click();
-	await page.waitForURL(/\/app\/mys-bulk-fee-run\/BFR-/, { timeout: 30_000 });
-	await expect(page.locator(".indicator-pill, .indicator").first()).toBeVisible({
+/**
+ * Set a desk form field via the form's own API (cur_frm.set_value), which runs
+ * the same validate / fetch_from / depends_on logic as UI entry but without
+ * fighting Frappe's awesomplete/datepicker widgets (those are upstream, not our
+ * code). Format-agnostic for dates (pass ISO yyyy-mm-dd).
+ */
+export async function setFormValue(page: Page, fieldname: string, value: string) {
+	await page.waitForFunction(() => Boolean((window as any).cur_frm?.doc), undefined, {
 		timeout: 15_000,
 	});
+	await page.evaluate(
+		({ fn, val }) => (window as any).cur_frm.set_value(fn, val),
+		{ fn: fieldname, val: value },
+	);
+}
+
+/**
+ * Save the current desk form via the Save keyboard shortcut and wait until the
+ * doc is persisted (no longer new, not dirty). Surfaces any blocking msgprint
+ * dialog as a readable failure instead of a bare timeout.
+ */
+export async function saveForm(page: Page) {
+	await page.keyboard.press("Control+s");
+	try {
+		await page.waitForFunction(
+			() => {
+				const f = (window as any).cur_frm;
+				return Boolean(f && !f.is_new() && !f.is_dirty());
+			},
+			undefined,
+			{ timeout: 20_000 },
+		);
+	} catch (e) {
+		const dialog = await page
+			.locator(".modal.show .modal-body, .msgprint")
+			.first()
+			.innerText()
+			.catch(() => "");
+		throw new Error(`saveForm: doc not persisted. Dialog: ${dialog || "(none)"}`);
+	}
 }
 
 export { base as test, expect };

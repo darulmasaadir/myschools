@@ -258,6 +258,25 @@ class TestFeeOverridesAndLateFees(FrappeTestCase):
 		self.assertEqual(fs, self.override_fs)
 		self.assertEqual(source, "branch_override")
 
+	def test_late_fee_policy_validate_tolerates_string_numbers(self):
+		"""grace_days/late_fee_percent as strings (client set_value, API, import)
+		must not raise TypeError in validate. Regression for '<' str vs int."""
+		policy = frappe.get_doc(
+			{
+				"doctype": "MYS Late Fee Policy",
+				"branch": BRANCH,
+				"grace_days": "7",
+				"late_fee_percent": "5",
+				"late_fee_minimum": "0",
+				"fees_category": LATE_CATEGORY,
+				"effective_from": "2025-02-01",
+				"is_active": 1,
+			}
+		)
+		policy.insert(ignore_permissions=True)
+		self.assertEqual(frappe.db.get_value("MYS Late Fee Policy", policy.name, "grace_days"), 7)
+		policy.delete(ignore_permissions=True)
+
 	def test_resolve_fee_structure_campus_override_wins(self):
 		campus_fs = frappe.get_doc(
 			{

@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 8a — fee-admin desk polish.** Bulk Fee Run / Fee Structure Override / Late
+  Fee Policy added to the MYS Branch workspace (shortcut + links); fee-admin link-target
+  reads (Program/Academic Year/Term/Fee Structure/Student Group/Fee Category) granted to
+  Branch Director/Accountant/Admin so the desk forms are fillable; role × surface guard
+  `scripts/verify_fee_admin_surfaces.py` (wired into battery + CI); Playwright
+  `phase8a_bulk_fee_run` (seeded + from-blank) and `phase8a_fee_admin_forms`.
+
+### Fixed
+
+- **Late Fee Policy validate `TypeError`.** `grace_days` compared against `int` raised
+  `'<' not supported between 'str' and 'int'` when set as a string (client `set_value`,
+  API, import); now `cint`-guarded with a regression test.
+
+### Added (cont.)
+
 - **Phase 8a-4 — bulk Fees generator.** `MYS Bulk Fee Run` doctype with **Generate Fees**
   action; `generate_bulk_fees_for_run` creates submitted `Fees` per active student-group
   member (override resolution, duplicate skip); `tests/test_bulk_fee_run.py`.

@@ -59,6 +59,7 @@ def after_migrate():
 	restrict_split_brain_billing_paths()
 	backfill_custom_number_card_document_types()
 	sync_workspace_number_card_content_labels()
+	sync_mys_branch_fee_admin_workspace()
 	backfill_module_profiles()
 	backfill_guardian_user_links()
 	set_default_print_formats()
@@ -114,6 +115,90 @@ def sync_workspace_number_card_content_labels():
 				changed = True
 		if changed:
 			frappe.db.set_value("Workspace", ws_name, "content", json.dumps(content))
+
+
+MYS_BRANCH_WORKSPACE = "mys-branch"
+_BRANCH_FEE_ADMIN_SHORTCUT = {
+	"color": "Cyan",
+	"doc_view": "List",
+	"label": "Bulk Fee Run",
+	"link_to": "MYS Bulk Fee Run",
+	"type": "DocType",
+}
+_BRANCH_FEE_ADMIN_LINKS = [
+	("Bulk Fee Run", "MYS Bulk Fee Run"),
+	("Fee Structure Override", "MYS Fee Structure Override"),
+	("Late Fee Policy", "MYS Late Fee Policy"),
+]
+
+
+def sync_mys_branch_fee_admin_workspace():
+	"""Ensure Phase 8a fee-admin shortcuts/links exist on the MYS Branch workspace.
+
+	Module JSON under my_school_erp/workspace/ only applies on first insert; existing
+	sites keep the old workspace until we patch it here (same pattern as number-card
+	content labels). Idempotent — safe on every migrate.
+	"""
+	import json
+
+	if not frappe.db.exists("Workspace", MYS_BRANCH_WORKSPACE):
+		return
+
+	ws = frappe.get_doc("Workspace", MYS_BRANCH_WORKSPACE)
+	changed = False
+
+	labels = {row.label for row in ws.shortcuts}
+	if _BRANCH_FEE_ADMIN_SHORTCUT["label"] not in labels:
+		ws.append("shortcuts", dict(_BRANCH_FEE_ADMIN_SHORTCUT))
+		changed = True
+
+	existing_links = {(row.label, row.link_to) for row in ws.links if row.type == "Link"}
+	for label, link_to in _BRANCH_FEE_ADMIN_LINKS:
+		if not frappe.db.exists("DocType", link_to):
+			continue
+		if (label, link_to) not in existing_links:
+			ws.append(
+				"links",
+				{
+					"hidden": 0,
+					"is_query_report": 0,
+					"label": label,
+					"link_count": 0,
+					"link_to": link_to,
+					"link_type": "DocType",
+					"onboard": 0,
+					"type": "Link",
+				},
+			)
+			changed = True
+
+	content = json.loads(ws.content or "[]")
+	block_vals = {
+		block.get("data", {}).get("shortcut_name") for block in content if block.get("type") == "shortcut"
+	}
+	if _BRANCH_FEE_ADMIN_SHORTCUT["label"] not in block_vals:
+		insert_at = next(
+			(
+				i + 1
+				for i, block in enumerate(content)
+				if block.get("type") == "shortcut" and block.get("data", {}).get("shortcut_name") == "Fees"
+			),
+			len(content),
+		)
+		content.insert(
+			insert_at,
+			{
+				"id": "sc-bulk-fees",
+				"type": "shortcut",
+				"data": {"shortcut_name": _BRANCH_FEE_ADMIN_SHORTCUT["label"], "col": 3},
+			},
+		)
+		ws.content = json.dumps(content)
+		changed = True
+
+	if changed:
+		ws.flags.ignore_validate = True
+		ws.save(ignore_permissions=True)
 
 
 DEFAULT_PRINT_FORMATS = {
@@ -301,6 +386,23 @@ FRANCHISE_ROLE_READS = {
 	],
 }
 
+# Fee-admin roles need read on the link-target doctypes their Phase 8a forms
+# (MYS Bulk Fee Run / Fee Structure Override / Late Fee Policy) reference —
+# otherwise desk link-field validation rejects the values and the forms can't
+# be filled or saved in the browser. Read-only; row scoping is unaffected.
+_FEE_ADMIN_LINK_READS = [
+	"Program",
+	"Academic Year",
+	"Academic Term",
+	"Fee Structure",
+	"Student Group",
+	"Fee Category",
+]
+for _role in ("Branch Director", "Branch Accountant", "Branch Admin"):
+	for _dt in _FEE_ADMIN_LINK_READS:
+		if _dt not in FRANCHISE_ROLE_READS[_role]:
+			FRANCHISE_ROLE_READS[_role].append(_dt)
+
 
 # Education bulk billing paths that create Sales Invoice — not read by MY School.
 SPLIT_BRAIN_BILLING_DOCTYPES = ("Fee Schedule", "Sales Invoice")
@@ -344,6 +446,19 @@ def grant_franchise_role_permissions():
 			# enforce the read=1 flag idempotently.
 			add_permission(doctype, role, 0)
 			update_permission_property(doctype, role, 0, "read", 1)
+
+	# Branch fee admins create individual Fees on desk (8a-3 validate + orange alert).
+	if frappe.db.exists("DocType", "Fees"):
+		for role in ("Branch Director", "Branch Accountant"):
+			if not frappe.db.exists("Role", role):
+				continue
+			add_permission("Fees", role, 0)
+			for perm in ("read", "create", "write"):
+				update_permission_property("Fees", role, 0, perm, 1)
+			for link_dt in ("Account", "Company", "Program Enrollment"):
+				if frappe.db.exists("DocType", link_dt):
+					add_permission(link_dt, role, 0)
+					update_permission_property(link_dt, role, 0, "read", 1)
 
 	# Guardian portal: read attendance + submit feedback via Web Form.
 	if frappe.db.exists("Role", "Guardian"):

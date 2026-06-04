@@ -266,6 +266,12 @@ jobs:
         # is created, the parent flagged, and the run idempotent. Self-cleaning.
         run: bench --site test_site execute myschools.scripts.verify_late_fees.run
 
+      - name: Verify fee-admin role × surface matrix (Phase 8a)
+        working-directory: frappe-bench
+        # bench-execute check: asserts the override / late-fee-policy / bulk-run
+        # permission matrix holds at runtime for every franchise role.
+        run: bench --site test_site execute myschools.scripts.verify_fee_admin_surfaces.run
+
       - name: Make test_site resolve to loopback
         run: |
           echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts

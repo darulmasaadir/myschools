@@ -264,6 +264,7 @@ What shipped:
 - **`resolve_fee_structure()` wired on `Fees.validate`** (8a-3) — defaults `fee_structure` from campus/branch override; warns if operator picks a different structure while an override is active.
 - **Billing safety** (8a-2) — `Accounts` module blocked on MYS Branch/Cluster profiles; franchise roles denied create on `Fee Schedule` / `Sales Invoice` via `restrict_split_brain_billing_paths()` in install/migrate.
 - **Bulk Fees** (8a-4) — `MYS Bulk Fee Run` + `generate_bulk_fees_for_run` (student group → submitted `Fees`, override resolution, duplicate skip).
+- **Branch desk + role×surface** — Bulk Fee Run / override / policy on the MYS Branch workspace (shortcut + links); `scripts/verify_fee_admin_surfaces.py` matrix; Playwright `phase8a_bulk_fee_run` + `phase8a_fee_admin_forms`.
 
 ### 8a follow-ups ✅ (in branch)
 

@@ -58,6 +58,7 @@ step_coverage_floor()  { ( cd "$BENCH" && ./env/bin/python apps/myschools/myscho
 step_http_smoke()      { ( cd "$BENCH" && ./env/bin/python -c "from myschools.scripts.verify_http_battery import run; run(host='${SITE}')" ); }
 step_branch_matrix()   { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_branch_desk_cards.run ); }
 step_late_fee_e2e()    { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_late_fees.run ); }
+step_fee_admin_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_fee_admin_surfaces.run ); }
 
 echo "PR battery — site=${SITE} branch=${BRANCH} commit=${HEAD_SHA:0:12}"
 echo "###############  STAGE 1 — local fast checks  ###############"
@@ -65,6 +66,7 @@ echo "###############  STAGE 1 — local fast checks  ###############"
 run_step "2. Lint / pre-commit"            step_precommit
 run_step "1. Unit tests (+coverage data)"  step_tests_coverage
 run_step "8. Role x surface (branch desk)" step_branch_matrix
+run_step "8. Role x surface (fee admin)"   step_fee_admin_matrix
 run_step "Late-fee scheduler e2e (8a)"     step_late_fee_e2e
 run_step "Coverage floor"                  step_coverage_floor
 run_step "3. HTTP smoke (dev site)"        step_http_smoke

@@ -1,12 +1,14 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt
+from frappe.utils import cint, flt
 
 
 class MYSLateFeePolicy(Document):
 	def validate(self):
-		if (self.grace_days or 0) < 0:
+		# cint/flt guard against str values (API, client set_value before type cast,
+		# data import) — a bare `self.grace_days < 0` raises TypeError on a string.
+		if cint(self.grace_days) < 0:
 			frappe.throw(_("Grace Days cannot be negative"))
 		if not (0 <= flt(self.late_fee_percent) <= 100):
 			frappe.throw(_("Late Fee % must be between 0 and 100"))

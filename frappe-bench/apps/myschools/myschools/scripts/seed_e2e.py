@@ -55,6 +55,10 @@ E2E_BULK_FEE_GROUP = "E2E Bulk Fee BR014"
 # Distinct from seed_education.POSTING_DATE so Generate Fees creates rows (not skip).
 E2E_BULK_POSTING_DATE = "2026-06-04"
 E2E_BULK_DUE_DATE = "2026-06-18"
+# Second date for the "new run from blank" spec so it bills fresh Fees instead of
+# skipping rows the seeded-draft spec already billed on E2E_BULK_POSTING_DATE.
+E2E_BULK_POSTING_DATE_2 = "2026-06-11"
+E2E_BULK_DUE_DATE_2 = "2026-06-25"
 
 E2E_CHECKLIST_TAG = "e2e portal checklist"
 
@@ -318,17 +322,31 @@ def _ensure_e2e_bulk_fee_prerequisites(branch: str) -> dict | None:
 	if added:
 		sg.save(ignore_permissions=True)
 
-	# Remove any prior e2e bulk fees on this posting date so Generate Fees is repeatable.
+	# Remove any prior e2e bulk fees on both posting dates so Generate Fees is repeatable.
 	for student in students:
 		for fee_name in frappe.get_all(
 			"Fees",
-			{"student": student, "posting_date": E2E_BULK_POSTING_DATE},
+			{"student": student, "posting_date": ["in", [E2E_BULK_POSTING_DATE, E2E_BULK_POSTING_DATE_2]]},
 			pluck="name",
 		):
 			fee = frappe.get_doc("Fees", fee_name)
 			if fee.docstatus == 1:
 				fee.cancel()
 			frappe.delete_doc("Fees", fee_name, force=True, ignore_permissions=True)
+
+	company = frappe.db.get_value("MYS Branch", branch, "company")
+	fee_structure = frappe.db.get_value(
+		"Fee Structure",
+		{"program": program, "academic_year": academic_year, "company": company},
+		"name",
+	)
+	default_fee_structure, override_fee_structure = _ensure_e2e_fee_override_pair(
+		branch, program, academic_year, company, fee_structure
+	)
+	if not frappe.db.exists("Fee Category", "Late Fee"):
+		frappe.get_doc({"doctype": "Fee Category", "category_name": "Late Fee"}).insert(
+			ignore_permissions=True
+		)
 
 	meta = {
 		"branch": branch,
@@ -338,9 +356,20 @@ def _ensure_e2e_bulk_fee_prerequisites(branch: str) -> dict | None:
 		"academic_term": academic_term,
 		"posting_date": E2E_BULK_POSTING_DATE,
 		"due_date": E2E_BULK_DUE_DATE,
+		"posting_date_2": E2E_BULK_POSTING_DATE_2,
+		"due_date_2": E2E_BULK_DUE_DATE_2,
 		"student_count": len(students),
+		"fee_structure": override_fee_structure or fee_structure,
+		"default_fee_structure": default_fee_structure,
+		"sample_student": students[0],
+		"company": company,
+		"program_enrollment": frappe.db.get_value(
+			"Program Enrollment",
+			{"student": students[0], "docstatus": 1},
+			"name",
+		),
+		"fee_category": "Late Fee",
 	}
-	company = frappe.db.get_value("MYS Branch", branch, "company")
 	if not company:
 		return meta
 
@@ -370,6 +399,72 @@ def _ensure_e2e_bulk_fee_prerequisites(branch: str) -> dict | None:
 	return meta
 
 
+def _ensure_e2e_fee_override_pair(
+	branch: str, program: str, academic_year: str, company: str, primary_fs: str | None
+) -> tuple[str | None, str | None]:
+	"""Return (default_fs, override_fs) for Fees desk Playwright (orange alert + auto-default).
+
+	Creates a second Fee Structure when only one exists, and an active branch override
+	pointing at the alternate structure so resolve_fee_structure returns override_fs.
+	"""
+	if not primary_fs or not company:
+		return None, None
+
+	alt_filters = {
+		"program": program,
+		"academic_year": academic_year,
+		"company": company,
+		"name": ["!=", primary_fs],
+	}
+	alt_fs = frappe.db.get_value("Fee Structure", alt_filters, "name")
+	if not alt_fs:
+		base = frappe.get_doc("Fee Structure", primary_fs)
+		alt = frappe.get_doc(
+			{
+				"doctype": "Fee Structure",
+				"program": program,
+				"academic_year": academic_year,
+				"company": company,
+				"receivable_account": base.receivable_account,
+				"components": [
+					{
+						"fees_category": row.fees_category,
+						"amount": (row.amount or 0) + 1000,
+					}
+					for row in base.components
+				],
+			}
+		).insert(ignore_permissions=True)
+		alt_fs = alt.name
+
+	override_fs = alt_fs
+	default_fs = primary_fs
+
+	if not frappe.db.exists(
+		"MYS Fee Structure Override",
+		{
+			"branch": branch,
+			"program": program,
+			"academic_year": academic_year,
+			"is_active": 1,
+		},
+	):
+		frappe.get_doc(
+			{
+				"doctype": "MYS Fee Structure Override",
+				"branch": branch,
+				"program": program,
+				"academic_year": academic_year,
+				"fee_structure": override_fs,
+				"effective_from": "2025-01-01",
+				"is_active": 1,
+				"reason": "E2E fee override for Playwright",
+			}
+		).insert(ignore_permissions=True)
+
+	return default_fs, override_fs
+
+
 def _ensure_overdue_invoice():
 	inv = _ensure_submitted_invoice()
 	if not inv:
@@ -390,6 +485,7 @@ def main():
 		_ensure_monitor_employee(branch)
 		_ensure_cluster_inspector_employee("e2e_audit@mys.local", branch, "E2E", "Audit Inspector")
 		_ensure_cluster_inspector_employee("e2e_accountant@mys.local", branch, "E2E", "Accountant")
+		_ensure_cluster_inspector_employee("e2e_director@mys.local", branch, "E2E", "Director")
 	template = _ensure_e2e_checklist_template()
 	bulk_fee = _ensure_e2e_bulk_fee_prerequisites(branch)
 	visit, finding = _ensure_resolved_finding()
