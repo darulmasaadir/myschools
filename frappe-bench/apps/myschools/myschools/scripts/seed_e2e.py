@@ -62,6 +62,11 @@ E2E_BULK_DUE_DATE_2 = "2026-06-25"
 
 E2E_CHECKLIST_TAG = "e2e portal checklist"
 
+E2E_TRANSFER_STUDENT_EMAIL = "e2e-transfer-student@example.test"
+E2E_LEAVING_STUDENT_EMAIL = "e2e-leaving-student@example.test"
+E2E_LIFECYCLE_TRANSFER_DATE = "2026-06-04"
+E2E_LIFECYCLE_LEAVING_DATE = "2026-06-04"
+
 
 def _ensure_user(email, spec):
 	if not frappe.db.exists("User", email):
@@ -465,6 +470,118 @@ def _ensure_e2e_fee_override_pair(
 	return default_fs, override_fs
 
 
+def _reset_lifecycle_docs(student: str, doctype: str) -> None:
+	for name in frappe.get_all(doctype, {"student": student}, pluck="name"):
+		doc = frappe.get_doc(doctype, name)
+		if doc.docstatus == 1:
+			doc.cancel()
+		frappe.delete_doc(doctype, name, force=True, ignore_permissions=True)
+
+
+def _ensure_e2e_program_enrollment(student: str, program: str) -> None:
+	from myschools.scripts import seed_education
+
+	active = frappe.db.get_value(
+		"Program Enrollment",
+		{
+			"student": student,
+			"program": program,
+			"academic_year": seed_education.ACADEMIC_YEAR,
+			"docstatus": 1,
+		},
+		"name",
+	)
+	if active:
+		return
+	pe = frappe.get_doc(
+		{
+			"doctype": "Program Enrollment",
+			"student": student,
+			"program": program,
+			"academic_year": seed_education.ACADEMIC_YEAR,
+			"academic_term": seed_education.ACADEMIC_TERM,
+			"enrollment_date": seed_education.POSTING_DATE,
+		}
+	)
+	pe.insert(ignore_permissions=True)
+	pe.submit()
+
+
+def _ensure_e2e_lifecycle_student(
+	email: str, first_name: str, last_name: str, branch: str, cluster: str, campus: str
+) -> str:
+	existing = frappe.db.get_value("Student", {"student_email_id": email}, "name")
+	if existing:
+		frappe.db.set_value(
+			"Student",
+			existing,
+			{
+				"mys_cluster": cluster,
+				"mys_branch": branch,
+				"mys_campus": campus,
+				"enabled": 1,
+				"date_of_leaving": None,
+				"leaving_certificate_number": "",
+				"reason_for_leaving": "",
+			},
+		)
+		return existing
+	doc = frappe.get_doc(
+		{
+			"doctype": "Student",
+			"first_name": first_name,
+			"last_name": last_name,
+			"student_email_id": email,
+			"mys_cluster": cluster,
+			"mys_branch": branch,
+			"mys_campus": campus,
+			"enabled": 1,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return doc.name
+
+
+def _ensure_e2e_student_lifecycle(branch: str) -> dict | None:
+	"""Dedicated students for Phase 8b transfer/leaving Playwright (idempotent reset)."""
+	if not branch:
+		return None
+	campus_kids = f"{branch}-Kids"
+	campus_junior = f"{branch}-Junior"
+	if not frappe.db.exists("MYS Campus", campus_junior):
+		return None
+	cluster = frappe.db.get_value("MYS Branch", branch, "cluster")
+	if not cluster:
+		return None
+
+	from myschools.scripts import seed_education
+
+	seed_education.run()
+	program = seed_education.PROGRAMS["Kids"]
+
+	transfer_student = _ensure_e2e_lifecycle_student(
+		E2E_TRANSFER_STUDENT_EMAIL, "E2E", "Transfer", branch, cluster, campus_kids
+	)
+	leaving_student = _ensure_e2e_lifecycle_student(
+		E2E_LEAVING_STUDENT_EMAIL, "E2E", "Leaving", branch, cluster, campus_kids
+	)
+
+	for student in (transfer_student, leaving_student):
+		_reset_lifecycle_docs(student, "MYS Student Transfer")
+		_reset_lifecycle_docs(student, "MYS Student Leaving")
+		_ensure_e2e_program_enrollment(student, program)
+
+	return {
+		"branch": branch,
+		"campus_kids": campus_kids,
+		"campus_junior": campus_junior,
+		"transfer_student": transfer_student,
+		"leaving_student": leaving_student,
+		"transfer_date": E2E_LIFECYCLE_TRANSFER_DATE,
+		"leaving_date": E2E_LIFECYCLE_LEAVING_DATE,
+	}
+
+
 def _ensure_overdue_invoice():
 	inv = _ensure_submitted_invoice()
 	if not inv:
@@ -488,6 +605,7 @@ def main():
 		_ensure_cluster_inspector_employee("e2e_director@mys.local", branch, "E2E", "Director")
 	template = _ensure_e2e_checklist_template()
 	bulk_fee = _ensure_e2e_bulk_fee_prerequisites(branch)
+	student_lifecycle = _ensure_e2e_student_lifecycle(branch)
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()
@@ -501,6 +619,7 @@ def main():
 		"branch": branch,
 		"checklist_template": template,
 		"bulk_fee": bulk_fee,
+		"student_lifecycle": student_lifecycle,
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-04
-**Up next:** Phase 8b — student lifecycle
+**Up next:** Phase 8b merge → 8c SMS adapters
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -33,7 +33,7 @@ These bind every phase:
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
-| 8 | Domain extensions | 🟡 | 8a ✅ · 8b–8e ⬜ |
+| 8 | Domain extensions | 🟡 | 8a ✅ · 8b in flight · 8c–8e ⬜ |
 
 ---
 
@@ -276,7 +276,17 @@ Decision record: [processes/billing-model.md](processes/billing-model.md). Canon
 
 ### 8b–8e (planned)
 
-- **8b** — Student lifecycle (Enrollment, Transfer, Leaving Certificate).
+### 8b — Student lifecycle 🟡
+
+**In flight:** branch `feature/phase-8b-student-lifecycle`.
+
+- **`MYS Student Transfer`** — submittable audit doc; on submit updates `Student.mys_cluster` / `mys_branch` / `mys_campus`, deactivates `Student Group` rows, syncs `Guardian.mys_branch`.
+- **`MYS Student Leaving`** — submittable workflow; assigns certificate number, sets Education `Student` exit fields (`enabled=0`, `date_of_leaving`, etc.), cancels submitted `Program Enrollment` rows.
+- **`MYS Leaving Certificate`** print format (Jinja on `MYS Student Leaving`).
+- **`Program Enrollment.validate`** guard — blocks enrollment when student is inactive or has no `mys_branch`.
+- Branch workspace links: Student Transfer, Student Leaving.
+
+### 8c–8e (planned)
 - **8c** — SMS / Email provider adapters on `MYS Communication Log`.
 - **8d** — HR scaffolding (Employee custom fields, payroll cycle).
 - **8e** — Payment gateway stubs (JazzCash, Easypaisa, HBL).

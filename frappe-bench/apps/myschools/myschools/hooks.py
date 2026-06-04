@@ -66,6 +66,9 @@ doc_events = {
 	"Fees": {
 		"validate": "myschools.api.fees.apply_resolved_fee_structure_on_fees",
 	},
+	"Program Enrollment": {
+		"validate": "myschools.api.student_lifecycle.validate_program_enrollment",
+	},
 }
 
 # Role-based landing pages
@@ -100,6 +103,8 @@ permission_query_conditions = {
 	"MYS Fee Structure Override": "myschools.api.fees.fee_structure_override_query",
 	"MYS Late Fee Policy": "myschools.api.fees.late_fee_policy_query",
 	"MYS Bulk Fee Run": "myschools.api.fees.bulk_fee_run_query",
+	"MYS Student Transfer": "myschools.api.student_lifecycle.student_transfer_query",
+	"MYS Student Leaving": "myschools.api.student_lifecycle.student_leaving_query",
 }
 
 has_permission = {

@@ -319,6 +319,64 @@ FEE_RECEIPT = r"""
 </div>
 """
 
+
+LEAVING_CERTIFICATE = r"""
+{%- if letter_head and not no_letterhead %}
+<div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
+{% endif -%}
+<div style="font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:12px">
+  <div style="text-align:center;margin-bottom:18px">
+    <div style="font-size:22px;font-weight:800;letter-spacing:1px;color:#0F7A4A">SCHOOL LEAVING CERTIFICATE</div>
+    <div style="font-size:11px;color:#6B7280">Certificate No. {{ doc.certificate_number }}</div>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+    <tr>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;width:25%;font-weight:600;color:#6B7280">Student</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB;width:25%">{{ doc.student_name or doc.student }}</td>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;width:25%;font-weight:600;color:#6B7280">MYS Student ID</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB;width:25%">{{ doc.mys_student_id or "—" }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Branch</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.branch }}</td>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Campus</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.campus or "—" }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Date of Leaving</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ frappe.utils.formatdate(doc.leaving_date, "long") if doc.leaving_date else "" }}</td>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Record</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.name }}</td>
+    </tr>
+  </table>
+
+  <div style="margin:14px 0;line-height:1.7;text-align:justify">
+    This is to certify that <strong>{{ doc.student_name or doc.student }}</strong>
+    {%- if doc.mys_student_id %} (ID: {{ doc.mys_student_id }}){% endif %}
+    was a student at <strong>{{ doc.branch }}</strong>
+    {%- if doc.campus %} — {{ doc.campus }} campus{% endif %}
+    and left the school on <strong>{{ frappe.utils.formatdate(doc.leaving_date, "long") if doc.leaving_date else "—" }}</strong>.
+  </div>
+
+  {% if doc.reason_for_leaving %}
+  <div style="margin-top:10px">
+    <div style="font-weight:700;color:#0F7A4A;font-size:13px;margin-bottom:4px">Reason for Leaving</div>
+    <div style="text-align:justify;line-height:1.6">{{ doc.reason_for_leaving }}</div>
+  </div>
+  {% endif %}
+
+  <div style="margin-top:36px;display:flex;justify-content:space-between">
+    <div style="width:45%;border-top:1px solid #1A1A1A;padding-top:6px;text-align:center;font-size:11px;color:#6B7280">
+      Branch Principal
+    </div>
+    <div style="width:45%;border-top:1px solid #1A1A1A;padding-top:6px;text-align:center;font-size:11px;color:#6B7280">
+      Branch Director
+    </div>
+  </div>
+</div>
+"""
+
 FRANCHISE_AGREEMENT = r"""
 {%- if letter_head and not no_letterhead %}
 <div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
@@ -406,6 +464,7 @@ FORMATS = [
 	("MYS Royalty Invoice", "MYS Royalty Invoice", ROYALTY_INVOICE),
 	("MYS Inspection Report", "MYS Inspection Visit", INSPECTION_REPORT),
 	("MYS Fee Receipt", "Fees", FEE_RECEIPT),
+	("MYS Leaving Certificate", "MYS Student Leaving", LEAVING_CERTIFICATE),
 	("MYS Franchise Agreement", "MYS Franchise Agreement", FRANCHISE_AGREEMENT),
 ]
 
