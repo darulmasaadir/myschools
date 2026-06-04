@@ -35,7 +35,9 @@ def apply_student_transfer(transfer: frappe.Document) -> None:
 	if transfer.to_campus:
 		campus = frappe.get_cached_doc("MYS Campus", transfer.to_campus)
 		if campus.branch != transfer.to_branch:
-			frappe.throw(_("Campus {0} does not belong to branch {1}").format(transfer.to_campus, transfer.to_branch))
+			frappe.throw(
+				_("Campus {0} does not belong to branch {1}").format(transfer.to_campus, transfer.to_branch)
+			)
 
 	frappe.db.set_value(
 		"Student",

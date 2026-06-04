@@ -30,9 +30,11 @@ class MYSStudentLeaving(Document):
 			self.mys_student_id = student.mys_student_id or ""
 
 		if self.branch != student.mys_branch:
-			frappe.throw(_("Student {0} belongs to branch {1}, not {2}.").format(
-				self.student, student.mys_branch, self.branch
-			))
+			frappe.throw(
+				_("Student {0} belongs to branch {1}, not {2}.").format(
+					self.student, student.mys_branch, self.branch
+				)
+			)
 
 		if getdate(self.leaving_date) > getdate():
 			frappe.throw(_("Leaving Date cannot be in the future."))

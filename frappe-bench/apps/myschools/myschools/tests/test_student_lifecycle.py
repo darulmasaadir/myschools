@@ -37,7 +37,9 @@ class TestStudentLifecycle(FrappeTestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		for name in frappe.get_all("MYS Student Leaving", {"branch": ["in", [BRANCH, BRANCH2]]}, pluck="name"):
+		for name in frappe.get_all(
+			"MYS Student Leaving", {"branch": ["in", [BRANCH, BRANCH2]]}, pluck="name"
+		):
 			doc = frappe.get_doc("MYS Student Leaving", name)
 			if doc.docstatus == 1:
 				doc.cancel()

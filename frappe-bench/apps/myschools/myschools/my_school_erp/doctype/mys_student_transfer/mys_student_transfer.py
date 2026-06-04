@@ -30,7 +30,9 @@ class MYSStudentTransfer(Document):
 		if self.to_campus:
 			campus_branch = frappe.db.get_value("MYS Campus", self.to_campus, "branch")
 			if campus_branch != self.to_branch:
-				frappe.throw(_("Campus {0} does not belong to branch {1}").format(self.to_campus, self.to_branch))
+				frappe.throw(
+					_("Campus {0} does not belong to branch {1}").format(self.to_campus, self.to_branch)
+				)
 
 		if getdate(self.transfer_date) > getdate():
 			frappe.throw(_("Transfer Date cannot be in the future."))
