@@ -83,9 +83,7 @@ def run():
 					if got != want:
 						verb = "allowed" if got else "denied"
 						exp = "allow" if want else "deny"
-						failures.append(
-							f"{email}: {doctype} {ptype} is {verb}, expected {exp}"
-						)
+						failures.append(f"{email}: {doctype} {ptype} is {verb}, expected {exp}")
 		finally:
 			frappe.set_user("Administrator")
 
