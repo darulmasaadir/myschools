@@ -13,13 +13,17 @@ from myschools.api.sms_providers import dispatch_sms
 
 class TestSmsProviders(FrappeTestCase):
 	def setUp(self):
-		frappe.db.delete("MYS Communication Log", {"channel": "SMS", "recipient_phone": ["like", "+92300999%"]})
+		frappe.db.delete(
+			"MYS Communication Log", {"channel": "SMS", "recipient_phone": ["like", "+92300999%"]}
+		)
 		frappe.db.commit()
 		self._orig_provider = frappe.db.get_single_value("MYS SMS Settings", "sms_provider")
 
 	def tearDown(self):
 		if frappe.db.exists("DocType", "MYS SMS Settings"):
-			frappe.db.set_value("MYS SMS Settings", "MYS SMS Settings", "sms_provider", self._orig_provider or "Stub")
+			frappe.db.set_value(
+				"MYS SMS Settings", "MYS SMS Settings", "sms_provider", self._orig_provider or "Stub"
+			)
 		frappe.db.commit()
 
 	def _set_provider(self, provider: str, **fields):
