@@ -16,6 +16,8 @@
   {"hidden": 0, "is_query_report": 0, "label": "Student", "link_count": 0, "link_to": "Student", "link_type": "DocType", "onboard": 1, "type": "Link"},
   {"hidden": 0, "is_query_report": 0, "label": "Guardian", "link_count": 0, "link_to": "Guardian", "link_type": "DocType", "onboard": 0, "type": "Link"},
   {"hidden": 0, "is_query_report": 0, "label": "Program Enrollment", "link_count": 0, "link_to": "Program Enrollment", "link_type": "DocType", "onboard": 0, "type": "Link"},
+  {"hidden": 0, "is_query_report": 0, "label": "Student Transfer", "link_count": 0, "link_to": "MYS Student Transfer", "link_type": "DocType", "onboard": 0, "type": "Link"},
+  {"hidden": 0, "is_query_report": 0, "label": "Student Leaving", "link_count": 0, "link_to": "MYS Student Leaving", "link_type": "DocType", "onboard": 0, "type": "Link"},
   {"hidden": 0, "is_query_report": 0, "label": "Fees", "link_count": 0, "onboard": 0, "type": "Card Break"},
   {"hidden": 0, "is_query_report": 0, "label": "Fees", "link_count": 0, "link_to": "Fees", "link_type": "DocType", "onboard": 1, "type": "Link"},
   {"hidden": 0, "is_query_report": 0, "label": "Bulk Fee Run", "link_count": 0, "link_to": "MYS Bulk Fee Run", "link_type": "DocType", "onboard": 0, "type": "Link"},

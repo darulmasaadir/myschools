@@ -23,6 +23,16 @@ export interface BulkFeeSeed {
 	fee_category: string;
 }
 
+export interface StudentLifecycleSeed {
+	branch: string;
+	campus_kids: string;
+	campus_junior: string;
+	transfer_student: string;
+	leaving_student: string;
+	transfer_date: string;
+	leaving_date: string;
+}
+
 export interface SeedState {
 	users: Record<string, { password: string; roles: string[] }>;
 	visit: string | null;
@@ -31,6 +41,7 @@ export interface SeedState {
 	branch: string | null;
 	checklist_template: string | null;
 	bulk_fee: BulkFeeSeed | null;
+	student_lifecycle: StudentLifecycleSeed | null;
 }
 
 export function loadSeed(): SeedState {
@@ -118,6 +129,26 @@ export async function saveForm(page: Page) {
 			.catch(() => "");
 		throw new Error(`saveForm: doc not persisted. Dialog: ${dialog || "(none)"}`);
 	}
+}
+
+/** Submit the current submittable desk form and wait until docstatus === 1. */
+export async function submitForm(page: Page) {
+	await page.waitForFunction(() => Boolean((window as any).cur_frm?.doc), undefined, {
+		timeout: 15_000,
+	});
+	const submitBtn = page.locator(
+		'.standard-actions button:has-text("Submit"), .page-actions button:has-text("Submit")',
+	).first();
+	await expect(submitBtn).toBeVisible({ timeout: 15_000 });
+	await submitBtn.click();
+	const confirmYes = page.locator(".modal.show button:has-text('Yes')").first();
+	await expect(confirmYes).toBeVisible({ timeout: 5_000 });
+	await confirmYes.click();
+	await page.waitForFunction(
+		() => (window as any).cur_frm?.doc?.docstatus === 1,
+		undefined,
+		{ timeout: 30_000 },
+	);
 }
 
 export { base as test, expect };

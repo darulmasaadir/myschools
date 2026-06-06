@@ -1,0 +1,173 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:STR-TF-{####}",
+ "creation": "2026-06-04 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "is_submittable": 1,
+ "field_order": [
+  "student",
+  "student_name",
+  "column_break_from",
+  "from_branch",
+  "from_campus",
+  "section_break_to",
+  "to_branch",
+  "to_campus",
+  "column_break_meta",
+  "transfer_date",
+  "reason",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Student",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "student.student_name",
+   "fieldname": "student_name",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Student Name"
+  },
+  {
+   "fieldname": "column_break_from",
+   "fieldtype": "Column Break",
+   "label": "From"
+  },
+  {
+   "fieldname": "from_branch",
+   "fieldtype": "Link",
+   "fetch_from": "student.mys_branch",
+   "label": "From Branch",
+   "options": "MYS Branch",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_campus",
+   "fieldtype": "Link",
+   "fetch_from": "student.mys_campus",
+   "label": "From Campus",
+   "options": "MYS Campus",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_to",
+   "fieldtype": "Section Break",
+   "label": "To"
+  },
+  {
+   "fieldname": "to_branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "To Branch",
+   "options": "MYS Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_campus",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "To Campus",
+   "options": "MYS Campus"
+  },
+  {
+   "fieldname": "column_break_meta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "transfer_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Transfer Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason for Transfer"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "MYS Student Transfer",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-04 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Student Transfer",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Chief Executive",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HO Dept Head"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Director",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Principal",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Admin",
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Branch Accountant"
+  }
+ ],
+ "sort_field": "transfer_date",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -30,6 +30,7 @@ browser, PDF, CI terminal-green) to tick in the PR body.
 | HTTP battery | `scripts/verify_http_battery.py` | ✅ e2e job | Portal routes and role landing (not a substitute for browser) |
 | Branch desk matrix | `scripts/verify_branch_desk_cards.py` | ✅ e2e job | Role × number-card surface regressions |
 | Fee-admin matrix | `scripts/verify_fee_admin_surfaces.py` | ✅ e2e job | Role × override/policy/bulk-run permission regressions |
+| Student-lifecycle matrix | `scripts/verify_student_lifecycle_surfaces.py` | ✅ e2e job | Role × transfer/leaving permission regressions |
 | Late-fee scheduler e2e | `scripts/verify_late_fees.py` | ✅ e2e job | Fires real `scheduled_apply_late_fees()` on a self-contained overdue scenario; asserts linked late fee + idempotency. Self-cleaning |
 | Playwright | `tests/e2e/*.spec.ts` | ✅ e2e job | User-visible flows that broke in production or manual battery |
 | Manual battery | PR verification template | ❌ by hand | Net-new feature's *first* walk, PDF round-trip, anything no spec covers yet |
@@ -54,6 +55,7 @@ belong in Playwright.
 | `phase7d_inspection_portal.spec.ts` | Inspection portal matrix + guest admission |
 | `phase8a_bulk_fee_run.spec.ts` | Bulk Fee Run desk: Generate Fees (seeded + from blank) + role denial |
 | `phase8a_fee_admin_forms.spec.ts` | Override / late-fee-policy forms: Director create, Principal denial |
+| `phase8b_student_lifecycle.spec.ts` | Transfer / leaving forms: Director submit, certificate print, Monitor denial |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally
@@ -116,6 +118,16 @@ include glob anywhere in the path.
 | Academic Monitor denied (bulk run) | `Academic Monitor is denied on Bulk Fee Run list` |
 | Role × surface permission matrix | `scripts/verify_fee_admin_surfaces.py` |
 | Bulk API / override / skip | `tests/test_bulk_fee_run.py` + `verify_late_fees.py` |
+
+## Phase 8b matrix (automated)
+
+| Cell | Playwright test |
+|------|-----------------|
+| Branch Director → campus transfer submit | `Branch Director submits campus transfer` |
+| Branch Director → leaving submit + certificate print | `Branch Director submits student leaving + leaving certificate print` |
+| Academic Monitor denied (transfer) | `Academic Monitor is denied on Student Transfer list` |
+| Role × surface permission matrix | `scripts/verify_student_lifecycle_surfaces.py` |
+| Transfer / leaving API + enrollment guard | `tests/test_student_lifecycle.py` |
 
 Not automated here (stay in manual battery until needed): fresh-install browser
 walk, every role × desk surface, PDF round-trip.

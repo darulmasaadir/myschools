@@ -272,6 +272,10 @@ jobs:
         # permission matrix holds at runtime for every franchise role.
         run: bench --site test_site execute myschools.scripts.verify_fee_admin_surfaces.run
 
+      - name: Verify student-lifecycle role × surface matrix (Phase 8b)
+        working-directory: frappe-bench
+        run: bench --site test_site execute myschools.scripts.verify_student_lifecycle_surfaces.run
+
       - name: Make test_site resolve to loopback
         run: |
           echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts

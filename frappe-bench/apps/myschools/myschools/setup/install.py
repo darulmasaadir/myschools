@@ -130,6 +130,10 @@ _BRANCH_FEE_ADMIN_LINKS = [
 	("Fee Structure Override", "MYS Fee Structure Override"),
 	("Late Fee Policy", "MYS Late Fee Policy"),
 ]
+_BRANCH_STUDENT_LIFECYCLE_LINKS = [
+	("Student Transfer", "MYS Student Transfer"),
+	("Student Leaving", "MYS Student Leaving"),
+]
 
 
 def sync_mys_branch_fee_admin_workspace():
@@ -153,7 +157,7 @@ def sync_mys_branch_fee_admin_workspace():
 		changed = True
 
 	existing_links = {(row.label, row.link_to) for row in ws.links if row.type == "Link"}
-	for label, link_to in _BRANCH_FEE_ADMIN_LINKS:
+	for label, link_to in _BRANCH_FEE_ADMIN_LINKS + _BRANCH_STUDENT_LIFECYCLE_LINKS:
 		if not frappe.db.exists("DocType", link_to):
 			continue
 		if (label, link_to) not in existing_links:
@@ -321,6 +325,8 @@ FRANCHISE_ROLE_READS = {
 		"MYS Bulk Fee Run",
 		"MYS Fee Structure Override",
 		"MYS Late Fee Policy",
+		"MYS Student Transfer",
+		"MYS Student Leaving",
 		"Student",
 		"Fees",
 		"Employee",
@@ -335,6 +341,8 @@ FRANCHISE_ROLE_READS = {
 		"MYS Inspection Visit",
 		"MYS Inspection Finding",
 		"MYS Corrective Action",
+		"MYS Student Transfer",
+		"MYS Student Leaving",
 		"Student",
 		"Fees",
 		"Employee",
@@ -351,6 +359,8 @@ FRANCHISE_ROLE_READS = {
 		"MYS Bulk Fee Run",
 		"MYS Fee Structure Override",
 		"MYS Late Fee Policy",
+		"MYS Student Transfer",
+		"MYS Student Leaving",
 		"Student",
 		"Fees",
 		"Employee",
@@ -367,6 +377,8 @@ FRANCHISE_ROLE_READS = {
 		"MYS Bulk Fee Run",
 		"MYS Fee Structure Override",
 		"MYS Late Fee Policy",
+		"MYS Student Transfer",
+		"MYS Student Leaving",
 		"Student",
 		"Fees",
 	],
@@ -402,6 +414,11 @@ for _role in ("Branch Director", "Branch Accountant", "Branch Admin"):
 	for _dt in _FEE_ADMIN_LINK_READS:
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
 			FRANCHISE_ROLE_READS[_role].append(_dt)
+
+# Enrollment desk: branch staff create Program Enrollment (Education upstream doctype).
+for _role in ("Branch Director", "Branch Principal", "Branch Admin"):
+	if "Program Enrollment" not in FRANCHISE_ROLE_READS[_role]:
+		FRANCHISE_ROLE_READS[_role].append("Program Enrollment")
 
 
 # Education bulk billing paths that create Sales Invoice — not read by MY School.
@@ -449,7 +466,7 @@ def grant_franchise_role_permissions():
 
 	# Branch fee admins create individual Fees on desk (8a-3 validate + orange alert).
 	if frappe.db.exists("DocType", "Fees"):
-		for role in ("Branch Director", "Branch Accountant"):
+		for role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Accountant"):
 			if not frappe.db.exists("Role", role):
 				continue
 			add_permission("Fees", role, 0)
@@ -459,6 +476,12 @@ def grant_franchise_role_permissions():
 				if frappe.db.exists("DocType", link_dt):
 					add_permission(link_dt, role, 0)
 					update_permission_property(link_dt, role, 0, "read", 1)
+			if role in ("Branch Director", "Branch Principal", "Branch Admin") and frappe.db.exists(
+				"DocType", "Program Enrollment"
+			):
+				add_permission("Program Enrollment", role, 0)
+				for perm in ("read", "create", "write", "submit"):
+					update_permission_property("Program Enrollment", role, 0, perm, 1)
 
 	# Guardian portal: read attendance + submit feedback via Web Form.
 	if frappe.db.exists("Role", "Guardian"):
