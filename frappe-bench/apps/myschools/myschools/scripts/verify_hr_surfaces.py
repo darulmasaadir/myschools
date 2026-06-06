@@ -79,7 +79,8 @@ def run():
 			allowed = set(branches)
 			frappe.set_user(email)
 			try:
-				rows = frappe.get_all(EMP, fields=["name", "mys_branch"])
+				# get_list respects permission_query_conditions; get_all does not.
+				rows = frappe.get_list(EMP, fields=["name", "mys_branch"], limit_page_length=0)
 			finally:
 				frappe.set_user("Administrator")
 			leaked = [r.name for r in rows if r.mys_branch and r.mys_branch not in allowed]
