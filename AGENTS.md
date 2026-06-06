@@ -42,6 +42,6 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 
 - ✅ Phases 0–6: foundations, branding, workspaces, print formats, notifications, workflows, setup wizard + reports
 - ✅ **Phase 7**: Portals — 7a–7d merged (PR #15, `9b02a81`)
-- 🟡 **Phase 8**: Domain extensions — **8a** ✅ (PR #16, `3b4fc7a`); **8b** in flight on `feature/phase-8b-student-lifecycle`; 8c–8e ⬜
+- 🟡 **Phase 8**: Domain extensions — **8a** ✅ (PR #16, `3b4fc7a`); **8b** ✅ (PR #17, `341295e`); **8c** ✅ (PR #18); 8d–8e ⬜
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

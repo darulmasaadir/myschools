@@ -31,6 +31,7 @@ browser, PDF, CI terminal-green) to tick in the PR body.
 | Branch desk matrix | `scripts/verify_branch_desk_cards.py` | ✅ e2e job | Role × number-card surface regressions |
 | Fee-admin matrix | `scripts/verify_fee_admin_surfaces.py` | ✅ e2e job | Role × override/policy/bulk-run permission regressions |
 | Student-lifecycle matrix | `scripts/verify_student_lifecycle_surfaces.py` | ✅ e2e job | Role × transfer/leaving permission regressions |
+| SMS adapter smoke | `scripts/verify_sms_adapters.py` | ✅ e2e job | Stub `send_sms` + gateway fields on Communication Log |
 | Late-fee scheduler e2e | `scripts/verify_late_fees.py` | ✅ e2e job | Fires real `scheduled_apply_late_fees()` on a self-contained overdue scenario; asserts linked late fee + idempotency. Self-cleaning |
 | Playwright | `tests/e2e/*.spec.ts` | ✅ e2e job | User-visible flows that broke in production or manual battery |
 | Manual battery | PR verification template | ❌ by hand | Net-new feature's *first* walk, PDF round-trip, anything no spec covers yet |
@@ -56,6 +57,7 @@ belong in Playwright.
 | `phase8a_bulk_fee_run.spec.ts` | Bulk Fee Run desk: Generate Fees (seeded + from blank) + role denial |
 | `phase8a_fee_admin_forms.spec.ts` | Override / late-fee-policy forms: Director create, Principal denial |
 | `phase8b_student_lifecycle.spec.ts` | Transfer / leaving forms: Director submit, certificate print, Monitor denial |
+| `phase8c_sms_settings.spec.ts` | MYS SMS Settings single: Stub default + save, Twilio section reveal |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally

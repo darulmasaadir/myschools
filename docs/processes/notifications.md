@@ -58,14 +58,25 @@ The mirror resolves the referenced doc's `branch` / `campus` automatically, so
 the log row carries the franchise context (and `scope` is set to `Branch` when
 a branch is found, `Individual` otherwise).
 
-### 1.3 SMS adapter stub
+### 1.3 SMS / email adapters (Phase 8c)
 
-`api/notifications.send_sms(recipient, message, doctype=None, name=None)` is
-provider-agnostic. Today it writes a `Sent` row to `MYS Communication Log` and
-returns `{ok, log, gateway: "stub"}`. Phase 8 swaps `gateway="stub"` for a real
-gateway (Jazz / Easypaisa / Twilio) without changing the signature, so
-callers (notifications using `channel=SMS`, scheduled jobs, future WhatsApp
-adapter) stay unchanged.
+`MYS SMS Settings` (single) selects the active SMS provider:
+
+| Provider | Gateway key | Behaviour |
+| -------- | ----------- | --------- |
+| Stub (default) | `stub` | Log-only — no HTTP call |
+| Twilio | `twilio` | REST API via Account SID + Auth Token |
+| HTTP Gateway | `http` | POST/GET to a vendor URL (Jazz / Easypaisa / custom) |
+| Frappe SMS Settings | `frappe-sms` | Delegates to core `SMS Settings` |
+
+`api/notifications.send_sms(recipient, message, doctype=None, name=None)` routes
+through `api/sms_providers.dispatch_sms`, writes `MYS Communication Log` with
+`gateway`, `recipient_phone`, and `provider_reference`, and returns
+`{ok, log, gateway, reference}`. Failed dispatches log `status=Failed` then throw.
+
+`api/notifications.send_email_message(recipient, subject, message, …)` sends via
+`frappe.sendmail` and logs `gateway=frappe-email`. Notification-fired emails
+continue to mirror through `log_outbound_email` with the same gateway field.
 
 ---
 
