@@ -116,7 +116,7 @@ class TestSmsProviders(FrappeTestCase):
 
 
 class TestSendEmailMessage(FrappeTestCase):
-	TEST_EMAIL = "ceo@mys.local"
+	TEST_EMAIL = "Administrator"
 
 	def setUp(self):
 		frappe.db.delete("MYS Communication Log", {"subject": ["like", "8c test %"]})
