@@ -115,3 +115,30 @@ def student_has_permission(doc, ptype="read", user=None):
 	if not branches:
 		return False
 	return doc.get("mys_branch") in branches
+
+
+def employee_query(user):
+	"""Row scoping for Employee — branch staff only see their own branch's
+	roster; cluster roles see their cluster; HO/CEO/System Manager see all.
+
+	Employees with no `mys_branch` (HO/back-office staff created upstream) stay
+	visible only to global roles — branch/cluster users get the franchise window.
+	"""
+	return _branch_filter("mys_branch", user) or ""
+
+
+def employee_has_permission(doc, ptype="read", user=None):
+	"""Per-document permission check for Employee records, mirroring Student."""
+	user = user or frappe.session.user
+	roles = _user_roles(user)
+	if roles & GLOBAL_ROLES:
+		return True
+	scope, branches = _user_scope(user)
+	if scope == "global":
+		return True
+	if not branches:
+		return False
+	# An employee can always see their own record even across the branch window.
+	if doc.get("user_id") and doc.get("user_id") == user:
+		return True
+	return doc.get("mys_branch") in branches

@@ -61,6 +61,7 @@ step_late_fee_e2e()    { ( cd "$BENCH" && bench --site "$SITE" execute myschools
 step_fee_admin_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_fee_admin_surfaces.run ); }
 step_student_lifecycle_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_student_lifecycle_surfaces.run ); }
 step_sms_adapters() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_sms_adapters.run ); }
+step_hr_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_hr_surfaces.run ); }
 
 echo "PR battery — site=${SITE} branch=${BRANCH} commit=${HEAD_SHA:0:12}"
 echo "###############  STAGE 1 — local fast checks  ###############"
@@ -70,6 +71,7 @@ run_step "1. Unit tests (+coverage data)"  step_tests_coverage
 run_step "8. Role x surface (branch desk)" step_branch_matrix
 run_step "8. Role x surface (fee admin)"   step_fee_admin_matrix
 run_step "8. Role x surface (student lifecycle)" step_student_lifecycle_matrix
+run_step "8. Role x surface (HR / Employee)" step_hr_matrix
 run_step "SMS adapter smoke (8c)"          step_sms_adapters
 run_step "Late-fee scheduler e2e (8a)"     step_late_fee_e2e
 run_step "Coverage floor"                  step_coverage_floor

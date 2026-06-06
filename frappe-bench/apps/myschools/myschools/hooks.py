@@ -5,7 +5,7 @@ app_description = "Multi-tier franchise school management system for myschools.p
 app_email = "info@myschools.pk"
 app_license = "agpl-3.0"
 
-required_apps = ["erpnext", "education"]
+required_apps = ["erpnext", "education", "hrms"]
 
 # Brand
 # -----
@@ -69,6 +69,11 @@ doc_events = {
 	"Program Enrollment": {
 		"validate": "myschools.api.student_lifecycle.validate_program_enrollment",
 	},
+	# Payroll runs (frappe/hrms) post to a branch's Company books — keep the
+	# run's Company aligned with its MYS Branch. See api/hr.py.
+	"Payroll Entry": {
+		"validate": "myschools.api.hr.set_payroll_entry_company_from_branch",
+	},
 }
 
 # Role-based landing pages
@@ -91,6 +96,8 @@ role_home_page = {
 # ------------------------------------------------------------
 permission_query_conditions = {
 	"Student": "myschools.api.permissions.student_query",
+	"Employee": "myschools.api.permissions.employee_query",
+	"Payroll Entry": "myschools.api.hr.payroll_entry_query",
 	"MYS Branch": "myschools.api.permissions.branch_query",
 	"MYS Campus": "myschools.api.permissions.campus_query",
 	"MYS Inspection Visit": "myschools.api.permissions.inspection_query",
@@ -109,6 +116,8 @@ permission_query_conditions = {
 
 has_permission = {
 	"Student": "myschools.api.permissions.student_has_permission",
+	"Employee": "myschools.api.permissions.employee_has_permission",
+	"Payroll Entry": "myschools.api.hr.payroll_entry_has_permission",
 }
 
 # Scheduled jobs
