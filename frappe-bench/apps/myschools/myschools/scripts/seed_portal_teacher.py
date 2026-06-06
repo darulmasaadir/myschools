@@ -96,9 +96,7 @@ def _ensure_education_prereqs() -> None:
 
 def _ensure_designation(name: str) -> None:
 	if not frappe.db.exists("Designation", name):
-		frappe.get_doc({"doctype": "Designation", "designation_name": name}).insert(
-			ignore_permissions=True
-		)
+		frappe.get_doc({"doctype": "Designation", "designation_name": name}).insert(ignore_permissions=True)
 
 
 def _ensure_min_students(branch: str, campus: str | None) -> None:
