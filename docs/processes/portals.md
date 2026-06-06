@@ -55,9 +55,9 @@ Branch resolution: `Employee.user_id == frappe.session.user` → `Employee.mys_b
 
 **HTTP battery:** `cd frappe-bench && ./env/bin/python -c "from myschools.scripts.verify_http_battery import run; run()"`
 
-## Phase 9 — Teacher portal 🟡
+## Phase 9 — Teacher portal ✅
 
-Branch: `feature/phase-9-teacher-portal`.
+Merged PR #22 (`09185cb`).
 
 | Route | Purpose |
 |---|---|

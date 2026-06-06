@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 9 — Teacher Portal (PR #22, `09185cb`).** `Teacher` franchise role;
+  `api/teacher_portal.py`; `/teacher` routes (dashboard, classes, roster,
+  schedule); `seed_portal_teacher.py`; unit tests, HTTP battery, Playwright
+  `phase9_teacher_portal.spec.ts`.
 - **Phase 8e — payment gateway stubs (PR #20, `802e6fc`).** `MYS Payment Settings`
   single (Stub, JazzCash, Easypaisa, HBL); `payment_providers.dispatch_payment` +
   `payments.initiate_fee_payment` with Communication Log audit (`channel=Payment`);

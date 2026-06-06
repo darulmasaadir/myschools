@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-06
-**Up next:** Phase 9 — Teacher Portal (first slice of the [Phase 9+ remaining-module inventory](#phase-9--remaining-module-inventory-scoping-pass))
+**Up next:** Phase 10 — Attendance + Examination (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass))
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -34,7 +34,7 @@ These bind every phase:
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
 | 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
-| 9 | Teacher Portal | 🟡 | branch `feature/phase-9-teacher-portal` |
+| 9 | Teacher Portal | ✅ | PR [#22](https://github.com/darulmasaadir/myschools/pull/22) (`09185cb`) |
 | 10+ | Remaining modules (Attendance/Exam, Academic, Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
@@ -321,9 +321,9 @@ Mirrors Phase 8c SMS adapters for fee collection — pluggable Pakistani gateway
 
 ---
 
-## Phase 9 — Teacher Portal 🟡
+## Phase 9 — Teacher Portal ✅
 
-**In flight:** branch `feature/phase-9-teacher-portal`.
+**Merged:** PR [#22](https://github.com/darulmasaadir/myschools/pull/22) (`09185cb`).
 
 Upgrade-safe teacher slice mirroring Phase 7 portal pattern (`www/` + `api/teacher_portal.py`, no SPA):
 
@@ -354,7 +354,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 8 | Attendance | 🟡 | Education `Student Attendance` exists; guardian portal reads it — needs a marking surface |
 | 9 | Finance / Fee | ✅ | Fees + overrides + late fees + bulk run + payment gateways (Phase 8a/8e) |
 | 10 | Parent Portal | ✅ | `/guardian` Web Forms + `www/` (Phase 7b) |
-| 11 | Teacher Portal | ⬜ | **Not built** — only guardian/branch/inspection portals exist |
+| 11 | Teacher Portal | ✅ | `/teacher` portal (Phase 9, PR #22) |
 | 12 | Communication | ✅ | Comm Log + notifications + SMS adapters (Phase 4/8c) |
 | 13 | Monitoring & Inspection | ✅ | Full workflow + inspection portal (Phase 0/7d) |
 | 14 | Transport | ⬜ | **Not built** |
