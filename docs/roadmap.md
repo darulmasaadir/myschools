@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-06
-**Up next:** Phase 9 — to be scoped (Phase 8 complete; see 22-module ceiling in project context)
+**Up next:** Phase 9 — Teacher Portal (first slice of the [Phase 9+ remaining-module inventory](#phase-9--remaining-module-inventory-scoping-pass))
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -34,6 +34,7 @@ These bind every phase:
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
 | 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
+| 9+ | Remaining modules (Teacher Portal, Attendance/Exam, Academic, Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
 
@@ -316,6 +317,66 @@ Mirrors Phase 8c SMS adapters for fee collection — pluggable Pakistani gateway
 - **`MYS Payment Settings`** single — Stub, JazzCash, Easypaisa, HBL.
 - **`api/payment_providers.py`** + **`api/payments.initiate_fee_payment`** — dispatch + `MYS Communication Log` (`channel=Payment`, `gateway`, `provider_reference`); **`stub_payment_complete`** guest callback for Stub redirect.
 - **`scripts/verify_payment_adapters.py`** + `test_payment_providers.py` + Playwright `phase8e_payment_settings.spec.ts` (settings UI + full happy path: `initiate_fee_payment` → Stub callback → audit log); payment seed in `seed_e2e`; battery + CI wiring.
+
+---
+
+## Phase 9+ — Remaining module inventory (scoping pass)
+
+This is the whole-map view across the module list in [`project-myschools`](../.cursor/rules/project-myschools.mdc) (the PDF cites "22 modules"; 21 are individually named below). It exists so we build in the **right dependency order** without big-design-up-front rework. Each remaining phase is **deep-scoped into its own detail section + branch right before we build it** — the table below is the order-of-battle, not a finished design. Sizes are S (≤1 day) · M (2–4 days) · L (1–2 weeks) · XL (2 weeks+).
+
+### Coverage of the 22 modules today
+
+| # | Module (PDF) | Status | Where it lives |
+|---|---|---|---|
+| 1 | Master Setup | ✅ | Setup Wizard + Module Onboarding (Phase 6) |
+| 2 | Franchise Mgmt | ✅ | Cluster/Branch/Campus/Department/Agreement/Owner + royalty (Phase 0) |
+| 3 | SIS (Student Info) | ✅ | Education `Student` + MYS franchise fields + lifecycle (Phase 8b) |
+| 4 | HR / Staff | 🟡 | Employee scoping + `frappe/hrms` payroll scaffolding (Phase 8d); recruitment/leave/appraisal depth remains |
+| 5 | Campus Mgmt | ✅ | `MYS Campus` + incharge/teacher links |
+| 6 | Academic | 🟡 | Education `Program`/`Course`/`Program Enrollment`; timetable + scheduling depth remains |
+| 7 | Examination | ⬜ | Education `Assessment Plan`/`Result` exist but unwired — needs report cards + franchise scoping |
+| 8 | Attendance | 🟡 | Education `Student Attendance` exists; guardian portal reads it — needs a marking surface |
+| 9 | Finance / Fee | ✅ | Fees + overrides + late fees + bulk run + payment gateways (Phase 8a/8e) |
+| 10 | Parent Portal | ✅ | `/guardian` Web Forms + `www/` (Phase 7b) |
+| 11 | Teacher Portal | ⬜ | **Not built** — only guardian/branch/inspection portals exist |
+| 12 | Communication | ✅ | Comm Log + notifications + SMS adapters (Phase 4/8c) |
+| 13 | Monitoring & Inspection | ✅ | Full workflow + inspection portal (Phase 0/7d) |
+| 14 | Transport | ⬜ | **Not built** |
+| 15 | Library | ⬜ | **Not built** |
+| 16 | LMS | ⬜ | **Not built** — integrate `frappe/lms` |
+| 17 | Document Mgmt | ⬜ | **Not built** |
+| 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
+| 19 | Mobile App | 🟡 | Portals are mobile-responsive web; no PWA/native decision yet |
+| 20 | Unique ID | ✅ | Student + staff ID generators (Phase 0) |
+| 21 | Reporting | 🟡 | 4 Query Reports + Central Dashboard (Phase 6); expands as modules land |
+
+### Proposed build order (⬜ planned — order/scope adjustable)
+
+| Phase | Title | Size | Depends on | Upgrade-safe approach (primitive) |
+|---|---|---|---|---|
+| **9** | **Teacher Portal** | L | Education `Instructor`, `Student Group`, `Course Schedule` (exist); portal pattern (Phase 7) | Web Forms + `www/` Jinja + `api/teacher_portal.py`, scoped via `Instructor.user_id` → branch/campus. Reuses `mys_portal_base.html`. |
+| **10** | **Attendance + Examination** | L | Phase 9 (teacher is the marking surface) | Wire Education `Student Attendance` + `Assessment Plan`/`Result`; teacher-portal marking screens; `MYS Report Card` print format; franchise scoping. |
+| **11** | **Academic scheduling** | M | Phases 9–10 | Education `Course Schedule` + `Student Group`; branch-scoped timetable views; optional `MYS Timetable` helper doctype only if Education's is insufficient. |
+| **12** | **Transport** | M | Fees engine (8a); branch scoping | Custom doctypes `MYS Transport Route` / `MYS Vehicle` / `MYS Student Transport`; transport fee rides on `Fees` (new fee category), not a parallel ledger. |
+| **13** | **Library** | M | Payment adapters (8e) for fines; branch scoping | Custom doctypes `MYS Library Item` / `MYS Library Loan`; overdue fines via the late-fee/`Fees` path; ERPNext Stock optional, likely overkill. |
+| **14** | **Document Mgmt** | S–M | Frappe `File` + role perms | Custom `MYS Document` doctype wrapping Frappe `File` with franchise scoping + expiry notifications (reuse Phase 4 notification pattern). No new storage layer. |
+| **15** | **LMS integration** | M | `frappe/lms` app | Add `frappe/lms` to `required_apps` (like `hrms` in 8d); SSO via shared Frappe users; link courses to `Program`. Scope LMS course visibility per branch. |
+| **16** | **Mobile App (PWA)** | M | All portals stable | Harden existing `www/` portals as an installable PWA (manifest + service worker in `myschools` app) rather than a native/SPA build — upgrade-safe, no parallel codebase. Native wrapper is a separate product decision. |
+| **17** | **Reporting expansion** | S each | Each module above | Add Query/Script Reports + Number Cards per module as it lands; fold into the owning phase where possible rather than a big-bang reporting phase. |
+
+### Why this order
+
+- **Teacher Portal first (9)** — highest unmet user value, and it's the *surface* attendance + exam marking need (10). Building those backends without the teacher entry point would strand them.
+- **Attendance/Exam (10) before Academic scheduling (11)** — daily-use teacher flows beat timetable polish.
+- **Transport (12) + Library (13)** are independent of the academic stack and each other; both deliberately ride the **existing Fees + payment rails** rather than inventing parallel billing — sequenced after the academic core only by priority, not dependency, so they can be reordered freely.
+- **Document Mgmt (14)** is small and unblocks compliance docs (agreements, certificates) — cheap win whenever there's slack.
+- **LMS (15)** is an app integration, lower coupling, parked mid-list until digital-learning is prioritised.
+- **Mobile (16)** comes last because a PWA is only worth hardening once the portal surfaces it wraps are stable.
+- **Reporting (17)** is continuous — each phase ships its own reports; this row is a catch-all for cross-module dashboards.
+
+### Standing-constraint check (applies to every phase above)
+
+Every ⬜ item maps to a **Safe** primitive (custom doctype in our app, Web Form, `www/` template, `required_apps` integration, fixture, or hook). **No** native SPA, **no** core fork. The two "add an app" rows (LMS, and the already-shipped hrms) follow the same `required_apps` + CI fresh-install chain pattern proven in Phase 8d.
 
 ---
 
