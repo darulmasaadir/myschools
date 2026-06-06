@@ -582,6 +582,44 @@ def _ensure_e2e_student_lifecycle(branch: str) -> dict | None:
 	}
 
 
+def _ensure_payment_seed(branch: str) -> dict | None:
+	"""Surface one submitted Fees with outstanding > 0 for the Phase 8e payment path.
+
+	seed_education.run() submits Fees on POSTING_DATE; we just need a handle to one
+	(plus its student/branch) so the Playwright spec can drive ``initiate_fee_payment``
+	end-to-end against the real whitelisted endpoint and the Stub redirect page.
+	"""
+	if not branch:
+		return None
+	from myschools.scripts import seed_education
+
+	seed_education.run()
+	fee = frappe.db.sql(
+		"""
+		SELECT f.name, f.student, f.outstanding_amount, f.grand_total, f.company
+		FROM `tabFees` f
+		JOIN `tabStudent` s ON s.name = f.student
+		WHERE f.docstatus = 1 AND s.mys_branch = %s AND COALESCE(f.outstanding_amount, 0) > 0
+		ORDER BY f.creation DESC
+		LIMIT 1
+		""",
+		branch,
+		as_dict=True,
+	)
+	if not fee:
+		return None
+	row = fee[0]
+	# Make sure the Stub provider is the active gateway so the spec is deterministic.
+	if frappe.db.exists("DocType", "MYS Payment Settings"):
+		frappe.db.set_value("MYS Payment Settings", "MYS Payment Settings", "payment_provider", "Stub")
+	return {
+		"fees": row.name,
+		"student": row.student,
+		"branch": branch,
+		"amount": float(row.outstanding_amount or row.grand_total or 0),
+	}
+
+
 def _ensure_overdue_invoice():
 	inv = _ensure_submitted_invoice()
 	if not inv:
@@ -606,6 +644,7 @@ def main():
 	template = _ensure_e2e_checklist_template()
 	bulk_fee = _ensure_e2e_bulk_fee_prerequisites(branch)
 	student_lifecycle = _ensure_e2e_student_lifecycle(branch)
+	payment = _ensure_payment_seed(branch)
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()
@@ -620,6 +659,7 @@ def main():
 		"checklist_template": template,
 		"bulk_fee": bulk_fee,
 		"student_lifecycle": student_lifecycle,
+		"payment": payment,
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

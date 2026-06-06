@@ -33,6 +33,13 @@ export interface StudentLifecycleSeed {
 	leaving_date: string;
 }
 
+export interface PaymentSeed {
+	fees: string;
+	student: string;
+	branch: string;
+	amount: number;
+}
+
 export interface SeedState {
 	users: Record<string, { password: string; roles: string[] }>;
 	visit: string | null;
@@ -42,6 +49,7 @@ export interface SeedState {
 	checklist_template: string | null;
 	bulk_fee: BulkFeeSeed | null;
 	student_lifecycle: StudentLifecycleSeed | null;
+	payment: PaymentSeed | null;
 }
 
 export function loadSeed(): SeedState {
