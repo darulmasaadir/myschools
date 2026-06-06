@@ -91,6 +91,7 @@ role_home_page = {
 # ------------------------------------------------------------
 permission_query_conditions = {
 	"Student": "myschools.api.permissions.student_query",
+	"Employee": "myschools.api.permissions.employee_query",
 	"MYS Branch": "myschools.api.permissions.branch_query",
 	"MYS Campus": "myschools.api.permissions.campus_query",
 	"MYS Inspection Visit": "myschools.api.permissions.inspection_query",
@@ -109,6 +110,7 @@ permission_query_conditions = {
 
 has_permission = {
 	"Student": "myschools.api.permissions.student_has_permission",
+	"Employee": "myschools.api.permissions.employee_has_permission",
 }
 
 # Scheduled jobs
