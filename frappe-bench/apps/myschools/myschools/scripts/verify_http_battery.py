@@ -49,6 +49,7 @@ def run(host: str = DEFAULT_HOST):
 		_check_role_landing(email, workspace, failures)
 	for email in ["monitor@mys.local", "audit@mys.local"]:
 		_check_inspection_user(email, failures)
+	_check_teacher_user(failures)
 	_check_admission_enquiry_public(failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
@@ -57,8 +58,23 @@ def run(host: str = DEFAULT_HOST):
 		raise SystemExit(1)
 	print(
 		"HTTP BATTERY OK — Administrator + 4 branch + "
-		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + /admission-enquiry"
+		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + teacher portal + /admission-enquiry"
 	)
+
+
+def _check_teacher_user(failures: list[str]) -> None:
+	"""Requires ``seed_portal_teacher`` or ``seed_e2e`` on the site (CI seeds both)."""
+	email = "e2e_teacher@mys.local"
+	op = _login(email, "mys-e2e-teacher")
+	for path in ["/teacher", "/teacher/classes", "/teacher/schedule"]:
+		status, body = _get(op, path)
+		if status != 200:
+			failures.append(f"{email} {path}: HTTP {status}")
+		elif "You do not have access" in body:
+			failures.append(f"{email} {path}: permission denied in body")
+	status, body = _get(op, "/teacher/classes")
+	if "E2E Teacher Class" not in body:
+		failures.append(f"{email} /teacher/classes: expected seeded class row")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:

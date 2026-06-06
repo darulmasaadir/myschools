@@ -41,6 +41,7 @@ EXPECTED_ROLE_HOMES = {
 	"Branch Admin": "mys-branch",
 	"Branch Accountant": "mys-branch",
 	"Campus Incharge": "mys-campus",
+	"Teacher": "teacher",
 }
 
 

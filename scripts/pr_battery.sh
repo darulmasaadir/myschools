@@ -63,6 +63,7 @@ step_student_lifecycle_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute 
 step_sms_adapters() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_sms_adapters.run ); }
 step_payment_adapters() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_payment_adapters.run ); }
 step_hr_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_hr_surfaces.run ); }
+step_teacher_portal_seed() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.seed_portal_teacher.main ); }
 
 echo "PR battery — site=${SITE} branch=${BRANCH} commit=${HEAD_SHA:0:12}"
 echo "###############  STAGE 1 — local fast checks  ###############"
@@ -77,6 +78,7 @@ run_step "SMS adapter smoke (8c)"          step_sms_adapters
 run_step "Payment adapter smoke (8e)"      step_payment_adapters
 run_step "Late-fee scheduler e2e (8a)"     step_late_fee_e2e
 run_step "Coverage floor"                  step_coverage_floor
+run_step "Teacher portal seed (9)"         step_teacher_portal_seed
 run_step "3. HTTP smoke (dev site)"        step_http_smoke
 
 print_table() {

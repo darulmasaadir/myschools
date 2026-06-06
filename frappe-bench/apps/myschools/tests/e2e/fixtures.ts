@@ -40,6 +40,15 @@ export interface PaymentSeed {
 	amount: number;
 }
 
+export interface TeacherSeed {
+	user: string;
+	employee: string;
+	instructor: string;
+	student_group: string;
+	schedule: string | null;
+	branch: string;
+}
+
 export interface SeedState {
 	users: Record<string, { password: string; roles: string[] }>;
 	visit: string | null;
@@ -50,6 +59,7 @@ export interface SeedState {
 	bulk_fee: BulkFeeSeed | null;
 	student_lifecycle: StudentLifecycleSeed | null;
 	payment: PaymentSeed | null;
+	teacher: TeacherSeed | null;
 }
 
 export function loadSeed(): SeedState {
