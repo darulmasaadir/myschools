@@ -95,13 +95,12 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
 - ✅ Formal workflows + list-view polish — Phase 5
 - ✅ Setup Wizard, onboarding tours, Query Reports — Phase 6
 - ✅ Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7 complete (PR #15 `9b02a81`)
-- ✅ **Phase 8a:** per-branch fee structure overrides + late-fee automation + bulk fee run (PR #16, `3b4fc7a`)
-- ⬜ Phase 8b–8e: student lifecycle, SMS adapters, HR scaffolding, Pakistani payment gateways
+- ✅ **Phase 8:** domain extensions complete (8a fee overrides/late fees/bulk billing · 8b student lifecycle · 8c SMS adapters · 8d HR/payroll scaffolding · 8e payment gateways — last PR #20 `802e6fc`)
 
 The system is **live for one demo branch network** (BR001 + BR014, three
-campuses each, one fully-submitted royalty invoice on file). It is **not yet
-live for real franchisees** — Phase 8a (fee overrides + late fees + bulk billing) is shipped;
-student lifecycle, gateways, and HR remain Phase 8b–8e.
+campuses each, one fully-submitted royalty invoice on file). Phase 8 domain
+extensions (billing, lifecycle, comms gateways, HR, fee payments) are shipped;
+production rollout to real franchisees is a deployment/ops decision, not a code gap.
 
 ## How is it built — briefly
 

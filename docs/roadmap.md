@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-06
-**Up next:** Phase 8e payment gateway stubs (JazzCash, Easypaisa, HBL)
+**Up next:** Phase 9 — to be scoped (Phase 8 complete; see 22-module ceiling in project context)
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -33,7 +33,7 @@ These bind every phase:
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
-| 8 | Domain extensions | 🟡 | 8a ✅ · 8b ✅ · 8c ✅ · 8d ✅ · 8e 🟡 |
+| 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
 
 ---
 
@@ -248,7 +248,7 @@ What shipped:
 
 ---
 
-## Phase 8 — Domain extensions 🟡
+## Phase 8 — Domain extensions ✅
 
 **Estimated size:** XL (30–50 h), split into sub-PRs 8a–8e.
 
@@ -307,15 +307,15 @@ Foundation already shipped in earlier phases: Employee `mys_role_tier` / `mys_br
 - **`scripts/verify_hr_surfaces.py`** — role × Employee + Payroll Entry matrix (live cross-branch leak check), wired into the battery + CI.
 - Playwright `phase8d_hr_payroll.spec.ts` (Director Employee leak check + Payroll Entry `mys_branch` field).
 
-### 8e — Payment gateway stubs 🟡
+### 8e — Payment gateway stubs ✅
 
-**In flight:** branch `feature/phase-8e-payment-gateways`.
+**Delivered:** PR [#20](https://github.com/darulmasaadir/myschools/pull/20) (merge `802e6fc`).
 
 Mirrors Phase 8c SMS adapters for fee collection — pluggable Pakistani gateways behind a stable API, audit-logged, Stub default:
 
 - **`MYS Payment Settings`** single — Stub, JazzCash, Easypaisa, HBL.
-- **`api/payment_providers.py`** + **`api/payments.initiate_fee_payment`** — dispatch + `MYS Communication Log` (`channel=Payment`, `gateway`, `provider_reference`).
-- **`scripts/verify_payment_adapters.py`** + `test_payment_providers.py` + Playwright `phase8e_payment_settings.spec.ts`; battery + CI wiring.
+- **`api/payment_providers.py`** + **`api/payments.initiate_fee_payment`** — dispatch + `MYS Communication Log` (`channel=Payment`, `gateway`, `provider_reference`); **`stub_payment_complete`** guest callback for Stub redirect.
+- **`scripts/verify_payment_adapters.py`** + `test_payment_providers.py` + Playwright `phase8e_payment_settings.spec.ts` (settings UI + full happy path: `initiate_fee_payment` → Stub callback → audit log); payment seed in `seed_e2e`; battery + CI wiring.
 
 ---
 

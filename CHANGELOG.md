@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 8e — payment gateway stubs (PR #20, `802e6fc`).** `MYS Payment Settings`
+  single (Stub, JazzCash, Easypaisa, HBL); `payment_providers.dispatch_payment` +
+  `payments.initiate_fee_payment` with Communication Log audit (`channel=Payment`);
+  `stub_payment_complete` guest callback; `verify_payment_adapters.py`, unit tests,
+  Playwright settings + full payment happy-path e2e; battery + CI wiring.
+- **Phase 8d — HR / payroll scaffolding (PR #19, `376576f`).** `frappe/hrms` in
+  `required_apps`; branch-scoped `Employee`; `mys_branch`/`mys_campus` on Payroll Entry;
+  `verify_hr_surfaces.py` + Playwright `phase8d_hr_payroll`.
+- **Phase 8c — SMS/email provider adapters (PR #18, `7094642`).** `MYS SMS Settings`;
+  `sms_providers` registry; gateway fields on Communication Log; verify script + Playwright.
+- **Phase 8b — student lifecycle (PR #17, `341295e`).** `MYS Student Transfer` /
+  `MYS Student Leaving`; leaving certificate print format; verify script + Playwright.
 - **Phase 8a — fee-admin desk polish.** Bulk Fee Run / Fee Structure Override / Late
   Fee Policy added to the MYS Branch workspace (shortcut + links); fee-admin link-target
   reads (Program/Academic Year/Term/Fee Structure/Student Group/Fee Category) granted to
