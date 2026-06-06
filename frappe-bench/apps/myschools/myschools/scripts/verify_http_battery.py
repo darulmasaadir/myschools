@@ -63,14 +63,8 @@ def run(host: str = DEFAULT_HOST):
 
 
 def _check_teacher_user(failures: list[str]) -> None:
+	"""Requires ``seed_portal_teacher`` or ``seed_e2e`` on the site (CI seeds both)."""
 	email = "e2e_teacher@mys.local"
-	try:
-		from myschools.scripts.seed_portal_teacher import main as seed_teacher
-
-		seed_teacher()
-	except Exception as exc:
-		failures.append(f"seed_portal_teacher: {exc}")
-		return
 	op = _login(email, "mys-e2e-teacher")
 	for path in ["/teacher", "/teacher/classes", "/teacher/schedule"]:
 		status, body = _get(op, path)
