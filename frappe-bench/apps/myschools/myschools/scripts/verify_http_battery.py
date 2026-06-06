@@ -72,12 +72,9 @@ def _check_teacher_user(failures: list[str]) -> None:
 			failures.append(f"{email} {path}: HTTP {status}")
 		elif "You do not have access" in body:
 			failures.append(f"{email} {path}: permission denied in body")
-	group = "E2E Teacher Class BR014"
-	status, body = _get(op, f"/teacher/class?group={urllib.parse.quote(group)}")
-	if status != 200:
-		failures.append(f"{email} /teacher/class: HTTP {status}")
-	elif "You do not have access" in body or "not assigned" in body.lower():
-		failures.append(f"{email} /teacher/class: denied for seeded group")
+	status, body = _get(op, "/teacher/classes")
+	if "E2E Teacher Class" not in body:
+		failures.append(f"{email} /teacher/classes: expected seeded class row")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:

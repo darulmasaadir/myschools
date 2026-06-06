@@ -2,6 +2,10 @@
 
 Run via:
     bench --site SITE execute myschools.scripts.seed_portal_teacher.main
+
+Self-contained for fresh-install / CI: chains ``seed_demo`` when needed, creates
+minimal students + education prereqs without calling ``seed_education.run()`` (that
+script needs company receivable accounts that may not exist before demo seed).
 """
 
 from __future__ import annotations
@@ -10,18 +14,22 @@ import frappe
 from frappe.utils import add_days, nowdate, today
 
 from myschools.scripts import seed_education
-from myschools.scripts.seed_e2e import _ensure_user
+from myschools.scripts.seed_e2e import _ensure_franchise_tree, _ensure_user
 from myschools.setup.install import create_franchise_roles, grant_franchise_role_permissions
 
 EMAIL = "e2e_teacher@mys.local"
 PASSWORD = "mys-e2e-teacher"
-GROUP_NAME = "E2E Teacher Class BR014"
 COURSE_NAME = "E2E Portal Math"
 ROOM_NAME = "E2E Room 101"
 TEACHER_TERM_LABEL = "E2E Teacher Jun"
 TEACHER_ACADEMIC_TERM = f"{seed_education.ACADEMIC_YEAR} ({TEACHER_TERM_LABEL})"
 TEACHER_TERM_START = "2026-06-01"
 TEACHER_TERM_END = "2026-06-30"
+PROGRAM_KIDS = seed_education.PROGRAMS["Kids"]
+
+
+def _group_name_for_branch(branch: str) -> str:
+	return f"E2E Teacher Class {branch}"
 
 
 def main():
@@ -36,7 +44,10 @@ def main():
 		},
 	)
 	branch, campus = _resolve_branch_and_campus()
+	_ensure_education_prereqs()
+	_ensure_min_students(branch, campus)
 	company = frappe.db.get_value("MYS Branch", branch, "company")
+	_ensure_designation("Teacher")
 	employee = _ensure_employee(branch, campus, company)
 	instructor = _ensure_instructor(employee)
 	group = _ensure_student_group(branch, instructor)
@@ -54,29 +65,58 @@ def main():
 
 
 def _resolve_branch_and_campus() -> tuple[str, str | None]:
-	"""Pick a branch that has a campus and students (fresh-install / CI safe)."""
-	from myschools.scripts import seed_education
-
-	seed_education.run()
-	row = frappe.db.sql(
-		"""
-		SELECT b.name AS branch, MIN(c.name) AS campus
-		FROM `tabMYS Branch` b
-		INNER JOIN `tabMYS Campus` c ON c.branch = b.name
-		INNER JOIN `tabStudent` s ON s.mys_branch = b.name
-		GROUP BY b.name
-		ORDER BY b.creation ASC
-		LIMIT 1
-		""",
-		as_dict=True,
-	)
-	if row:
-		return row[0].branch, row[0].campus
-	branch = frappe.db.get_value("MYS Branch", {}, "name", order_by="creation asc")
+	"""Franchise tree + campus (CI-safe — does not assume ``{branch}-Kids`` exists)."""
+	branch = _ensure_franchise_tree()
 	if not branch:
-		frappe.throw("No MYS Branch — run seed_demo first.")
-	campus = frappe.db.get_value("MYS Campus", {"branch": branch}, "name")
+		frappe.throw("No MYS Branch — seed_demo could not run.")
+	campus = frappe.db.get_value("MYS Campus", {"branch": branch}, "name", order_by="creation asc")
 	return branch, campus
+
+
+def _ensure_education_prereqs() -> None:
+	if not frappe.db.exists("Academic Year", seed_education.ACADEMIC_YEAR):
+		frappe.get_doc(
+			{
+				"doctype": "Academic Year",
+				"academic_year_name": seed_education.ACADEMIC_YEAR,
+				"year_start_date": seed_education.YEAR_START,
+				"year_end_date": seed_education.YEAR_END,
+			}
+		).insert(ignore_permissions=True)
+	_ensure_teacher_academic_term()
+	if not frappe.db.exists("Program", PROGRAM_KIDS):
+		frappe.get_doc(
+			{
+				"doctype": "Program",
+				"program_name": PROGRAM_KIDS,
+				"program_code": PROGRAM_KIDS.replace(" ", "-").upper(),
+			}
+		).insert(ignore_permissions=True)
+
+
+def _ensure_designation(name: str) -> None:
+	if not frappe.db.exists("Designation", name):
+		frappe.get_doc({"doctype": "Designation", "designation_name": name}).insert(
+			ignore_permissions=True
+		)
+
+
+def _ensure_min_students(branch: str, campus: str | None) -> None:
+	if frappe.db.count("Student", {"mys_branch": branch}):
+		return
+	cluster = frappe.db.get_value("MYS Branch", branch, "cluster")
+	for i in range(1, 4):
+		frappe.get_doc(
+			{
+				"doctype": "Student",
+				"first_name": "E2E",
+				"last_name": f"TeacherPupil{i}",
+				"student_email_id": f"e2e-teacher-pupil-{branch.lower()}-{i}@example.test",
+				"mys_branch": branch,
+				"mys_cluster": cluster,
+				"mys_campus": campus,
+			}
+		).insert(ignore_permissions=True)
 
 
 def _ensure_employee(branch: str, campus: str | None, company: str) -> str:
@@ -138,23 +178,22 @@ def _ensure_teacher_academic_term() -> str:
 
 
 def _ensure_student_group(branch: str, instructor: str) -> str:
-	seed_education.run()
-	program = seed_education.PROGRAMS["Kids"]
+	group_name = _group_name_for_branch(branch)
 	year = seed_education.ACADEMIC_YEAR
 	term = _ensure_teacher_academic_term()
-	if not frappe.db.exists("Student Group", GROUP_NAME):
+	if not frappe.db.exists("Student Group", group_name):
 		frappe.get_doc(
 			{
 				"doctype": "Student Group",
-				"student_group_name": GROUP_NAME,
+				"student_group_name": group_name,
 				"group_based_on": "Batch",
-				"program": program,
+				"program": PROGRAM_KIDS,
 				"academic_year": year,
 				"academic_term": term,
 				"max_strength": 50,
 			}
 		).insert(ignore_permissions=True)
-	sg = frappe.get_doc("Student Group", GROUP_NAME)
+	sg = frappe.get_doc("Student Group", group_name)
 	if sg.academic_term != term:
 		sg.academic_term = term
 		sg.save(ignore_permissions=True)
@@ -162,7 +201,7 @@ def _ensure_student_group(branch: str, instructor: str) -> str:
 	if instructor not in linked:
 		sg.append("instructors", {"instructor": instructor})
 		sg.save(ignore_permissions=True)
-	return GROUP_NAME
+	return group_name
 
 
 def _ensure_group_students(group: str, branch: str, campus: str | None) -> list[str]:
@@ -171,7 +210,7 @@ def _ensure_group_students(group: str, branch: str, campus: str | None) -> list[
 		filters["mys_campus"] = campus
 	students = frappe.get_all("Student", filters, pluck="name", limit=3)
 	if not students:
-		frappe.throw("No students on branch — run seed_education first.")
+		frappe.throw("No students on branch after minimal seed.")
 	sg = frappe.get_doc("Student Group", group)
 	existing = {row.student for row in sg.get("students") or []}
 	added = False
@@ -225,7 +264,7 @@ def _ensure_schedule(group: str, instructor: str) -> str | None:
 			"student_group": group,
 			"instructor": instructor,
 			"course": course,
-			"program": seed_education.PROGRAMS["Kids"],
+			"program": PROGRAM_KIDS,
 			"schedule_date": schedule_date,
 			"from_time": "09:00:00",
 			"to_time": "10:00:00",

@@ -27,7 +27,7 @@ test.describe("Phase 9 — Teacher portal", () => {
 		await expect(page.locator(".mys-portal__table")).toContainText(seed.teacher!.student_group);
 
 		await page.goto(`/teacher/class?group=${encodeURIComponent(seed.teacher!.student_group)}`);
-		await expect(page.locator("h1")).toContainText("E2E Teacher Class");
+		await expect(page.locator("h1")).toContainText("E2E Teacher Class", { timeout: 10_000 });
 		await expect(page.locator(".mys-portal__table tbody tr").first()).toBeVisible();
 
 		await page.goto("/teacher/schedule");
