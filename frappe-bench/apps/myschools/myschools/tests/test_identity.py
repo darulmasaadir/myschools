@@ -13,6 +13,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import today
 
+from myschools.api.hr import set_payroll_entry_company_from_branch
 from myschools.api.identity import (
 	ROLE_CODES,
 	set_mys_staff_id,
@@ -42,9 +43,7 @@ class TestIdentityGeneration(FrappeTestCase):
 		frappe.db.delete("Employee", {"mys_branch": ["in", [BRANCH, BRANCH2]]})
 		for stu in frappe.get_all("Student", {"mys_branch": BRANCH}, pluck="name"):
 			frappe.delete_doc("Student", stu, force=True, ignore_permissions=True)
-		for user in frappe.get_all(
-			"User", {"email": ["like", "_test_8d_%@example.test"]}, pluck="name"
-		):
+		for user in frappe.get_all("User", {"email": ["like", "_test_8d_%@example.test"]}, pluck="name"):
 			frappe.delete_doc("User", user, force=True, ignore_permissions=True)
 		for campus in [CAMPUS]:
 			if frappe.db.exists("MYS Campus", campus):
@@ -134,9 +133,7 @@ class TestIdentityGeneration(FrappeTestCase):
 		self.assertFalse(doc.get("mys_student_id"))
 
 	def test_franchise_link_validation_rejects_cross_cluster_branch(self):
-		doc = frappe.get_doc(
-			{"doctype": "Student", "mys_branch": BRANCH, "mys_cluster": OTHER_CLUSTER}
-		)
+		doc = frappe.get_doc({"doctype": "Student", "mys_branch": BRANCH, "mys_cluster": OTHER_CLUSTER})
 		with self.assertRaises(frappe.ValidationError):
 			validate_student_franchise_links(doc)
 
@@ -204,3 +201,73 @@ class TestEmployeeScoping(FrappeTestCase):
 	def test_has_permission_global_role(self):
 		doc = frappe.get_doc({"doctype": "Employee", "mys_branch": "anything"})
 		self.assertTrue(employee_has_permission(doc, "read", user="Administrator"))
+
+
+class TestPayrollEntryBranchCompany(FrappeTestCase):
+	"""Phase 8d — Payroll Entry (frappe/hrms) is aligned to the branch's Company."""
+
+	@classmethod
+	def setUpClass(cls):
+		super().setUpClass()
+		cls.has_hrms = frappe.db.exists("DocType", "Payroll Entry")
+		cls.company = frappe.db.get_value("Company", {}, "name")
+		if cls.has_hrms:
+			cls._build_branch()
+
+	@classmethod
+	def tearDownClass(cls):
+		if cls.has_hrms:
+			if frappe.db.exists("MYS Branch", BRANCH):
+				frappe.delete_doc("MYS Branch", BRANCH, force=True, ignore_permissions=True)
+			if frappe.db.exists("MYS Cluster", CLUSTER):
+				frappe.delete_doc("MYS Cluster", CLUSTER, force=True, ignore_permissions=True)
+			frappe.db.commit()
+		super().tearDownClass()
+
+	@classmethod
+	def _build_branch(cls):
+		if not frappe.db.exists("MYS Cluster", CLUSTER):
+			frappe.get_doc(
+				{
+					"doctype": "MYS Cluster",
+					"cluster_code": CLUSTER,
+					"cluster_name": "Payroll Test Cluster",
+					"region": "Test",
+				}
+			).insert(ignore_permissions=True)
+		if not frappe.db.exists("MYS Branch", BRANCH):
+			frappe.get_doc(
+				{
+					"doctype": "MYS Branch",
+					"branch_code": BRANCH,
+					"branch_name": "Payroll Test Branch",
+					"cluster": CLUSTER,
+					"city": "Test",
+					"province": "Test",
+					"is_active": 1,
+					"company": cls.company,
+				}
+			).insert(ignore_permissions=True)
+
+	def test_company_defaulted_from_branch(self):
+		if not self.has_hrms:
+			self.skipTest("hrms not installed")
+		doc = frappe.get_doc({"doctype": "Payroll Entry", "mys_branch": BRANCH})
+		set_payroll_entry_company_from_branch(doc)
+		self.assertEqual(doc.company, self.company)
+
+	def test_mismatched_company_is_rejected(self):
+		if not self.has_hrms:
+			self.skipTest("hrms not installed")
+		doc = frappe.get_doc(
+			{"doctype": "Payroll Entry", "mys_branch": BRANCH, "company": "_NOT_THE_BRANCH_CO"}
+		)
+		with self.assertRaises(frappe.ValidationError):
+			set_payroll_entry_company_from_branch(doc)
+
+	def test_no_branch_is_a_noop(self):
+		if not self.has_hrms:
+			self.skipTest("hrms not installed")
+		doc = frappe.get_doc({"doctype": "Payroll Entry", "company": self.company})
+		set_payroll_entry_company_from_branch(doc)
+		self.assertEqual(doc.company, self.company)

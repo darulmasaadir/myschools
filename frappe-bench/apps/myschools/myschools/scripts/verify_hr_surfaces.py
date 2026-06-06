@@ -20,9 +20,11 @@ from __future__ import annotations
 import frappe
 from frappe.permissions import has_permission
 
+from myschools.api.hr import payroll_entry_query
 from myschools.api.permissions import _user_scope, employee_query
 
 EMP = "Employee"
+PAYROLL = "Payroll Entry"
 
 # email -> (can_read_employee, scope) where scope is "global" | "scoped".
 # "scoped" means employee_query must be a non-empty mys_branch window.
@@ -82,13 +84,26 @@ def run():
 				frappe.set_user("Administrator")
 			leaked = [r.name for r in rows if r.mys_branch and r.mys_branch not in allowed]
 			if leaked:
-				failures.append(
-					f"{email}: sees Employee outside window {sorted(allowed)}: {leaked}"
-				)
+				failures.append(f"{email}: sees Employee outside window {sorted(allowed)}: {leaked}")
+
+	# Payroll Entry scope window (frappe/hrms, Phase 8d). Only assert when hrms
+	# is installed; the row window must match the Employee window per role.
+	if frappe.db.exists("DocType", PAYROLL):
+		for email, (_can_read, scope) in EXPECTED.items():
+			if not frappe.db.exists("User", email):
+				continue
+			pe_query = payroll_entry_query(email) or ""
+			if scope == "global" and pe_query != "":
+				failures.append(f"{email}: expected unscoped Payroll Entry window, got {pe_query!r}")
+			elif scope == "scoped" and "mys_branch" not in pe_query:
+				failures.append(f"{email}: expected mys_branch Payroll Entry window, got {pe_query!r}")
+		surfaces = "Employee + Payroll Entry"
+	else:
+		surfaces = "Employee (hrms not installed — Payroll Entry skipped)"
 
 	if failures:
 		print("FAILED —", len(failures), "issue(s):")
 		for f in failures:
 			print(f"  x {f}")
 		frappe.throw("HR role x surface verification failed")
-	print("OK — HR (Employee) surfaces verified for", ", ".join(EXPECTED))
+	print(f"OK — HR ({surfaces}) surfaces verified for", ", ".join(EXPECTED))

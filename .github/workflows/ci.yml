@@ -105,6 +105,7 @@ jobs:
           bench set-config -g redis_socketio redis://127.0.0.1:6379
           bench get-app erpnext --branch version-15
           bench get-app education --branch version-15.2
+          bench get-app hrms --branch version-15
           # symlink our app from the checked-out repo, register it as an
           # editable Python package in bench's venv, and list it in apps.txt
           # so `bench install-app myschools` can find it (mirrors what
@@ -126,7 +127,7 @@ jobs:
             --admin-password admin \
             --no-mariadb-socket \
             --db-host 127.0.0.1 \
-            --install-app erpnext --install-app education
+            --install-app erpnext --install-app hrms --install-app education
           bench --site test_site install-app myschools
           bench --site test_site set-config developer_mode 1
 
@@ -208,6 +209,7 @@ jobs:
           bench set-config -g redis_socketio redis://127.0.0.1:6379
           bench get-app erpnext --branch version-15
           bench get-app education --branch version-15.2
+          bench get-app hrms --branch version-15
           ln -s "${{ github.workspace }}/myschools-repo/frappe-bench/apps/myschools" apps/myschools
           ./env/bin/pip install -e apps/myschools
           [ -z "$(tail -c 1 sites/apps.txt)" ] || echo "" >> sites/apps.txt
@@ -221,7 +223,7 @@ jobs:
             --admin-password admin \
             --no-mariadb-socket \
             --db-host 127.0.0.1 \
-            --install-app erpnext --install-app education
+            --install-app erpnext --install-app hrms --install-app education
           bench --site test_site install-app myschools
           bench --site test_site set-config developer_mode 1
           bench use test_site

@@ -420,6 +420,21 @@ for _role in ("Branch Director", "Branch Principal", "Branch Admin"):
 	if "Program Enrollment" not in FRANCHISE_ROLE_READS[_role]:
 		FRANCHISE_ROLE_READS[_role].append("Program Enrollment")
 
+# Payroll oversight (Phase 8d): branch finance roles + HO/cluster read Payroll
+# Entry (frappe/hrms); row scope is enforced by api.hr.payroll_entry_query so
+# each role only sees their own branch/cluster runs. Creating payroll still uses
+# the stock hrms HR roles. Granted only when hrms is installed (guarded in
+# grant_franchise_role_permissions via the DocType existence check).
+for _role in (
+	"Chief Executive",
+	"HO Dept Head",
+	"Cluster Director",
+	"Branch Director",
+	"Branch Accountant",
+):
+	if "Payroll Entry" not in FRANCHISE_ROLE_READS[_role]:
+		FRANCHISE_ROLE_READS[_role].append("Payroll Entry")
+
 
 # Education bulk billing paths that create Sales Invoice — not read by MY School.
 SPLIT_BRAIN_BILLING_DOCTYPES = ("Fee Schedule", "Sales Invoice")
@@ -698,14 +713,38 @@ def create_custom_franchise_fields():
 		},
 	]
 
+	field_map = {
+		"Student": student_fields,
+		"Employee": employee_fields,
+		"Guardian": guardian_fields,
+		"Fee Structure": fee_structure_fields,
+		"Fees": fees_fields,
+	}
+
+	# Payroll Entry ships with frappe/hrms (Phase 8d). Guard so a site without
+	# hrms (shouldn't happen — it's in required_apps) doesn't error on install.
+	if frappe.db.exists("DocType", "Payroll Entry"):
+		field_map["Payroll Entry"] = [
+			{
+				"fieldname": "mys_branch",
+				"label": "MYS Branch",
+				"fieldtype": "Link",
+				"options": "MYS Branch",
+				"insert_after": "company",
+				"in_standard_filter": 1,
+				"description": "Scope this payroll run to a MY School branch; the run's Company is aligned to the branch's books.",
+			},
+			{
+				"fieldname": "mys_campus",
+				"label": "MYS Campus",
+				"fieldtype": "Link",
+				"options": "MYS Campus",
+				"insert_after": "mys_branch",
+			},
+		]
+
 	create_custom_fields(
-		{
-			"Student": student_fields,
-			"Employee": employee_fields,
-			"Guardian": guardian_fields,
-			"Fee Structure": fee_structure_fields,
-			"Fees": fees_fields,
-		},
+		field_map,
 		ignore_validate=True,
 		update=True,
 	)

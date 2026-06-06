@@ -66,7 +66,7 @@ This table is the architectural view — module by module, what it ships:
 | Inspection workflow | ✅ | `MYS Inspection Checklist Template` (+ `Item` child), `MYS Inspection Visit` (+ `Result` child), `MYS Inspection Finding`, `MYS Corrective Action` | [process](processes/inspection-workflow.md) · [API](api/inspection.md) |
 | Communication | 🟡 | `MYS Communication Log`; 6 `Email Template` + 6 `Notification` fixtures; `Communication.after_insert` mirror; `send_sms` + `send_email_message` adapters (Phase **8c** ✅ PR #18) | Royalty + inspection + agreement alerts wired; system emails mirrored into the audit log; pluggable SMS providers. [process](processes/notifications.md) |
 | Permissions | ✅ | (no doctypes — pure Python in `api/permissions.py`) | Branch / cluster scoping via `permission_query_conditions`; `Student` + `Employee` (8d) scoped + per-doc `has_permission` |
-| HR / Staff | 🟡 | upstream `erpnext.Employee` + `mys_branch` / `mys_campus` / `mys_role_tier` / `mys_staff_id` custom fields; `set_mys_staff_id`; Phase **8d**: branch-scoped Employee roster, `test_identity.py`, `verify_hr_surfaces.py` | Built on ERPNext `Employee` (HRMS/payroll deferred — not installed). Staff ID `MYS-{branch}-{role}{####}`. |
+| HR / Staff / Payroll | 🟡 | upstream `erpnext.Employee` + `frappe/hrms` `Payroll Entry`; `mys_*` custom fields on both; `set_mys_staff_id`; Phase **8d**: branch-scoped Employee + Payroll Entry, `api/hr.py`, `test_identity.py`, `verify_hr_surfaces.py` | `hrms` added to `required_apps`. Payroll runs scope to a branch's `Company`. Staff ID `MYS-{branch}-{role}{####}`. |
 | SIS (Student Info System) | 🟡 | upstream `education.Student` + `Program Enrollment`; Phase **8b** ✅: `MYS Student Transfer`, `MYS Student Leaving`, leaving certificate print format | Franchise links via custom fields; transfer/leaving workflows shipped PR #17. |
 | Fees | 🟡 | upstream `education.Fees` + `Fee Structure`; Phase **8a**: overrides, late fees, **`MYS Bulk Fee Run`**, [`api/fees.py`](../frappe-bench/apps/myschools/myschools/api/fees.py) | **Canonical billing object** — not Fee Schedule → Sales Invoice ([billing-model](processes/billing-model.md)). Submitted `Fees` → royalty, dashboard, portals, late-fee job. **8a-3** wires overrides on validate; **8a-4** bulk generator. |
 | Central Monitoring Dashboard | ✅ | `Dashboard` + 8 `Number Card` + 3 `Dashboard Chart` shipped as JSON under `my_school_erp/` | Single role-aware dashboard — same view for every role, rows filtered through `permission_query_conditions`. Custom-method cards in [`api/dashboard.py`](../frappe-bench/apps/myschools/myschools/api/dashboard.py) |
@@ -196,6 +196,7 @@ Applied as `Custom Field` records (exported as fixtures, filter `name like '%-my
 
 - **Student**: `mys_cluster`, `mys_branch` (fetch from cluster), `mys_campus`, `mys_student_id`
 - **Employee**: `mys_branch`, `mys_campus`, `mys_role_tier` (HO / Cluster / Branch / Campus), `mys_staff_id`
+- **Payroll Entry** (`frappe/hrms`, Phase 8d): `mys_branch`, `mys_campus`
 - **Guardian**: `mys_branch` (so parent portal only shows their branch)
 
 ---

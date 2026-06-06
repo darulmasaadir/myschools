@@ -299,12 +299,12 @@ Decision record: [processes/billing-model.md](processes/billing-model.md). Canon
 
 **In flight:** branch `feature/phase-8d-hr-scaffolding`.
 
-Foundation already shipped in earlier phases: Employee `mys_role_tier` / `mys_branch` / `mys_campus` / `mys_staff_id` custom fields (`setup/install.py`) and the staff-ID generator `set_mys_staff_id` (`api/identity.py`, `MYS-BR014-TCH0056`). 8d builds the thin, upgrade-safe HR layer on top of ERPNext's built-in payroll (no HRMS, no custom payroll engine):
+Foundation already shipped in earlier phases: Employee `mys_role_tier` / `mys_branch` / `mys_campus` / `mys_staff_id` custom fields (`setup/install.py`) and the staff-ID generator `set_mys_staff_id` (`api/identity.py`, `MYS-BR014-TCH0056`). 8d adds the upgrade-safe HR/payroll layer on top of ERPNext + the official **`frappe/hrms`** app (added to `required_apps`; ERPNext v15 moved payroll out of core into hrms):
 
 - **Branch-scoped `Employee`** — `permission_query_conditions` + `has_permission` so franchise roles only see their own staff (mirrors the Student scoping pattern).
-- **Franchise fields on ERPNext `Payroll Entry`** — `mys_branch` / `mys_campus` Custom Fields so payroll runs scope to a branch's `Company`; a `branch → company` default helper.
-- **`test_identity.py`** — backfills the missing unit coverage for student + staff ID generation (counter, role codes, franchise-link validation).
-- **`scripts/verify_hr_surfaces.py`** — role × Employee/Payroll Entry matrix, wired into the battery + CI.
+- **Franchise fields on hrms `Payroll Entry`** — `mys_branch` / `mys_campus` Custom Fields; `api/hr.set_payroll_entry_company_from_branch` keeps each run's `Company` aligned to the branch's books, and `payroll_entry_query` branch-scopes the list. Oversight roles (HO/CEO/Cluster/Branch Director/Accountant) get read.
+- **`test_identity.py`** — backfills the missing unit coverage for student + staff ID generation (counter, role codes, franchise-link validation) + Payroll Entry company alignment.
+- **`scripts/verify_hr_surfaces.py`** — role × Employee + Payroll Entry matrix (live cross-branch leak check), wired into the battery + CI.
 
 ### 8e (planned)
 - **8e** — Payment gateway stubs (JazzCash, Easypaisa, HBL).
