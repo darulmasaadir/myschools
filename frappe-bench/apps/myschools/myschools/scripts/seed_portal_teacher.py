@@ -35,10 +35,7 @@ def main():
 			"password": PASSWORD,
 		},
 	)
-	branch = frappe.db.get_value("MYS Branch", {}, "name")
-	if not branch:
-		frappe.throw("No MYS Branch — run seed_demo first.")
-	campus = f"{branch}-Kids"
+	branch, campus = _resolve_branch_and_campus()
 	company = frappe.db.get_value("MYS Branch", branch, "company")
 	employee = _ensure_employee(branch, campus, company)
 	instructor = _ensure_instructor(employee)
@@ -56,31 +53,56 @@ def main():
 	}
 
 
-def _ensure_employee(branch: str, campus: str, company: str) -> str:
+def _resolve_branch_and_campus() -> tuple[str, str | None]:
+	"""Pick a branch that has a campus and students (fresh-install / CI safe)."""
+	from myschools.scripts import seed_education
+
+	seed_education.run()
+	row = frappe.db.sql(
+		"""
+		SELECT b.name AS branch, MIN(c.name) AS campus
+		FROM `tabMYS Branch` b
+		INNER JOIN `tabMYS Campus` c ON c.branch = b.name
+		INNER JOIN `tabStudent` s ON s.mys_branch = b.name
+		GROUP BY b.name
+		ORDER BY b.creation ASC
+		LIMIT 1
+		""",
+		as_dict=True,
+	)
+	if row:
+		return row[0].branch, row[0].campus
+	branch = frappe.db.get_value("MYS Branch", {}, "name", order_by="creation asc")
+	if not branch:
+		frappe.throw("No MYS Branch — run seed_demo first.")
+	campus = frappe.db.get_value("MYS Campus", {"branch": branch}, "name")
+	return branch, campus
+
+
+def _ensure_employee(branch: str, campus: str | None, company: str) -> str:
 	existing = frappe.db.get_value("Employee", {"user_id": EMAIL}, "name")
 	if existing:
-		frappe.db.set_value(
-			"Employee",
-			existing,
-			{"mys_branch": branch, "mys_campus": campus, "status": "Active", "company": company},
-		)
+		patch = {"mys_branch": branch, "status": "Active", "company": company}
+		if campus:
+			patch["mys_campus"] = campus
+		frappe.db.set_value("Employee", existing, patch)
 		return existing
-	doc = frappe.get_doc(
-		{
-			"doctype": "Employee",
-			"first_name": "E2E",
-			"last_name": "Teacher",
-			"gender": "Male",
-			"date_of_birth": "1992-01-01",
-			"date_of_joining": today(),
-			"status": "Active",
-			"company": company,
-			"designation": "Teacher",
-			"user_id": EMAIL,
-			"mys_branch": branch,
-			"mys_campus": campus,
-		}
-	)
+	fields = {
+		"doctype": "Employee",
+		"first_name": "E2E",
+		"last_name": "Teacher",
+		"gender": "Male",
+		"date_of_birth": "1992-01-01",
+		"date_of_joining": today(),
+		"status": "Active",
+		"company": company,
+		"designation": "Teacher",
+		"user_id": EMAIL,
+		"mys_branch": branch,
+	}
+	if campus:
+		fields["mys_campus"] = campus
+	doc = frappe.get_doc(fields)
 	doc.insert(ignore_permissions=True)
 	return doc.name
 
@@ -143,13 +165,11 @@ def _ensure_student_group(branch: str, instructor: str) -> str:
 	return GROUP_NAME
 
 
-def _ensure_group_students(group: str, branch: str, campus: str) -> list[str]:
-	students = frappe.get_all(
-		"Student",
-		{"mys_branch": branch, "mys_campus": campus},
-		pluck="name",
-		limit=3,
-	)
+def _ensure_group_students(group: str, branch: str, campus: str | None) -> list[str]:
+	filters: dict = {"mys_branch": branch}
+	if campus:
+		filters["mys_campus"] = campus
+	students = frappe.get_all("Student", filters, pluck="name", limit=3)
 	if not students:
 		frappe.throw("No students on branch — run seed_education first.")
 	sg = frappe.get_doc("Student Group", group)
