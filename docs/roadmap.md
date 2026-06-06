@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-06
-**Up next:** Phase 8d HR scaffolding (Employee custom fields, payroll cycle)
+**Up next:** Phase 8e payment gateway stubs (JazzCash, Easypaisa, HBL)
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -33,7 +33,7 @@ These bind every phase:
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
-| 8 | Domain extensions | 🟡 | 8a ✅ · 8b ✅ · 8c ✅ · 8d 🟡 · 8e ⬜ |
+| 8 | Domain extensions | 🟡 | 8a ✅ · 8b ✅ · 8c ✅ · 8d ✅ · 8e 🟡 |
 
 ---
 
@@ -295,9 +295,9 @@ Decision record: [processes/billing-model.md](processes/billing-model.md). Canon
 - Gateway / provider-reference / recipient-phone fields on `MYS Communication Log`.
 - `scripts/verify_sms_adapters.py` (wired into battery + CI) + Playwright `phase8c_sms_settings.spec.ts` (Stub save + Twilio section reveal).
 
-### 8d — HR / payroll scaffolding 🟡
+### 8d — HR / payroll scaffolding ✅
 
-**In flight:** branch `feature/phase-8d-hr-scaffolding`.
+**Delivered:** PR [#19](https://github.com/darulmasaadir/myschools/pull/19) (merge `376576f`), `feature/phase-8d-hr-scaffolding`.
 
 Foundation already shipped in earlier phases: Employee `mys_role_tier` / `mys_branch` / `mys_campus` / `mys_staff_id` custom fields (`setup/install.py`) and the staff-ID generator `set_mys_staff_id` (`api/identity.py`, `MYS-BR014-TCH0056`). 8d adds the upgrade-safe HR/payroll layer on top of ERPNext + the official **`frappe/hrms`** app (added to `required_apps`; ERPNext v15 moved payroll out of core into hrms):
 
@@ -305,9 +305,17 @@ Foundation already shipped in earlier phases: Employee `mys_role_tier` / `mys_br
 - **Franchise fields on hrms `Payroll Entry`** — `mys_branch` / `mys_campus` Custom Fields; `api/hr.set_payroll_entry_company_from_branch` keeps each run's `Company` aligned to the branch's books, and `payroll_entry_query` branch-scopes the list. Oversight roles (HO/CEO/Cluster/Branch Director/Accountant) get read.
 - **`test_identity.py`** — backfills the missing unit coverage for student + staff ID generation (counter, role codes, franchise-link validation) + Payroll Entry company alignment.
 - **`scripts/verify_hr_surfaces.py`** — role × Employee + Payroll Entry matrix (live cross-branch leak check), wired into the battery + CI.
+- Playwright `phase8d_hr_payroll.spec.ts` (Director Employee leak check + Payroll Entry `mys_branch` field).
 
-### 8e (planned)
-- **8e** — Payment gateway stubs (JazzCash, Easypaisa, HBL).
+### 8e — Payment gateway stubs 🟡
+
+**In flight:** branch `feature/phase-8e-payment-gateways`.
+
+Mirrors Phase 8c SMS adapters for fee collection — pluggable Pakistani gateways behind a stable API, audit-logged, Stub default:
+
+- **`MYS Payment Settings`** single — Stub, JazzCash, Easypaisa, HBL.
+- **`api/payment_providers.py`** + **`api/payments.initiate_fee_payment`** — dispatch + `MYS Communication Log` (`channel=Payment`, `gateway`, `provider_reference`).
+- **`scripts/verify_payment_adapters.py`** + `test_payment_providers.py` + Playwright `phase8e_payment_settings.spec.ts`; battery + CI wiring.
 
 ---
 
