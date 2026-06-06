@@ -57,6 +57,7 @@ belong in Playwright.
 | `phase8a_bulk_fee_run.spec.ts` | Bulk Fee Run desk: Generate Fees (seeded + from blank) + role denial |
 | `phase8a_fee_admin_forms.spec.ts` | Override / late-fee-policy forms: Director create, Principal denial |
 | `phase8b_student_lifecycle.spec.ts` | Transfer / leaving forms: Director submit, certificate print, Monitor denial |
+| `phase8c_sms_settings.spec.ts` | MYS SMS Settings single: Stub default + save, Twilio section reveal |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally
