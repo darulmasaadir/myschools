@@ -276,6 +276,10 @@ jobs:
         working-directory: frappe-bench
         run: bench --site test_site execute myschools.scripts.verify_student_lifecycle_surfaces.run
 
+      - name: Verify SMS adapter smoke (Phase 8c)
+        working-directory: frappe-bench
+        run: bench --site test_site execute myschools.scripts.verify_sms_adapters.run
+
       - name: Make test_site resolve to loopback
         run: |
           echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts

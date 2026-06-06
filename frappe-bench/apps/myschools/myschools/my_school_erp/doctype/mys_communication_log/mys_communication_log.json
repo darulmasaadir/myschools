@@ -18,6 +18,10 @@
   "column_break_2",
   "recipient_role",
   "recipient_user",
+  "recipient_phone",
+  "column_break_provider",
+  "gateway",
+  "provider_reference",
   "section_break_message",
   "subject",
   "body"
@@ -101,6 +105,30 @@
    "fieldtype": "Link",
    "label": "Recipient User",
    "options": "User"
+  },
+  {
+   "fieldname": "recipient_phone",
+   "fieldtype": "Data",
+   "label": "Recipient Phone",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_provider",
+   "fieldtype": "Column Break",
+   "label": "Provider"
+  },
+  {
+   "fieldname": "gateway",
+   "fieldtype": "Data",
+   "label": "Gateway",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "provider_reference",
+   "fieldtype": "Data",
+   "label": "Provider Reference",
+   "description": "External message ID returned by the SMS/email gateway"
   },
   {
    "fieldname": "section_break_message",

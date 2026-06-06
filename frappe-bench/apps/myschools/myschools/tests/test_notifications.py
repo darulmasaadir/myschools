@@ -201,13 +201,15 @@ class TestSmsStub(FrappeTestCase):
 		row = frappe.db.get_value(
 			"MYS Communication Log",
 			{"channel": "SMS", "body": "Body of the SMS"},
-			["channel", "status", "scope", "body"],
+			["channel", "status", "scope", "body", "gateway", "recipient_phone"],
 			as_dict=True,
 		)
 		self.assertIsNotNone(row)
 		self.assertEqual(row.channel, "SMS")
 		self.assertEqual(row.status, "Sent")
 		self.assertEqual(row.scope, "Individual")
+		self.assertEqual(row.gateway, "stub")
+		self.assertEqual(row.recipient_phone, self.TEST_RECIPIENT)
 
 	def test_send_sms_rejects_empty_args(self):
 		with self.assertRaises(frappe.ValidationError):
