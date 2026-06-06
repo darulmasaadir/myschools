@@ -282,6 +282,10 @@ jobs:
         working-directory: frappe-bench
         run: bench --site test_site execute myschools.scripts.verify_sms_adapters.run
 
+      - name: Verify payment adapter smoke (Phase 8e)
+        working-directory: frappe-bench
+        run: bench --site test_site execute myschools.scripts.verify_payment_adapters.run
+
       - name: Verify HR / Employee role × surface matrix (Phase 8d)
         working-directory: frappe-bench
         run: bench --site test_site execute myschools.scripts.verify_hr_surfaces.run

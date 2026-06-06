@@ -59,6 +59,7 @@ belong in Playwright.
 | `phase8b_student_lifecycle.spec.ts` | Transfer / leaving forms: Director submit, certificate print, Monitor denial |
 | `phase8c_sms_settings.spec.ts` | MYS SMS Settings single: Stub default + save, Twilio section reveal |
 | `phase8d_hr_payroll.spec.ts` | Employee branch-scope leak check (Director); Payroll Entry `mys_branch` field |
+| `phase8e_payment_settings.spec.ts` | MYS Payment Settings single: Stub default + save, JazzCash section reveal |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally

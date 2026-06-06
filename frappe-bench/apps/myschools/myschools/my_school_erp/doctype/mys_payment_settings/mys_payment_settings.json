@@ -1,0 +1,145 @@
+{
+ "actions": [],
+ "creation": "2026-06-06 18:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "payment_provider",
+  "section_break_jazzcash",
+  "jazzcash_merchant_id",
+  "jazzcash_password",
+  "jazzcash_return_url",
+  "section_break_easypaisa",
+  "easypaisa_store_id",
+  "easypaisa_hash_key",
+  "easypaisa_return_url",
+  "section_break_hbl",
+  "hbl_merchant_id",
+  "hbl_secret_key",
+  "hbl_return_url",
+  "section_break_help",
+  "provider_help"
+ ],
+ "fields": [
+  {
+   "default": "Stub",
+   "fieldname": "payment_provider",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Payment Provider",
+   "options": "Stub\nJazzCash\nEasypaisa\nHBL",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='JazzCash'",
+   "fieldname": "section_break_jazzcash",
+   "fieldtype": "Section Break",
+   "label": "JazzCash"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='JazzCash'",
+   "fieldname": "jazzcash_merchant_id",
+   "fieldtype": "Data",
+   "label": "Merchant ID"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='JazzCash'",
+   "fieldname": "jazzcash_password",
+   "fieldtype": "Password",
+   "label": "Password"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='JazzCash'",
+   "fieldname": "jazzcash_return_url",
+   "fieldtype": "Data",
+   "label": "Return URL",
+   "description": "Callback URL after the payer completes checkout"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='Easypaisa'",
+   "fieldname": "section_break_easypaisa",
+   "fieldtype": "Section Break",
+   "label": "Easypaisa"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='Easypaisa'",
+   "fieldname": "easypaisa_store_id",
+   "fieldtype": "Data",
+   "label": "Store ID"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='Easypaisa'",
+   "fieldname": "easypaisa_hash_key",
+   "fieldtype": "Password",
+   "label": "Hash Key"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='Easypaisa'",
+   "fieldname": "easypaisa_return_url",
+   "fieldtype": "Data",
+   "label": "Return URL"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='HBL'",
+   "fieldname": "section_break_hbl",
+   "fieldtype": "Section Break",
+   "label": "HBL"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='HBL'",
+   "fieldname": "hbl_merchant_id",
+   "fieldtype": "Data",
+   "label": "Merchant ID"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='HBL'",
+   "fieldname": "hbl_secret_key",
+   "fieldtype": "Password",
+   "label": "Secret Key"
+  },
+  {
+   "depends_on": "eval:doc.payment_provider=='HBL'",
+   "fieldname": "hbl_return_url",
+   "fieldtype": "Data",
+   "label": "Return URL"
+  },
+  {
+   "fieldname": "section_break_help",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "provider_help",
+   "fieldtype": "Small Text",
+   "label": "Provider Help",
+   "read_only": 1,
+   "default": "Stub logs a Payment row to MYS Communication Log only. JazzCash, Easypaisa, and HBL post to their gateway APIs and return a redirect URL for the payer. Configure live credentials before enabling in production."
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "module": "MY School ERP",
+ "name": "MYS Payment Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Chief Executive",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
