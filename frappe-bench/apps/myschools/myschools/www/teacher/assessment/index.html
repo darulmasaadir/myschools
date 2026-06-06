@@ -1,0 +1,102 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted"><a href="/teacher/assessments">← Back to assessments</a></p>
+{% if saved %}<p class="mys-portal__success">Scores saved.</p>{% endif %}
+
+{% if entry %}
+<div class="mys-portal__card">
+	<p class="mys-portal__summary">
+		<span>Class <strong>{{ entry.plan.student_group }}</strong></span>
+		<span>Max <strong>{{ entry.plan.maximum_assessment_score }}</strong></span>
+	</p>
+</div>
+<form id="scores-form">
+	<input type="hidden" id="plan-name" value="{{ entry.plan.name }}">
+	<div class="mys-portal__card">
+		<table class="mys-portal__table">
+			<thead>
+				<tr>
+					<th>Student</th>
+					{% for c in entry.criteria %}
+					<th>{{ c.assessment_criteria }}<br><span class="mys-portal__muted">/ {{ c.maximum_score }}</span></th>
+					{% endfor %}
+					<th>Grade</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in entry.rows %}
+				<tr data-student="{{ row.student }}">
+					<td>{{ row.student_name }}</td>
+					{% for c in entry.criteria %}
+					<td>
+						<input type="number" class="score-input" min="0" max="{{ c.maximum_score }}"
+							data-criteria="{{ c.assessment_criteria }}"
+							value="{{ row.scores.get(c.assessment_criteria, '') }}">
+					</td>
+					{% endfor %}
+					<td>{{ row.grade or '—' }}</td>
+					<td>
+						{% if row.submitted %}
+						<a class="mys-portal__btn mys-portal__btn--secondary" target="_blank"
+							href="/api/method/myschools.api.teacher_portal.download_report_card?assessment_plan={{ entry.plan.name | urlencode }}&student={{ row.student | urlencode }}">PDF</a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="mys-portal__actions">
+		<button type="button" id="save-scores" class="mys-portal__btn">Save scores</button>
+	</div>
+	<p id="scores-msg" class="mys-portal__muted"></p>
+</form>
+{% else %}
+<div class="mys-portal__card"><p>Assessment plan not found or you do not have access.</p></div>
+{% endif %}
+
+<script>
+(function () {
+	const saveBtn = document.getElementById("save-scores");
+	if (!saveBtn) return;
+	saveBtn.addEventListener("click", async () => {
+		const msg = document.getElementById("scores-msg");
+		const plan = document.getElementById("plan-name").value;
+		const rows = Array.from(document.querySelectorAll("tr[data-student]")).map((tr) => {
+			const scores = {};
+			tr.querySelectorAll(".score-input").forEach((inp) => {
+				if (inp.value !== "") scores[inp.dataset.criteria] = parseFloat(inp.value);
+			});
+			return { student: tr.dataset.student, scores };
+		}).filter((r) => Object.keys(r.scores).length);
+		if (!rows.length) {
+			msg.textContent = "Enter at least one score.";
+			return;
+		}
+		msg.textContent = "Saving…";
+		const r = await fetch("/api/method/myschools.api.teacher_portal.save_assessment_scores", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+			},
+			body: new URLSearchParams({ assessment_plan: plan, rows: JSON.stringify(rows) }),
+		});
+		const data = await r.json();
+		if (data.exc) {
+			msg.textContent = "Save failed.";
+			return;
+		}
+		window.location.href = "/teacher/assessment?plan=" + encodeURIComponent(plan) + "&saved=1";
+	});
+})();
+</script>
+{% endblock %}

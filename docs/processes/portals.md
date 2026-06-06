@@ -70,6 +70,18 @@ Scope: `Employee.user_id` → `Instructor` → `Student Group Instructor` child 
 
 **Local smoke:** `bench --site SITE execute myschools.scripts.seed_portal_teacher.main`
 
+## Phase 10 — Teacher attendance + assessments 🟡
+
+Branch: `feature/phase-10-attendance-exam`.
+
+| Route | Purpose |
+|---|---|
+| `/teacher/attendance?group=&date=` | Mark `Student Attendance` for a class |
+| `/teacher/assessments` | Submitted `Assessment Plan` list for teacher's groups |
+| `/teacher/assessment?plan=` | Enter `Assessment Result` scores + report card PDF |
+
+API: `save_class_attendance`, `save_assessment_scores`, `download_report_card` on `api/teacher_portal.py`.
+
 ## Phase 7d — Inspection portal (in flight)
 
 Branch: `feature/phase-7d-inspection-portal`.

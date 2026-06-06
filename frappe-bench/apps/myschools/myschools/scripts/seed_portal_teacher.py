@@ -26,6 +26,10 @@ TEACHER_ACADEMIC_TERM = f"{seed_education.ACADEMIC_YEAR} ({TEACHER_TERM_LABEL})"
 TEACHER_TERM_START = "2026-06-01"
 TEACHER_TERM_END = "2026-06-30"
 PROGRAM_KIDS = seed_education.PROGRAMS["Kids"]
+GRADING_SCALE = "E2E MY School Grading"
+ASSESSMENT_GROUP = "E2E Term Assessment"
+ASSESSMENT_CRITERIA = "E2E Written Test"
+ASSESSMENT_PLAN_NAME = "E2E Portal Mid Term"
 
 
 def _group_name_for_branch(branch: str) -> str:
@@ -47,12 +51,14 @@ def main():
 	_ensure_education_prereqs()
 	_ensure_min_students(branch, campus)
 	company = frappe.db.get_value("MYS Branch", branch, "company")
+	_ensure_company_holiday_list(company)
 	_ensure_designation("Teacher")
 	employee = _ensure_employee(branch, campus, company)
 	instructor = _ensure_instructor(employee)
 	group = _ensure_student_group(branch, instructor)
 	_ensure_group_students(group, branch, campus)
 	schedule = _ensure_schedule(group, instructor)
+	assessment_plan = _ensure_assessment_plan(group, instructor)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
@@ -60,6 +66,7 @@ def main():
 		"instructor": instructor,
 		"student_group": group,
 		"schedule": schedule,
+		"assessment_plan": assessment_plan,
 		"branch": branch,
 	}
 
@@ -92,6 +99,38 @@ def _ensure_education_prereqs() -> None:
 				"program_code": PROGRAM_KIDS.replace(" ", "-").upper(),
 			}
 		).insert(ignore_permissions=True)
+
+
+def _ensure_company_holiday_list(company: str | None) -> None:
+	"""Education Student Attendance.validate_is_holiday requires a company holiday list."""
+	if not frappe.db.exists("DocType", "Holiday List"):
+		return
+	companies: list[str] = []
+	if company:
+		companies.append(company)
+	try:
+		from erpnext import get_default_company
+
+		default = get_default_company()
+		if default and default not in companies:
+			companies.append(default)
+	except Exception:
+		pass
+	if not companies:
+		companies = frappe.get_all("Company", pluck="name", limit=1)
+	list_name = "MYS Default Holidays"
+	if not frappe.db.exists("Holiday List", list_name):
+		frappe.get_doc(
+			{
+				"doctype": "Holiday List",
+				"holiday_list_name": list_name,
+				"from_date": "2020-01-01",
+				"to_date": "2030-12-31",
+			}
+		).insert(ignore_permissions=True)
+	for comp in companies:
+		if comp and not frappe.db.get_value("Company", comp, "default_holiday_list"):
+			frappe.db.set_value("Company", comp, "default_holiday_list", list_name)
 
 
 def _ensure_designation(name: str) -> None:
@@ -221,12 +260,134 @@ def _ensure_group_students(group: str, branch: str, campus: str | None) -> list[
 	return students
 
 
+def _ensure_grading_scale() -> str:
+	if not frappe.db.exists("DocType", "Grading Scale"):
+		return ""
+	if frappe.db.exists("Grading Scale", GRADING_SCALE):
+		return GRADING_SCALE
+	doc = frappe.get_doc(
+		{
+			"doctype": "Grading Scale",
+			"grading_scale_name": GRADING_SCALE,
+			"intervals": [
+				{"grade_code": "A", "threshold": 90, "grade_description": "Excellent"},
+				{"grade_code": "B", "threshold": 80, "grade_description": "Good"},
+				{"grade_code": "C", "threshold": 70, "grade_description": "Average"},
+				{"grade_code": "F", "threshold": 0, "grade_description": "Fail"},
+			],
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return GRADING_SCALE
+
+
+def _ensure_assessment_group() -> str:
+	if not frappe.db.exists("DocType", "Assessment Group"):
+		return ""
+	if frappe.db.exists("Assessment Group", ASSESSMENT_GROUP):
+		return ASSESSMENT_GROUP
+	root = frappe.db.get_value(
+		"Assessment Group", {"is_group": 1}, "name", order_by="lft asc"
+	)
+	if not root:
+		root_doc = frappe.get_doc(
+			{
+				"doctype": "Assessment Group",
+				"assessment_group_name": "All Assessment Groups",
+				"is_group": 1,
+				"parent_assessment_group": "All Assessment Groups",
+			}
+		)
+		root_doc.insert(ignore_permissions=True)
+		root = root_doc.name
+	doc = frappe.get_doc(
+		{
+			"doctype": "Assessment Group",
+			"assessment_group_name": ASSESSMENT_GROUP,
+			"parent_assessment_group": root,
+			"is_group": 0,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return ASSESSMENT_GROUP
+
+
+def _ensure_assessment_criteria() -> str:
+	if not frappe.db.exists("DocType", "Assessment Criteria"):
+		return ""
+	if frappe.db.exists("Assessment Criteria", ASSESSMENT_CRITERIA):
+		return ASSESSMENT_CRITERIA
+	doc = frappe.get_doc(
+		{
+			"doctype": "Assessment Criteria",
+			"assessment_criteria": ASSESSMENT_CRITERIA,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return ASSESSMENT_CRITERIA
+
+
 def _ensure_course() -> str:
+	grading = _ensure_grading_scale()
 	existing = frappe.db.get_value("Course", {"course_name": COURSE_NAME}, "name")
 	if existing:
+		if grading:
+			frappe.db.set_value("Course", existing, "default_grading_scale", grading)
 		return existing
-	doc = frappe.get_doc({"doctype": "Course", "course_name": COURSE_NAME})
+	fields = {"doctype": "Course", "course_name": COURSE_NAME}
+	if grading:
+		fields["default_grading_scale"] = grading
+	doc = frappe.get_doc(fields)
 	doc.insert(ignore_permissions=True)
+	return doc.name
+
+
+def _ensure_assessment_plan(group: str, instructor: str) -> str | None:
+	if not frappe.db.exists("DocType", "Assessment Plan"):
+		return None
+	existing = frappe.db.get_value(
+		"Assessment Plan",
+		{"assessment_name": ASSESSMENT_PLAN_NAME, "student_group": group},
+		"name",
+	)
+	if existing:
+		doc = frappe.get_doc("Assessment Plan", existing)
+		if doc.docstatus == 0:
+			doc.submit()
+		return existing
+	course = _ensure_course()
+	assessment_group = _ensure_assessment_group()
+	criteria = _ensure_assessment_criteria()
+	grading = _ensure_grading_scale()
+	if not all([course, assessment_group, criteria, grading]):
+		return None
+	term = _ensure_teacher_academic_term()
+	doc = frappe.get_doc(
+		{
+			"doctype": "Assessment Plan",
+			"assessment_name": ASSESSMENT_PLAN_NAME,
+			"student_group": group,
+			"assessment_group": assessment_group,
+			"grading_scale": grading,
+			"course": course,
+			"program": PROGRAM_KIDS,
+			"academic_year": seed_education.ACADEMIC_YEAR,
+			"academic_term": term,
+			"schedule_date": today(),
+			"from_time": "10:00:00",
+			"to_time": "11:00:00",
+			"examiner": instructor,
+			"maximum_assessment_score": 100,
+			"assessment_criteria": [
+				{
+					"assessment_criteria": criteria,
+					"maximum_score": 100,
+				}
+			],
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	doc.submit()
 	return doc.name
 
 

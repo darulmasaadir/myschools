@@ -211,6 +211,7 @@ DEFAULT_PRINT_FORMATS = {
 	"MYS Inspection Visit": "MYS Inspection Report",
 	"MYS Franchise Agreement": "MYS Franchise Agreement",
 	"Fees": "MYS Fee Receipt",
+	"Assessment Result": "MYS Report Card",
 }
 
 
@@ -403,6 +404,9 @@ FRANCHISE_ROLE_READS = {
 		"Course Schedule",
 		"Instructor",
 		"Program",
+		"Student Attendance",
+		"Assessment Plan",
+		"Assessment Result",
 	],
 }
 
@@ -505,6 +509,18 @@ def grant_franchise_role_permissions():
 				add_permission("Program Enrollment", role, 0)
 				for perm in ("read", "create", "write", "submit"):
 					update_permission_property("Program Enrollment", role, 0, perm, 1)
+
+	# Teacher portal: marking attendance + assessment results via whitelist API.
+	if frappe.db.exists("Role", "Teacher"):
+		for doctype in ("Student Attendance", "Assessment Result"):
+			if not frappe.db.exists("DocType", doctype):
+				continue
+			add_permission(doctype, "Teacher", 0)
+			for perm in ("read", "create", "write", "submit", "cancel"):
+				update_permission_property(doctype, "Teacher", 0, perm, 1)
+		if frappe.db.exists("DocType", "Assessment Plan"):
+			add_permission("Assessment Plan", "Teacher", 0)
+			update_permission_property("Assessment Plan", "Teacher", 0, "read", 1)
 
 	# Guardian portal: read attendance + submit feedback via Web Form.
 	if frappe.db.exists("Role", "Guardian"):

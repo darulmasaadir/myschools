@@ -456,6 +456,78 @@ FRANCHISE_AGREEMENT = r"""
 """
 
 
+REPORT_CARD = r"""
+{%- if letter_head and not no_letterhead %}
+<div class="letter-head" style="margin-bottom:14px">{{ letter_head|safe }}</div>
+{% endif -%}
+<div style="font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:12px">
+  <div style="text-align:center;margin-bottom:18px">
+    <div style="font-size:22px;font-weight:800;letter-spacing:0.5px;color:#0F7A4A">REPORT CARD</div>
+    <div style="font-size:11px;color:#6B7280">{{ doc.assessment_plan }}</div>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+    <tr>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;width:25%;font-weight:600;color:#6B7280">Student</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB;width:25%">{{ doc.student_name }}</td>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;width:25%;font-weight:600;color:#6B7280">Class</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB;width:25%">{{ doc.student_group or "—" }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Program</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.program or "—" }}</td>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Course</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.course or "—" }}</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Academic Year</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.academic_year or "—" }}</td>
+      <td style="padding:6px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600;color:#6B7280">Term</td>
+      <td style="padding:6px 10px;border:1px solid #E5E7EB">{{ doc.academic_term or "—" }}</td>
+    </tr>
+  </table>
+
+  <div style="font-weight:700;color:#0F7A4A;margin:14px 0 6px 0;font-size:13px">Assessment Results</div>
+  <table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px">
+    <thead>
+      <tr style="background:#0F7A4A;color:#fff">
+        <th style="padding:8px 10px;text-align:left">Criteria</th>
+        <th style="padding:8px 10px;text-align:right">Score</th>
+        <th style="padding:8px 10px;text-align:right">Max</th>
+        <th style="padding:8px 10px;text-align:left">Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in doc.details %}
+      <tr>
+        <td style="padding:6px 10px;border-bottom:1px solid #E5E7EB">{{ row.assessment_criteria }}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #E5E7EB;text-align:right">{{ row.score }}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #E5E7EB;text-align:right">{{ row.maximum_score }}</td>
+        <td style="padding:6px 10px;border-bottom:1px solid #E5E7EB">{{ row.grade or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse">
+    <tr>
+      <td style="padding:8px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600">Total Score</td>
+      <td style="padding:8px 10px;border:1px solid #E5E7EB;text-align:right;font-weight:700">{{ doc.total_score }} / {{ doc.maximum_score }}</td>
+      <td style="padding:8px 10px;background:#F9FAFB;border:1px solid #E5E7EB;font-weight:600">Overall Grade</td>
+      <td style="padding:8px 10px;border:1px solid #E5E7EB;text-align:center;font-size:16px;font-weight:800;color:#0F7A4A">{{ doc.grade or "—" }}</td>
+    </tr>
+  </table>
+
+  {% if doc.comment %}
+  <div style="margin-top:14px">
+    <div style="font-weight:700;color:#0F7A4A;font-size:13px;margin-bottom:6px">Teacher's Comment</div>
+    <div style="line-height:1.6">{{ doc.comment }}</div>
+  </div>
+  {% endif %}
+</div>
+"""
+
+
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
@@ -466,6 +538,7 @@ FORMATS = [
 	("MYS Fee Receipt", "Fees", FEE_RECEIPT),
 	("MYS Leaving Certificate", "MYS Student Leaving", LEAVING_CERTIFICATE),
 	("MYS Franchise Agreement", "MYS Franchise Agreement", FRANCHISE_AGREEMENT),
+	("MYS Report Card", "Assessment Result", REPORT_CARD),
 ]
 
 
@@ -532,6 +605,7 @@ def smoke_render():
 		("MYS Inspection Visit", "MYS Inspection Report", "INSPECTION REPORT"),
 		("MYS Franchise Agreement", "MYS Franchise Agreement", "FRANCHISE AGREEMENT"),
 		("Fees", "MYS Fee Receipt", "FEE RECEIPT"),
+		("Assessment Result", "MYS Report Card", "REPORT CARD"),
 	]
 	results = {}
 	for doctype, pf, marker in cases:

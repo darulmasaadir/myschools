@@ -66,7 +66,7 @@ def _check_teacher_user(failures: list[str]) -> None:
 	"""Requires ``seed_portal_teacher`` or ``seed_e2e`` on the site (CI seeds both)."""
 	email = "e2e_teacher@mys.local"
 	op = _login(email, "mys-e2e-teacher")
-	for path in ["/teacher", "/teacher/classes", "/teacher/schedule"]:
+	for path in ["/teacher", "/teacher/classes", "/teacher/schedule", "/teacher/attendance", "/teacher/assessments"]:
 		status, body = _get(op, path)
 		if status != 200:
 			failures.append(f"{email} {path}: HTTP {status}")
@@ -75,6 +75,46 @@ def _check_teacher_user(failures: list[str]) -> None:
 	status, body = _get(op, "/teacher/classes")
 	if "E2E Teacher Class" not in body:
 		failures.append(f"{email} /teacher/classes: expected seeded class row")
+	# POST attendance — exercises teacher whitelist + Education Student Attendance write path.
+	group_resp = _post_json(
+		op,
+		"/api/method/frappe.client.get_list",
+		{
+			"doctype": "Student Group",
+			"filters": json.dumps({"student_group_name": ["like", "E2E Teacher Class%"]}),
+			"fields": json.dumps(["name"]),
+			"limit_page_length": 1,
+		},
+	)
+	groups = group_resp.get("message") or []
+	if groups:
+		group = groups[0]["name"]
+		stu_resp = _post_json(
+			op,
+			"/api/method/frappe.client.get_list",
+			{
+				"doctype": "Student Group Student",
+				"filters": json.dumps({"parent": group, "parenttype": "Student Group", "active": 1}),
+				"fields": json.dumps(["student"]),
+				"limit_page_length": 1,
+			},
+		)
+		students = stu_resp.get("message") or []
+		if students:
+			from frappe.utils import nowdate
+
+			att = _post_json(
+				op,
+				"/api/method/myschools.api.teacher_portal.save_class_attendance",
+				{
+					"student_group": group,
+					"date": nowdate(),
+					"rows": json.dumps([{"student": students[0]["student"], "status": "Present"}]),
+				},
+			)
+			msg = att.get("message") or {}
+			if not isinstance(msg, dict) or not msg.get("ok"):
+				failures.append(f"{email} save_class_attendance: unexpected response {att}")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:

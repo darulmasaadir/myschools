@@ -50,6 +50,7 @@ EXPECTED_FORMATS = {
 	"MYS Inspection Report": "MYS Inspection Visit",
 	"MYS Fee Receipt": "Fees",
 	"MYS Franchise Agreement": "MYS Franchise Agreement",
+	"MYS Report Card": "Assessment Result",
 }
 
 
