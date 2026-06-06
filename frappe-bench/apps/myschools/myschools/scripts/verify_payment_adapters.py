@@ -1,6 +1,6 @@
 """Phase 8e — payment adapter smoke on the live site (run via bench execute).
 
-    bench --site SITE execute myschools.scripts.verify_payment_adapters.run
+bench --site SITE execute myschools.scripts.verify_payment_adapters.run
 """
 
 from __future__ import annotations

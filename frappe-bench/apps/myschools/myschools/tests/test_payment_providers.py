@@ -205,9 +205,9 @@ class TestInitiateFeePayment(FrappeTestCase):
 				}
 			).insert(ignore_permissions=True)
 		if not frappe.db.exists("Program", PROGRAM):
-			frappe.get_doc(
-				{"doctype": "Program", "program_name": PROGRAM, "program_code": PROGRAM}
-			).insert(ignore_permissions=True)
+			frappe.get_doc({"doctype": "Program", "program_name": PROGRAM, "program_code": PROGRAM}).insert(
+				ignore_permissions=True
+			)
 		cls.fee_structure = cls._ensure_fee_structure()
 
 	@classmethod

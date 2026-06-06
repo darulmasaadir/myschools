@@ -123,7 +123,10 @@ def _send_jazzcash(
 		"pp_ReturnURL": callback,
 	}
 	# Production URL is configured per deployment; tests mock requests.post.
-	url = frappe.conf.get("mys_jazzcash_api_url") or "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/2.0/Purchase/DoMWalletTransaction"
+	url = (
+		frappe.conf.get("mys_jazzcash_api_url")
+		or "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/2.0/Purchase/DoMWalletTransaction"
+	)
 	result = _gateway_post(url, payload)
 	if not result.ok:
 		return PaymentDispatchResult(ok=False, gateway="jazzcash", error=result.error)
