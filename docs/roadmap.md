@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-06
-**Up next:** Phase 8c SMS / email provider adapters (in flight)
+**Up next:** Phase 8d HR scaffolding (Employee custom fields, payroll cycle)
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -33,7 +33,7 @@ These bind every phase:
 | 5 | Workflows & List View polish | ✅ | PR #8 (`feature/workflows`) |
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
-| 8 | Domain extensions | 🟡 | 8a ✅ · 8b ✅ · 8c in flight · 8d–8e ⬜ |
+| 8 | Domain extensions | 🟡 | 8a ✅ · 8b ✅ · 8c ✅ · 8d–8e ⬜ |
 
 ---
 
@@ -285,15 +285,15 @@ Decision record: [processes/billing-model.md](processes/billing-model.md). Canon
 - Branch workspace links: Student Transfer, Student Leaving.
 - **`scripts/verify_student_lifecycle_surfaces.py`** + Playwright `phase8b_student_lifecycle.spec.ts`.
 
-### 8c — SMS / email provider adapters 🟡
+### 8c — SMS / email provider adapters ✅
 
-**In flight:** branch `feature/phase-8c-sms-adapters`.
+**Delivered:** PR [#18](https://github.com/darulmasaadir/myschools/pull/18), `feature/phase-8c-sms-adapters`.
 
-- **`MYS SMS Settings`** single — provider selection (Stub, Twilio, HTTP Gateway, Frappe SMS Settings).
+- **`MYS SMS Settings`** single — provider selection (Stub, Twilio, HTTP Gateway, Frappe SMS Settings); gated to System Manager + Chief Executive.
 - Provider registry in [`api/sms_providers.py`](../frappe-bench/apps/myschools/myschools/api/sms_providers.py); `send_sms` routes through active adapter and records `gateway` on `MYS Communication Log`.
 - `send_email_message` helper for programmatic outbound email with audit log row.
 - Gateway / provider-reference / recipient-phone fields on `MYS Communication Log`.
-- `scripts/verify_sms_adapters.py` (wired into battery + CI).
+- `scripts/verify_sms_adapters.py` (wired into battery + CI) + Playwright `phase8c_sms_settings.spec.ts` (Stub save + Twilio section reveal).
 
 ### 8d–8e (planned)
 - **8d** — HR scaffolding (Employee custom fields, payroll cycle).
