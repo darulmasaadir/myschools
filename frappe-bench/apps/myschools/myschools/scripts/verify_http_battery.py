@@ -49,6 +49,7 @@ def run(host: str = DEFAULT_HOST):
 		_check_role_landing(email, workspace, failures)
 	for email in ["monitor@mys.local", "audit@mys.local"]:
 		_check_inspection_user(email, failures)
+	_check_teacher_user(failures)
 	_check_admission_enquiry_public(failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
@@ -57,8 +58,32 @@ def run(host: str = DEFAULT_HOST):
 		raise SystemExit(1)
 	print(
 		"HTTP BATTERY OK — Administrator + 4 branch + "
-		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + /admission-enquiry"
+		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + teacher portal + /admission-enquiry"
 	)
+
+
+def _check_teacher_user(failures: list[str]) -> None:
+	email = "e2e_teacher@mys.local"
+	try:
+		from myschools.scripts.seed_portal_teacher import main as seed_teacher
+
+		seed_teacher()
+	except Exception as exc:
+		failures.append(f"seed_portal_teacher: {exc}")
+		return
+	op = _login(email, "mys-e2e-teacher")
+	for path in ["/teacher", "/teacher/classes", "/teacher/schedule"]:
+		status, body = _get(op, path)
+		if status != 200:
+			failures.append(f"{email} {path}: HTTP {status}")
+		elif "You do not have access" in body:
+			failures.append(f"{email} {path}: permission denied in body")
+	group = "E2E Teacher Class BR014"
+	status, body = _get(op, f"/teacher/class?group={urllib.parse.quote(group)}")
+	if status != 200:
+		failures.append(f"{email} /teacher/class: HTTP {status}")
+	elif "You do not have access" in body or "not assigned" in body.lower():
+		failures.append(f"{email} /teacher/class: denied for seeded group")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:

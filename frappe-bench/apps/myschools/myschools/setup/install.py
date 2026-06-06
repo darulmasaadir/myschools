@@ -19,6 +19,7 @@ FRANCHISE_ROLES = [
 	"Branch Admin",
 	"Branch Accountant",
 	"Campus Incharge",
+	"Teacher",
 ]
 
 # Website-only role for parent/guardian portal (no Desk access).
@@ -395,6 +396,13 @@ FRANCHISE_ROLE_READS = {
 		"Fees",
 		"Student Attendance",
 		"MYS Communication Log",
+	],
+	"Teacher": [
+		"Student",
+		"Student Group",
+		"Course Schedule",
+		"Instructor",
+		"Program",
 	],
 }
 

@@ -34,7 +34,8 @@ These bind every phase:
 | 6 | Setup Wizard, Module Onboarding, Reports | ✅ | PR #9 (`feature/setup-wizard-and-reports`) |
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
 | 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
-| 9+ | Remaining modules (Teacher Portal, Attendance/Exam, Academic, Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
+| 9 | Teacher Portal | 🟡 | branch `feature/phase-9-teacher-portal` |
+| 10+ | Remaining modules (Attendance/Exam, Academic, Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
 
@@ -317,6 +318,21 @@ Mirrors Phase 8c SMS adapters for fee collection — pluggable Pakistani gateway
 - **`MYS Payment Settings`** single — Stub, JazzCash, Easypaisa, HBL.
 - **`api/payment_providers.py`** + **`api/payments.initiate_fee_payment`** — dispatch + `MYS Communication Log` (`channel=Payment`, `gateway`, `provider_reference`); **`stub_payment_complete`** guest callback for Stub redirect.
 - **`scripts/verify_payment_adapters.py`** + `test_payment_providers.py` + Playwright `phase8e_payment_settings.spec.ts` (settings UI + full happy path: `initiate_fee_payment` → Stub callback → audit log); payment seed in `seed_e2e`; battery + CI wiring.
+
+---
+
+## Phase 9 — Teacher Portal 🟡
+
+**In flight:** branch `feature/phase-9-teacher-portal`.
+
+Upgrade-safe teacher slice mirroring Phase 7 portal pattern (`www/` + `api/teacher_portal.py`, no SPA):
+
+- **`Teacher` franchise role** + `role_home_page` / `PORTAL_ROUTE_BY_ROLE` → `/teacher`.
+- **`api/teacher_portal.py`** — resolve `Employee.user_id` → `Instructor`; list assigned `Student Group`s, branch-scoped rosters, and `Course Schedule` (14-day window).
+- **Routes:** `/teacher` (dashboard), `/teacher/classes`, `/teacher/class?group=`, `/teacher/schedule`.
+- **`scripts/seed_portal_teacher.py`** + `seed_e2e` teacher fixture; `tests/test_teacher_portal.py`; HTTP battery teacher paths; Playwright `phase9_teacher_portal.spec.ts`.
+
+Attendance/exam marking is **Phase 10** — this slice is the landing surface only.
 
 ---
 

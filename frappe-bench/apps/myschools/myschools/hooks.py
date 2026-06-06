@@ -89,6 +89,7 @@ role_home_page = {
 	"Branch Admin": "mys-branch",
 	"Branch Accountant": "mys-branch",
 	"Campus Incharge": "mys-campus",
+	"Teacher": "teacher",
 	"Guardian": "guardian",
 }
 

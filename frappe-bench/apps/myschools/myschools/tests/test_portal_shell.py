@@ -42,6 +42,12 @@ class TestPortalRouting(FrappeTestCase):
 	def test_resolve_branch_roles(self):
 		self.assertEqual(get_portal_redirect(["Branch Principal"]), "/branch")
 
+	def test_resolve_teacher_role(self):
+		self.assertEqual(get_portal_redirect(["Teacher"]), "/teacher")
+
+	def test_teacher_before_branch_staff(self):
+		self.assertEqual(get_portal_redirect(["Teacher", "Branch Principal"]), "/teacher")
+
 	def test_unknown_roles_return_none(self):
 		self.assertIsNone(get_portal_redirect(["Chief Executive"]))
 

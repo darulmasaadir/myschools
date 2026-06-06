@@ -49,6 +49,11 @@ USERS = {
 		"roles": ["Branch Accountant"],
 		"password": "mys-e2e-accountant",
 	},
+	"e2e_teacher@mys.local": {
+		"first_name": "E2E Teacher",
+		"roles": ["Teacher"],
+		"password": "mys-e2e-teacher",
+	},
 }
 
 E2E_BULK_FEE_GROUP = "E2E Bulk Fee BR014"
@@ -645,6 +650,9 @@ def main():
 	bulk_fee = _ensure_e2e_bulk_fee_prerequisites(branch)
 	student_lifecycle = _ensure_e2e_student_lifecycle(branch)
 	payment = _ensure_payment_seed(branch)
+	from myschools.scripts.seed_portal_teacher import main as seed_teacher_portal
+
+	teacher = seed_teacher_portal()
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()
@@ -660,6 +668,7 @@ def main():
 		"bulk_fee": bulk_fee,
 		"student_lifecycle": student_lifecycle,
 		"payment": payment,
+		"teacher": teacher,
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

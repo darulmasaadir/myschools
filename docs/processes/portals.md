@@ -55,6 +55,21 @@ Branch resolution: `Employee.user_id == frappe.session.user` → `Employee.mys_b
 
 **HTTP battery:** `cd frappe-bench && ./env/bin/python -c "from myschools.scripts.verify_http_battery import run; run()"`
 
+## Phase 9 — Teacher portal 🟡
+
+Branch: `feature/phase-9-teacher-portal`.
+
+| Route | Purpose |
+|---|---|
+| `/teacher` | Dashboard: class count + this week's schedule summary |
+| `/teacher/classes` | Student groups assigned to the instructor |
+| `/teacher/class?group=` | Branch-scoped class roster |
+| `/teacher/schedule` | Next 14 days `Course Schedule` rows |
+
+Scope: `Employee.user_id` → `Instructor` → `Student Group Instructor` child rows. Roster students filtered to `Employee.mys_branch`.
+
+**Local smoke:** `bench --site SITE execute myschools.scripts.seed_portal_teacher.main`
+
 ## Phase 7d — Inspection portal (in flight)
 
 Branch: `feature/phase-7d-inspection-portal`.

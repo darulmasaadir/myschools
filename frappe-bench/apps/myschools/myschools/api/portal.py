@@ -13,6 +13,7 @@ PORTAL_ROUTE_BY_ROLE: tuple[tuple[str, str], ...] = (
 	("Guardian", "/guardian"),
 	("Audit Officer", "/inspection"),
 	("Academic Monitor", "/inspection"),
+	("Teacher", "/teacher"),
 	("Branch Director", "/branch"),
 	("Branch Principal", "/branch"),
 	("Branch Admin", "/branch"),

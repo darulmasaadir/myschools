@@ -60,6 +60,7 @@ belong in Playwright.
 | `phase8c_sms_settings.spec.ts` | MYS SMS Settings single: Stub default + save, Twilio section reveal |
 | `phase8d_hr_payroll.spec.ts` | Employee branch-scope leak check (Director); Payroll Entry `mys_branch` field |
 | `phase8e_payment_settings.spec.ts` | MYS Payment Settings single: Stub default + save, JazzCash section reveal |
+| `phase9_teacher_portal.spec.ts` | Teacher portal: dashboard, classes, roster, schedule; director denied |
 | `setup_wizard_walkthrough.spec.ts` | Opt-in (`MYS_WIZARD_TEST=1`) |
 
 ### Running locally

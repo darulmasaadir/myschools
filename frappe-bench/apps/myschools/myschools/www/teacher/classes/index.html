@@ -1,0 +1,40 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/teacher/classes' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">{{ instructor_name }}</p>
+
+{% if student_groups %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Class</th>
+				<th>Program</th>
+				<th>Students</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for g in student_groups %}
+			<tr>
+				<td>{{ g.student_group_name or g.name }}</td>
+				<td>{{ g.program or '—' }}</td>
+				<td>{{ g.student_count }}</td>
+				<td><a href="/teacher/class?group={{ g.name }}">Roster</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card">
+	<p>No student groups are assigned to you yet.</p>
+</div>
+{% endif %}
+{% endblock %}
