@@ -62,6 +62,7 @@ def main():
 	schedules = _ensure_week_schedule(group, instructor)
 	assessment_plan = _ensure_assessment_plan(group, instructor)
 	guardian = _ensure_guardian_for_students(students)
+	transport = _ensure_transport(branch, guardian["student"] if guardian else None)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
@@ -73,6 +74,7 @@ def main():
 		"assessment_plan": assessment_plan,
 		"branch": branch,
 		"guardian": guardian,
+		"transport": transport,
 	}
 
 
@@ -440,6 +442,64 @@ def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 		doc.insert(ignore_permissions=True)
 		created.append(doc.name)
 	return created
+
+
+VEHICLE_REG = "E2E-BUS-01"
+ROUTE_NAME = "E2E Transport Route"
+
+
+def _ensure_transport(branch: str, student: str | None) -> dict | None:
+	"""Vehicle + route + an active assignment for the guardian's child (Phase 12)."""
+	if not student or not frappe.db.exists("DocType", "MYS Student Transport"):
+		return None
+	vehicle = frappe.db.get_value("MYS Vehicle", {"registration_no": VEHICLE_REG}, "name")
+	if not vehicle:
+		vehicle = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Vehicle",
+					"registration_no": VEHICLE_REG,
+					"branch": branch,
+					"model": "E2E Coach",
+					"capacity": 40,
+					"driver_name": "E2E Driver",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	route = frappe.db.get_value("MYS Transport Route", {"route_name": ROUTE_NAME, "branch": branch}, "name")
+	if not route:
+		route = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Transport Route",
+					"route_name": ROUTE_NAME,
+					"branch": branch,
+					"vehicle": vehicle,
+					"fee_amount": 4500,
+					"stops": "Main Gate, Market Stop, Park Avenue",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	assignment = frappe.db.get_value("MYS Student Transport", {"student": student, "route": route}, "name")
+	if not assignment:
+		assignment = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Student Transport",
+					"student": student,
+					"route": route,
+					"pickup_point": "Main Gate",
+					"status": "Active",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	return {"vehicle": vehicle, "route": route, "assignment": assignment, "student": student}
 
 
 def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:

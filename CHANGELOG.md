@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 12 — Transport (PR pending).** Custom desk doctypes `MYS Vehicle`,
+  `MYS Transport Route`, `MYS Student Transport` (branch-scoped via
+  `permission_query_conditions`); `api/transport.py` with capacity + branch-
+  consistency validation and `generate_transport_fee` riding the existing Fees
+  engine (`Transport Fee` category + `mys_transport_for` Custom Field, created
+  idempotently in `install.py`); guardian `/guardian/transport` read view + nav;
+  seed vehicle/route/assignment for the e2e guardian's child; `test_transport.py`,
+  HTTP battery `/guardian/transport`, Playwright `phase12_transport.spec.ts`.
 - **Phase 11 e2e backfill (PR #25, `e747c60`).** Playwright asserts `/branch`
   dashboard timetable card, guardian `?student=` filter (owned + rejected
   non-owned child), and desk `Course Schedule` list scope; guardian seed links a
