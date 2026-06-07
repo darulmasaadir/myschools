@@ -19,6 +19,7 @@ import re
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import date
 
 BASE = "http://127.0.0.1:8000"
 DEFAULT_HOST = "myschools.localhost"
@@ -88,12 +89,8 @@ def _check_teacher_user(failures: list[str]) -> None:
 		failures.append(f"{email} /teacher/classes: no class roster link for attendance POST")
 		return
 	group = urllib.parse.unquote(group_match.group(1))
-	from frappe.utils import nowdate
-
-	att_date = nowdate()
-	att_status, att_body = _get(
-		op, f"/teacher/attendance?group={urllib.parse.quote(group)}&date={att_date}"
-	)
+	att_date = date.today().isoformat()
+	att_status, att_body = _get(op, f"/teacher/attendance?group={urllib.parse.quote(group)}&date={att_date}")
 	if att_status != 200:
 		failures.append(f"{email} /teacher/attendance: HTTP {att_status}")
 		return
@@ -125,9 +122,7 @@ def _check_teacher_user(failures: list[str]) -> None:
 				"/api/method/myschools.api.teacher_portal.save_assessment_scores",
 				{
 					"assessment_plan": plan,
-					"rows": json.dumps(
-						[{"student": student, "scores": {criteria_match.group(1): 85}}]
-					),
+					"rows": json.dumps([{"student": student, "scores": {criteria_match.group(1): 85}}]),
 				},
 			)
 			score_msg = scores.get("message") or {}
