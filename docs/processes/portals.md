@@ -82,6 +82,18 @@ Merged PR #23 (`584a0d0`).
 
 API: `save_class_attendance`, `save_assessment_scores`, `download_report_card` on `api/teacher_portal.py`.
 
+## Phase 11 — Timetable portals ✅
+
+Merged PR #24 (`98821d9`).
+
+| Route | Purpose |
+|---|---|
+| `/branch/timetable` | Branch-scoped 14-day timetable (all classes at the branch) |
+| `/guardian/timetable` | Guardian view of linked children's class schedules (`?student=` optional) |
+| `/teacher/schedule` | Week-grouped instructor schedule (polish on Phase 9 route) |
+
+Shared API: `api/scheduling.py`. Desk list scoping: `course_schedule_query` + `student_group_query`.
+
 ## Phase 7d — Inspection portal (in flight)
 
 Branch: `feature/phase-7d-inspection-portal`.

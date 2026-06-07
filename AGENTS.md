@@ -45,5 +45,6 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - ✅ **Phase 8**: Domain extensions — 8a–8e complete (last: PR #20, `802e6fc` — payment gateway stubs)
 - ✅ **Phase 9**: Teacher Portal — PR #22 (`09185cb`)
 - ✅ **Phase 10**: Attendance + Examination — PR #23 (`584a0d0`)
+- ✅ **Phase 11**: Academic scheduling — PR #24 (`98821d9`)
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

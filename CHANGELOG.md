@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 11 — Academic scheduling (PR #24, `98821d9`).** Shared `api/scheduling.py`;
+  `/branch/timetable`, `/guardian/timetable`, week-grouped `/teacher/schedule`;
+  desk `course_schedule_query` + `student_group_query`; seed Mon–Fri schedules +
+  `e2e_guardian@mys.local`; `test_scheduling.py`, HTTP battery, Playwright
+  `phase11_timetable.spec.ts`.
 - **Phase 10 — Attendance + Examination (PR #23, `584a0d0`).** Teacher portal
   attendance + assessment marking (`/teacher/attendance`, `/teacher/assessments`,
   `/teacher/assessment`); `save_class_attendance` / `save_assessment_scores` /
