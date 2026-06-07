@@ -56,6 +56,7 @@ export interface GuardianSeed {
 	user: string;
 	guardian: string;
 	student: string;
+	students?: string[];
 }
 
 export interface SeedState {

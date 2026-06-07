@@ -467,14 +467,17 @@ def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:
 			.name
 		)
 	frappe.db.set_value("Guardian", guardian_name, "user", GUARDIAN_EMAIL)
-	student_name = student_ids[0]
-	student = frappe.get_doc("Student", student_name)
-	linked = {row.guardian for row in student.get("guardians") or []}
-	if guardian_name not in linked:
-		student.append("guardians", {"guardian": guardian_name, "relation": "Father"})
-		student.save(ignore_permissions=True)
+	# Link up to two children so the /guardian/timetable ?student= selector renders.
+	linked_students = student_ids[:2]
+	for student_name in linked_students:
+		student = frappe.get_doc("Student", student_name)
+		linked = {row.guardian for row in student.get("guardians") or []}
+		if guardian_name not in linked:
+			student.append("guardians", {"guardian": guardian_name, "relation": "Father"})
+			student.save(ignore_permissions=True)
 	return {
 		"user": GUARDIAN_EMAIL,
 		"guardian": guardian_name,
-		"student": student_name,
+		"student": linked_students[0],
+		"students": linked_students,
 	}
