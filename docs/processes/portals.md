@@ -84,19 +84,23 @@ API: `save_class_attendance`, `save_assessment_scores`, `download_report_card` o
 
 ## Phase 11 — Timetable portals ✅
 
-Merged PR #24 (`98821d9`).
+Merged PR #24 (`98821d9`); e2e backfill PR #25 (`e747c60`).
 
 | Route | Purpose |
 |---|---|
+| `/branch` | Dashboard timetable summary card (session count + "View timetable" link) |
 | `/branch/timetable` | Branch-scoped 14-day timetable (all classes at the branch) |
-| `/guardian/timetable` | Guardian view of linked children's class schedules (`?student=` optional) |
+| `/guardian/timetable` | Guardian view of linked children's class schedules (`?student=` filter when 2+ children) |
 | `/teacher/schedule` | Week-grouped instructor schedule (polish on Phase 9 route) |
+| Desk `/app/course-schedule` | Branch-scoped list via `course_schedule_query` (branch director read perms) |
 
 Shared API: `api/scheduling.py`. Desk list scoping: `course_schedule_query` + `student_group_query`.
 
-## Phase 7d — Inspection portal (in flight)
+Playwright: `tests/e2e/phase11_timetable.spec.ts` (6 tests — landing pages, dashboard card, guardian filter + reject non-owned child, desk list).
 
-Branch: `feature/phase-7d-inspection-portal`.
+## Phase 7d — Inspection portal ✅
+
+Merged PR #15 (`9b02a81`).
 
 | Route | Purpose |
 |---|---|

@@ -96,11 +96,14 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
 - ✅ Setup Wizard, onboarding tours, Query Reports — Phase 6
 - ✅ Portals (Guardian / Branch / Inspection — Frappe Web Forms + `www/`, not a custom SPA) — Phase 7 complete (PR #15 `9b02a81`)
 - ✅ **Phase 8:** domain extensions complete (8a fee overrides/late fees/bulk billing · 8b student lifecycle · 8c SMS adapters · 8d HR/payroll scaffolding · 8e payment gateways — last PR #20 `802e6fc`)
+- ✅ **Phase 9:** Teacher portal — `/teacher` routes (dashboard, classes, roster, schedule); PR #22 `09185cb`
+- ✅ **Phase 10:** Attendance + examination — teacher marking + `MYS Report Card`; PR #23 `584a0d0`
+- ✅ **Phase 11:** Academic scheduling — branch/guardian/teacher timetable portals + desk `Course Schedule` scoping; PR #24 `98821d9` + e2e backfill PR #25 `e747c60`
 
 The system is **live for one demo branch network** (BR001 + BR014, three
-campuses each, one fully-submitted royalty invoice on file). Phase 8 domain
-extensions (billing, lifecycle, comms gateways, HR, fee payments) are shipped;
-production rollout to real franchisees is a deployment/ops decision, not a code gap.
+campuses each, one fully-submitted royalty invoice on file). Phases 8–11 are
+shipped on `develop`; production rollout to real franchisees is a deployment/ops
+decision, not a code gap.
 
 ## How is it built — briefly
 

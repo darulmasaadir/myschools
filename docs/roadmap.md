@@ -1,6 +1,6 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-06-07
+**Last updated:** 2026-06-08
 **Up next:** Phase 12 — Transport (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass))
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
@@ -36,7 +36,7 @@ These bind every phase:
 | 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
 | 9 | Teacher Portal | ✅ | PR [#22](https://github.com/darulmasaadir/myschools/pull/22) (`09185cb`) |
 | 10 | Attendance + Examination | ✅ | PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`) |
-| 11 | Academic scheduling | ✅ | PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`) |
+| 11 | Academic scheduling | ✅ | PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`) + e2e backfill PR [#25](https://github.com/darulmasaadir/myschools/pull/25) (`e747c60`) |
 | 12+ | Remaining modules (Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
@@ -340,14 +340,15 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ## Phase 11 — Academic scheduling ✅
 
-**Merged:** PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`).
+**Merged:** PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`); e2e backfill PR [#25](https://github.com/darulmasaadir/myschools/pull/25) (`e747c60`).
 
 Education `Course Schedule` + `Student Group` with branch-scoped timetable views:
 
 - **`api/scheduling.py`** — shared fetch/group helpers for teacher, branch, and guardian portals.
-- **Routes:** `/branch/timetable`, `/guardian/timetable` (+ week-grouped `/teacher/schedule` polish).
+- **Routes:** `/branch/timetable`, `/guardian/timetable` (+ week-grouped `/teacher/schedule` polish); `/branch` dashboard timetable summary card.
 - **Desk scoping:** `course_schedule_query` + `student_group_query` in `hooks.py`; branch role read perms in `install.py`.
-- **Seed** extends `seed_portal_teacher` with Mon–Fri schedules + `e2e_guardian@mys.local`; `test_scheduling.py`; HTTP battery; Playwright `phase11_timetable.spec.ts`.
+- **Seed** extends `seed_portal_teacher` with Mon–Fri schedules + `e2e_guardian@mys.local` (two linked children for `?student=` selector).
+- **Tests:** `test_scheduling.py`; HTTP battery; Playwright `phase11_timetable.spec.ts` (6 assertions incl. dashboard card, guardian `?student=` filter, desk `Course Schedule` list scope).
 
 ---
 

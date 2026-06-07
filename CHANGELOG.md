@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 11 e2e backfill (PR #25, `e747c60`).** Playwright asserts `/branch`
+  dashboard timetable card, guardian `?student=` filter (owned + rejected
+  non-owned child), and desk `Course Schedule` list scope; guardian seed links a
+  second child for the selector.
 - **Phase 11 — Academic scheduling (PR #24, `98821d9`).** Shared `api/scheduling.py`;
   `/branch/timetable`, `/guardian/timetable`, week-grouped `/teacher/schedule`;
   desk `course_schedule_query` + `student_group_query`; seed Mon–Fri schedules +
@@ -41,6 +45,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Branch Director/Accountant/Admin so the desk forms are fillable; role × surface guard
   `scripts/verify_fee_admin_surfaces.py` (wired into battery + CI); Playwright
   `phase8a_bulk_fee_run` (seeded + from-blank) and `phase8a_fee_admin_forms`.
+
+### Changed
+
+- **CI — GitHub Actions Node-24 majors (PR #26, `a84b840`).** Bump
+  `checkout`/`setup-python`/`setup-node`/`cache`/`upload-artifact` to v5/v6
+  runtimes ahead of the Node 20 runner deprecation (2026-09-16).
+- **PR verification rule** — mandatory per-phase **5a/5b/5c** trio (local
+  Playwright, manual dev browser walk with screenshots, spec-completeness audit);
+  codified after Phase 11 PR #24 shortfall (`3062c3d`).
 
 ### Fixed
 

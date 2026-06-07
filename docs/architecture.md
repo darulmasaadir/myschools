@@ -75,6 +75,9 @@ This table is the architectural view — module by module, what it ships:
 | Workflows + list polish (Phase 5) | ✅ | `Workflow` + `Workflow State`/`Action` fixtures for inspection finding + royalty invoice; list-view JS settings | Role-gated transitions (e.g. Verify = Audit Officer). [process](processes/workflows.md) |
 | Setup Wizard, Onboarding, Reports (Phase 6) | ✅ | `setup_wizard.js` slide + `setup_wizard_stages`; `MYS Franchise Setup` Module Onboarding; 4 Query Reports | Operator onboarding + ops reporting. |
 | Portals — Guardian / Branch / Inspection (Phase 7) | ✅ | `www/` Jinja pages + `api/{guardian,branch,inspection}_portal.py`; `Guardian` website role; `/admission-enquiry` | Frappe Web Forms + `www/`, not a custom SPA. Delivered 7a–7d; merge `9b02a81` (PR #15). [process](processes/portals.md) |
+| Teacher portal (Phase 9) | ✅ | `api/teacher_portal.py`; `/teacher` routes; `Teacher` franchise role | Instructor-scoped via `Employee.user_id` → `Instructor` → `Student Group`. PR #22 `09185cb`. [process](processes/portals.md) |
+| Attendance + Examination (Phase 10) | ✅ | Teacher portal marking on Education `Student Attendance` + `Assessment Plan`/`Result`; `MYS Report Card` print format | Whitelist APIs: `save_class_attendance`, `save_assessment_scores`, `download_report_card`. PR #23 `584a0d0`. |
+| Academic scheduling (Phase 11) | ✅ | `api/scheduling.py`; Education `Course Schedule` + `Student Group`; `course_schedule_query` / `student_group_query` | `/branch/timetable`, `/guardian/timetable`, week-grouped `/teacher/schedule`; branch dashboard timetable card. PR #24 `98821d9` + e2e PR #25 `e747c60`. |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 
