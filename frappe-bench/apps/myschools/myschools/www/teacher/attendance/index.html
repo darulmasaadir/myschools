@@ -1,0 +1,110 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/teacher/attendance' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+{% if saved %}<p class="mys-portal__success">Attendance saved.</p>{% endif %}
+
+<div class="mys-portal__card">
+	<form id="attendance-filter" class="mys-portal__actions" method="get" action="/teacher/attendance">
+		<label>Class
+			<select name="group" required>
+				<option value="">Choose class</option>
+				{% for g in student_groups %}
+				<option value="{{ g.name }}" {% if g.name == selected_group %}selected{% endif %}>{{ g.student_group_name or g.name }}</option>
+				{% endfor %}
+			</select>
+		</label>
+		<label>Date
+			<input type="date" name="date" value="{{ attendance_date }}" required>
+		</label>
+		<button type="submit" class="mys-portal__btn">Load</button>
+	</form>
+</div>
+
+{% if sheet and sheet.rows %}
+<form id="attendance-form">
+	<input type="hidden" id="attendance-group" value="{{ sheet.group }}">
+	<input type="hidden" id="attendance-date" value="{{ sheet.date }}">
+	<div class="mys-portal__card">
+		<table class="mys-portal__table">
+			<thead>
+				<tr>
+					<th>Student</th>
+					<th>MYS ID</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for row in sheet.rows %}
+				<tr data-student="{{ row.student }}">
+					<td>{{ row.student_name }}</td>
+					<td>{{ row.mys_student_id or '—' }}</td>
+					<td>
+						<select class="att-status" name="status_{{ row.student }}">
+							<option value="">—</option>
+							<option value="Present" {% if row.status == 'Present' %}selected{% endif %}>Present</option>
+							<option value="Absent" {% if row.status == 'Absent' %}selected{% endif %}>Absent</option>
+							<option value="Leave" {% if row.status == 'Leave' %}selected{% endif %}>Leave</option>
+						</select>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	<div class="mys-portal__actions">
+		<button type="button" id="save-attendance" class="mys-portal__btn">Save attendance</button>
+	</div>
+	<p id="attendance-msg" class="mys-portal__muted"></p>
+</form>
+{% elif selected_group %}
+<div class="mys-portal__card"><p>No students in this class at your branch.</p></div>
+{% else %}
+<p class="mys-portal__muted">Select a class and date to mark attendance.</p>
+{% endif %}
+
+<script>
+(function () {
+	const saveBtn = document.getElementById("save-attendance");
+	if (!saveBtn) return;
+	saveBtn.addEventListener("click", async () => {
+		const msg = document.getElementById("attendance-msg");
+		const group = document.getElementById("attendance-group").value;
+		const date = document.getElementById("attendance-date").value;
+		const rows = Array.from(document.querySelectorAll("tr[data-student]")).map((tr) => ({
+			student: tr.dataset.student,
+			status: tr.querySelector(".att-status").value,
+		})).filter((r) => r.status);
+		if (!rows.length) {
+			msg.textContent = "Select a status for at least one student.";
+			return;
+		}
+		msg.textContent = "Saving…";
+		const r = await fetch("/api/method/myschools.api.teacher_portal.save_class_attendance", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"X-Frappe-CSRF-Token": (window.frappe && frappe.csrf_token) || window.csrf_token || "",
+			},
+			body: new URLSearchParams({
+				student_group: group,
+				date: date,
+				rows: JSON.stringify(rows),
+			}),
+		});
+		const data = await r.json();
+		if (data.exc) {
+			msg.textContent = "Save failed.";
+			return;
+		}
+		window.location.href = "/teacher/attendance?group=" + encodeURIComponent(group)
+			+ "&date=" + encodeURIComponent(date) + "&saved=1";
+	});
+})();
+</script>
+{% endblock %}

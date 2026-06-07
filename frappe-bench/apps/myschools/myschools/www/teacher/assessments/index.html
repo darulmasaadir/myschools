@@ -1,0 +1,40 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/teacher/assessments' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">Submitted assessment plans for your classes.</p>
+
+{% if plans %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Assessment</th>
+				<th>Class</th>
+				<th>Date</th>
+				<th>Results</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for plan in plans %}
+			<tr>
+				<td>{{ plan.assessment_name or plan.name }}</td>
+				<td>{{ plan.student_group }}</td>
+				<td>{{ plan.schedule_date or '—' }}</td>
+				<td>{{ plan.result_count or 0 }}</td>
+				<td><a class="mys-portal__btn" href="/teacher/assessment?plan={{ plan.name | urlencode }}">Enter scores</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card"><p>No assessment plans for your classes yet.</p></div>
+{% endif %}
+{% endblock %}

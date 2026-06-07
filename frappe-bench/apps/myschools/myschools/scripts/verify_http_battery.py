@@ -15,9 +15,11 @@ from __future__ import annotations
 
 import http.cookiejar
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import date
 
 BASE = "http://127.0.0.1:8000"
 DEFAULT_HOST = "myschools.localhost"
@@ -66,7 +68,13 @@ def _check_teacher_user(failures: list[str]) -> None:
 	"""Requires ``seed_portal_teacher`` or ``seed_e2e`` on the site (CI seeds both)."""
 	email = "e2e_teacher@mys.local"
 	op = _login(email, "mys-e2e-teacher")
-	for path in ["/teacher", "/teacher/classes", "/teacher/schedule"]:
+	for path in [
+		"/teacher",
+		"/teacher/classes",
+		"/teacher/schedule",
+		"/teacher/attendance",
+		"/teacher/assessments",
+	]:
 		status, body = _get(op, path)
 		if status != 200:
 			failures.append(f"{email} {path}: HTTP {status}")
@@ -75,6 +83,51 @@ def _check_teacher_user(failures: list[str]) -> None:
 	status, body = _get(op, "/teacher/classes")
 	if "E2E Teacher Class" not in body:
 		failures.append(f"{email} /teacher/classes: expected seeded class row")
+	# POST attendance — whitelist path only (Teacher cannot frappe.client.get_list).
+	group_match = re.search(r"/teacher/class\?group=([^\"&]+)", body)
+	if not group_match:
+		failures.append(f"{email} /teacher/classes: no class roster link for attendance POST")
+		return
+	group = urllib.parse.unquote(group_match.group(1))
+	att_date = date.today().isoformat()
+	att_status, att_body = _get(op, f"/teacher/attendance?group={urllib.parse.quote(group)}&date={att_date}")
+	if att_status != 200:
+		failures.append(f"{email} /teacher/attendance: HTTP {att_status}")
+		return
+	student_match = re.search(r'data-student="([^"]+)"', att_body)
+	if not student_match:
+		failures.append(f"{email} /teacher/attendance: no roster rows to mark")
+		return
+	student = student_match.group(1)
+	att = _post_json(
+		op,
+		"/api/method/myschools.api.teacher_portal.save_class_attendance",
+		{
+			"student_group": group,
+			"date": att_date,
+			"rows": json.dumps([{"student": student, "status": "Present"}]),
+		},
+	)
+	msg = att.get("message") or {}
+	if not isinstance(msg, dict) or not msg.get("ok"):
+		failures.append(f"{email} save_class_attendance: unexpected response {att}")
+	plan_match = re.search(r"/teacher/assessment\?plan=([^\"&]+)", _get(op, "/teacher/assessments")[1])
+	if plan_match:
+		plan = urllib.parse.unquote(plan_match.group(1))
+		score_body = _get(op, f"/teacher/assessment?plan={urllib.parse.quote(plan)}")[1]
+		criteria_match = re.search(r'data-criteria="([^"]+)"', score_body)
+		if criteria_match:
+			scores = _post_json(
+				op,
+				"/api/method/myschools.api.teacher_portal.save_assessment_scores",
+				{
+					"assessment_plan": plan,
+					"rows": json.dumps([{"student": student, "scores": {criteria_match.group(1): 85}}]),
+				},
+			)
+			score_msg = scores.get("message") or {}
+			if not isinstance(score_msg, dict) or not score_msg.get("ok"):
+				failures.append(f"{email} save_assessment_scores: unexpected response {scores}")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:
