@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 10 — Attendance + Examination (PR #23, `584a0d0`).** Teacher portal
+  attendance + assessment marking (`/teacher/attendance`, `/teacher/assessments`,
+  `/teacher/assessment`); `save_class_attendance` / `save_assessment_scores` /
+  `download_report_card`; `MYS Report Card` print format; seed, unit tests, HTTP
+  battery POST, Playwright `phase10_teacher_attendance.spec.ts` (incl. PDF bytes).
 - **Phase 9 — Teacher Portal (PR #22, `09185cb`).** `Teacher` franchise role;
   `api/teacher_portal.py`; `/teacher` routes (dashboard, classes, roster,
   schedule); `seed_portal_teacher.py`; unit tests, HTTP battery, Playwright

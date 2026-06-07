@@ -70,9 +70,9 @@ Scope: `Employee.user_id` → `Instructor` → `Student Group Instructor` child 
 
 **Local smoke:** `bench --site SITE execute myschools.scripts.seed_portal_teacher.main`
 
-## Phase 10 — Teacher attendance + assessments 🟡
+## Phase 10 — Teacher attendance + assessments ✅
 
-Branch: `feature/phase-10-attendance-exam`.
+Merged PR #23 (`584a0d0`).
 
 | Route | Purpose |
 |---|---|

@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-06-06
-**Up next:** Phase 10 — Attendance + Examination 🟡 (branch `feature/phase-10-attendance-exam`)
+**Last updated:** 2026-06-07
+**Up next:** Phase 11 — Academic scheduling (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass))
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -35,7 +35,7 @@ These bind every phase:
 | 7 | Portals — Guardian / Branch / Inspection (Web Forms + `www/`) | ✅ | 7a PR #12 · 7b PR #13 · 7c PR #14 (`e4432df`) · 7d PR [#15](https://github.com/darulmasaadir/myschools/pull/15) (`9b02a81`) |
 | 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
 | 9 | Teacher Portal | ✅ | PR [#22](https://github.com/darulmasaadir/myschools/pull/22) (`09185cb`) |
-| 10 | Attendance + Examination | 🟡 | branch `feature/phase-10-attendance-exam` |
+| 10 | Attendance + Examination | ✅ | PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`) |
 | 11+ | Remaining modules (Academic, Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
@@ -333,13 +333,13 @@ Upgrade-safe teacher slice mirroring Phase 7 portal pattern (`www/` + `api/teach
 - **Routes:** `/teacher` (dashboard), `/teacher/classes`, `/teacher/class?group=`, `/teacher/schedule`.
 - **`scripts/seed_portal_teacher.py`** + `seed_e2e` teacher fixture; `tests/test_teacher_portal.py`; HTTP battery teacher paths; Playwright `phase9_teacher_portal.spec.ts`.
 
-Attendance/exam marking is **Phase 10** — this slice is the landing surface only.
+Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
-## Phase 10 — Attendance + Examination 🟡
+## Phase 10 — Attendance + Examination ✅
 
-**In flight:** branch `feature/phase-10-attendance-exam`.
+**Merged:** PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`).
 
 Teacher-portal marking on Education `Student Attendance` + `Assessment Plan`/`Result`:
 
@@ -364,8 +364,8 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 4 | HR / Staff | 🟡 | Employee scoping + `frappe/hrms` payroll scaffolding (Phase 8d); recruitment/leave/appraisal depth remains |
 | 5 | Campus Mgmt | ✅ | `MYS Campus` + incharge/teacher links |
 | 6 | Academic | 🟡 | Education `Program`/`Course`/`Program Enrollment`; timetable + scheduling depth remains |
-| 7 | Examination | 🟡 | Teacher portal marking + `MYS Report Card` (Phase 10) — franchise desk depth remains |
-| 8 | Attendance | 🟡 | Teacher portal marking (Phase 10); guardian portal already reads records |
+| 7 | Examination | ✅ | Teacher portal marking + `MYS Report Card` (Phase 10, PR #23) — branch desk depth remains |
+| 8 | Attendance | ✅ | Teacher portal marking (Phase 10, PR #23); guardian portal reads records |
 | 9 | Finance / Fee | ✅ | Fees + overrides + late fees + bulk run + payment gateways (Phase 8a/8e) |
 | 10 | Parent Portal | ✅ | `/guardian` Web Forms + `www/` (Phase 7b) |
 | 11 | Teacher Portal | ✅ | `/teacher` portal (Phase 9, PR #22) |
