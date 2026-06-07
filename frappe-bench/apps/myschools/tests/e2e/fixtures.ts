@@ -46,6 +46,7 @@ export interface TeacherSeed {
 	instructor: string;
 	student_group: string;
 	schedule: string | null;
+	assessment_plan?: string | null;
 	branch: string;
 }
 
