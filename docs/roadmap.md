@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-07
-**Up next:** Phase 11 — Academic scheduling (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass))
+**Up next:** Phase 11 — Academic scheduling 🟡 in flight on `feature/phase-11-academic-scheduling`
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -36,7 +36,8 @@ These bind every phase:
 | 8 | Domain extensions | ✅ | 8a–8e complete (last: PR [#20](https://github.com/darulmasaadir/myschools/pull/20) `802e6fc`) |
 | 9 | Teacher Portal | ✅ | PR [#22](https://github.com/darulmasaadir/myschools/pull/22) (`09185cb`) |
 | 10 | Attendance + Examination | ✅ | PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`) |
-| 11+ | Remaining modules (Academic, Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
+| 11 | Academic scheduling | 🟡 | Branch + guardian timetable portals; desk `Course Schedule` scoping |
+| 11+ | Remaining modules (Transport, Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
 
@@ -337,6 +338,19 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
+## Phase 11 — Academic scheduling 🟡
+
+**Branch:** `feature/phase-11-academic-scheduling` (open).
+
+Education `Course Schedule` + `Student Group` with branch-scoped timetable views:
+
+- **`api/scheduling.py`** — shared fetch/group helpers for teacher, branch, and guardian portals.
+- **Routes:** `/branch/timetable`, `/guardian/timetable` (+ week-grouped `/teacher/schedule` polish).
+- **Desk scoping:** `course_schedule_query` + `student_group_query` in `hooks.py`; branch role read perms in `install.py`.
+- **Seed** extends `seed_portal_teacher` with Mon–Fri schedules + `e2e_guardian@mys.local`; `test_scheduling.py`; HTTP battery; Playwright `phase11_timetable.spec.ts`.
+
+---
+
 ## Phase 10 — Attendance + Examination ✅
 
 **Merged:** PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`).
@@ -363,7 +377,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 3 | SIS (Student Info) | ✅ | Education `Student` + MYS franchise fields + lifecycle (Phase 8b) |
 | 4 | HR / Staff | 🟡 | Employee scoping + `frappe/hrms` payroll scaffolding (Phase 8d); recruitment/leave/appraisal depth remains |
 | 5 | Campus Mgmt | ✅ | `MYS Campus` + incharge/teacher links |
-| 6 | Academic | 🟡 | Education `Program`/`Course`/`Program Enrollment`; timetable + scheduling depth remains |
+| 6 | Academic | 🟡 | Education `Program`/`Course`/`Program Enrollment`; Phase 11 timetable portals in flight |
 | 7 | Examination | ✅ | Teacher portal marking + `MYS Report Card` (Phase 10, PR #23) — branch desk depth remains |
 | 8 | Attendance | ✅ | Teacher portal marking (Phase 10, PR #23); guardian portal reads records |
 | 9 | Finance / Fee | ✅ | Fees + overrides + late fees + bulk run + payment gateways (Phase 8a/8e) |

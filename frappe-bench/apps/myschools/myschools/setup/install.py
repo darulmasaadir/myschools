@@ -432,6 +432,14 @@ for _role in ("Branch Director", "Branch Principal", "Branch Admin"):
 	if "Program Enrollment" not in FRANCHISE_ROLE_READS[_role]:
 		FRANCHISE_ROLE_READS[_role].append("Program Enrollment")
 
+# Timetable desk reads (Phase 11): branch roles see schedules for their groups;
+# row scope is enforced by course_schedule_query / student_group_query.
+_SCHEDULING_READS = ("Course Schedule", "Student Group", "Instructor", "Program", "Room")
+for _role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Accountant"):
+	for _dt in _SCHEDULING_READS:
+		if _dt not in FRANCHISE_ROLE_READS[_role]:
+			FRANCHISE_ROLE_READS[_role].append(_dt)
+
 # Payroll oversight (Phase 8d): branch finance roles + HO/cluster read Payroll
 # Entry (frappe/hrms); row scope is enforced by api.hr.payroll_entry_query so
 # each role only sees their own branch/cluster runs. Creating payroll still uses

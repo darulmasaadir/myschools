@@ -52,6 +52,7 @@ def run(host: str = DEFAULT_HOST):
 	for email in ["monitor@mys.local", "audit@mys.local"]:
 		_check_inspection_user(email, failures)
 	_check_teacher_user(failures)
+	_check_guardian_timetable(failures)
 	_check_admission_enquiry_public(failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
@@ -128,6 +129,20 @@ def _check_teacher_user(failures: list[str]) -> None:
 			score_msg = scores.get("message") or {}
 			if not isinstance(score_msg, dict) or not score_msg.get("ok"):
 				failures.append(f"{email} save_assessment_scores: unexpected response {scores}")
+
+
+def _check_guardian_timetable(failures: list[str]) -> None:
+	"""Requires ``seed_portal_teacher`` / ``seed_e2e`` (e2e_guardian + class schedules)."""
+	email = "e2e_guardian@mys.local"
+	op = _login(email, "mys-e2e-guardian")
+	for path in ["/guardian/timetable"]:
+		status, body = _get(op, path)
+		if status != 200:
+			failures.append(f"{email} {path}: HTTP {status}")
+		elif "You do not have access" in body:
+			failures.append(f"{email} {path}: permission denied in body")
+		elif "E2E Teacher Class" not in body and "No classes scheduled" in body:
+			failures.append(f"{email} {path}: expected seeded class timetable rows")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:
@@ -295,7 +310,7 @@ def _check_branch_user(email: str, failures: list[str]) -> None:
 	shortcuts = [x.get("label") for x in (msg.get("shortcuts") or {}).get("items") or []]
 	if "Mobile Dashboard" not in shortcuts:
 		failures.append(f"{email} desk missing Mobile Dashboard shortcut")
-	for path in ["/branch", "/branch/findings", "/branch/royalty", "/branch/fees"]:
+	for path in ["/branch", "/branch/findings", "/branch/royalty", "/branch/fees", "/branch/timetable"]:
 		status, body = _get(op, path)
 		if status != 200:
 			failures.append(f"{email} {path}: HTTP {status}")

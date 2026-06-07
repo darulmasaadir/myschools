@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 
 import frappe
-from frappe.utils import add_days, getdate, nowdate
+from frappe.utils import getdate, nowdate
 
 TEACHER_ROLES = frozenset({"Teacher"})
 
@@ -155,31 +155,9 @@ def get_roster_for_group(
 
 
 def get_schedule_for_teacher(instructor: frappe.Document, days: int = 14, limit: int = 100) -> list[dict]:
-	if not frappe.db.exists("DocType", "Course Schedule"):
-		return []
-	from_date = nowdate()
-	to_date = add_days(from_date, days)
-	return frappe.get_all(
-		"Course Schedule",
-		filters={
-			"instructor": instructor.name,
-			"schedule_date": ["between", [from_date, to_date]],
-		},
-		fields=[
-			"name",
-			"schedule_date",
-			"from_time",
-			"to_time",
-			"course",
-			"program",
-			"student_group",
-			"room",
-			"title",
-		],
-		order_by="schedule_date asc, from_time asc",
-		limit=limit,
-		ignore_permissions=True,
-	)
+	from myschools.api.scheduling import get_schedules_for_instructor
+
+	return get_schedules_for_instructor(instructor.name, days=days, limit=limit)
 
 
 def get_schedule_summary(schedule_rows: list[dict]) -> dict:

@@ -111,7 +111,13 @@ class TestBranchPortalAccess(FrappeTestCase):
 			routes = {n["route"] for n in context.nav_items}
 			self.assertEqual(
 				routes,
-				{"/branch", "/branch/findings", "/branch/royalty", "/branch/fees"},
+				{
+					"/branch",
+					"/branch/findings",
+					"/branch/royalty",
+					"/branch/fees",
+					"/branch/timetable",
+				},
 			)
 		finally:
 			frappe.set_user("Administrator")

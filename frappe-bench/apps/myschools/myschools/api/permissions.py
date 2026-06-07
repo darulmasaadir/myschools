@@ -127,6 +127,45 @@ def employee_query(user):
 	return _branch_filter("mys_branch", user) or ""
 
 
+def _groups_for_branches_sql(branches: list[str]) -> str:
+	in_list = ", ".join(frappe.db.escape(b) for b in branches)
+	return f"""
+		SELECT DISTINCT sgs.parent
+		FROM `tabStudent Group Student` sgs
+		INNER JOIN `tabStudent` st ON st.name = sgs.student
+		WHERE sgs.parenttype = 'Student Group' AND sgs.active = 1
+			AND st.mys_branch IN ({in_list})
+	"""
+
+
+def student_group_query(user):
+	scope, branches = _user_scope(user)
+	if scope == "global":
+		return ""
+	if scope == "none" or not branches:
+		return "`tabStudent Group`.name = '__none__'"
+	return f"`tabStudent Group`.name IN ({_groups_for_branches_sql(branches)})"
+
+
+def course_schedule_query(user):
+	scope, branches = _user_scope(user)
+	if scope == "global":
+		return ""
+	if scope == "none" or not branches:
+		return "`tabCourse Schedule`.name = '__none__'"
+	in_list = ", ".join(frappe.db.escape(b) for b in branches)
+	group_subquery = _groups_for_branches_sql(branches)
+	return f"""(
+		`tabCourse Schedule`.student_group IN ({group_subquery})
+		OR `tabCourse Schedule`.instructor IN (
+			SELECT inst.name
+			FROM `tabInstructor` inst
+			INNER JOIN `tabEmployee` emp ON emp.name = inst.employee
+			WHERE emp.mys_branch IN ({in_list})
+		)
+	)"""
+
+
 def employee_has_permission(doc, ptype="read", user=None):
 	"""Per-document permission check for Employee records, mirroring Student."""
 	user = user or frappe.session.user
