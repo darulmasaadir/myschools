@@ -105,9 +105,7 @@ def enrich_schedule_rows(rows: list[dict]) -> list[dict]:
 			fields=["name", "instructor_name"],
 			limit=len(instructor_ids),
 		)
-		instructor_names = {
-			row["name"]: row.get("instructor_name") or row["name"] for row in instructor_rows
-		}
+		instructor_names = {row["name"]: row.get("instructor_name") or row["name"] for row in instructor_rows}
 	for row in rows:
 		inst = row.get("instructor")
 		if inst:

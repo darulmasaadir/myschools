@@ -82,19 +82,27 @@ class TestScheduling(FrappeTestCase):
 		group_name = f"Sched Group {branch}"
 		program = frappe.db.get_value("Program", {}, "name")
 		if not program:
-			program = frappe.get_doc(
-				{"doctype": "Program", "program_name": "Sched Test Program", "program_code": "STP"}
-			).insert(ignore_permissions=True).name
+			program = (
+				frappe.get_doc(
+					{"doctype": "Program", "program_name": "Sched Test Program", "program_code": "STP"}
+				)
+				.insert(ignore_permissions=True)
+				.name
+			)
 		year = frappe.db.get_value("Academic Year", {}, "name")
 		if not year:
-			year = frappe.get_doc(
-				{
-					"doctype": "Academic Year",
-					"academic_year_name": "Sched Test Year",
-					"year_start_date": "2026-01-01",
-					"year_end_date": "2026-12-31",
-				}
-			).insert(ignore_permissions=True).name
+			year = (
+				frappe.get_doc(
+					{
+						"doctype": "Academic Year",
+						"academic_year_name": "Sched Test Year",
+						"year_start_date": "2026-01-01",
+						"year_end_date": "2026-12-31",
+					}
+				)
+				.insert(ignore_permissions=True)
+				.name
+			)
 		if not frappe.db.exists("Student Group", group_name):
 			frappe.get_doc(
 				{
@@ -161,15 +169,19 @@ class TestScheduling(FrappeTestCase):
 			return existing
 		course = frappe.db.get_value("Course", {}, "name")
 		if not course:
-			course = frappe.get_doc({"doctype": "Course", "course_name": "Sched Test Course"}).insert(
-				ignore_permissions=True
-			).name
+			course = (
+				frappe.get_doc({"doctype": "Course", "course_name": "Sched Test Course"})
+				.insert(ignore_permissions=True)
+				.name
+			)
 		room_name = f"Sched Test Room {slot}"
 		room = frappe.db.get_value("Room", {"room_name": room_name}, "name")
 		if not room and frappe.db.exists("DocType", "Room"):
-			room = frappe.get_doc({"doctype": "Room", "room_name": room_name}).insert(
-				ignore_permissions=True
-			).name
+			room = (
+				frappe.get_doc({"doctype": "Room", "room_name": room_name})
+				.insert(ignore_permissions=True)
+				.name
+			)
 		start_hour = 10 + slot
 		fields = {
 			"doctype": "Course Schedule",
@@ -201,13 +213,17 @@ class TestScheduling(FrappeTestCase):
 			user.insert(ignore_permissions=True)
 		guardian_name = frappe.db.get_value("Guardian", {"email_address": email}, "name")
 		if not guardian_name:
-			guardian_name = frappe.get_doc(
-				{
-					"doctype": "Guardian",
-					"guardian_name": "Sched Guardian",
-					"email_address": email,
-				}
-			).insert(ignore_permissions=True).name
+			guardian_name = (
+				frappe.get_doc(
+					{
+						"doctype": "Guardian",
+						"guardian_name": "Sched Guardian",
+						"email_address": email,
+					}
+				)
+				.insert(ignore_permissions=True)
+				.name
+			)
 		frappe.db.set_value("Guardian", guardian_name, "user", email)
 		student_doc = frappe.get_doc("Student", student)
 		linked = {row.guardian for row in student_doc.get("guardians") or []}

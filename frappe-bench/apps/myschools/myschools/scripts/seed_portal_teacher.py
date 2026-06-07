@@ -404,7 +404,7 @@ def _ensure_room() -> str:
 
 
 def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
-	"""Mon–Fri sessions for the next school week (portal timetable smoke)."""
+	"""Mon-Fri sessions for the next school week (portal timetable smoke)."""
 	if not frappe.db.exists("DocType", "Course Schedule"):
 		return []
 	course = _ensure_course()
@@ -455,13 +455,17 @@ def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:
 	)
 	guardian_name = frappe.db.get_value("Guardian", {"email_address": GUARDIAN_EMAIL}, "name")
 	if not guardian_name:
-		guardian_name = frappe.get_doc(
-			{
-				"doctype": "Guardian",
-				"guardian_name": "E2E Guardian Parent",
-				"email_address": GUARDIAN_EMAIL,
-			}
-		).insert(ignore_permissions=True).name
+		guardian_name = (
+			frappe.get_doc(
+				{
+					"doctype": "Guardian",
+					"guardian_name": "E2E Guardian Parent",
+					"email_address": GUARDIAN_EMAIL,
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
 	frappe.db.set_value("Guardian", guardian_name, "user", GUARDIAN_EMAIL)
 	student_name = student_ids[0]
 	student = frappe.get_doc("Student", student_name)
