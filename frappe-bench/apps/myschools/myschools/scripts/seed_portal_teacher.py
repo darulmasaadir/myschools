@@ -19,6 +19,8 @@ from myschools.setup.install import create_franchise_roles, grant_franchise_role
 
 EMAIL = "e2e_teacher@mys.local"
 PASSWORD = "mys-e2e-teacher"
+GUARDIAN_EMAIL = "e2e_guardian@mys.local"
+GUARDIAN_PASSWORD = "mys-e2e-guardian"
 COURSE_NAME = "E2E Portal Math"
 ROOM_NAME = "E2E Room 101"
 TEACHER_TERM_LABEL = "E2E Teacher Jun"
@@ -56,18 +58,21 @@ def main():
 	employee = _ensure_employee(branch, campus, company)
 	instructor = _ensure_instructor(employee)
 	group = _ensure_student_group(branch, instructor)
-	_ensure_group_students(group, branch, campus)
-	schedule = _ensure_schedule(group, instructor)
+	students = _ensure_group_students(group, branch, campus)
+	schedules = _ensure_week_schedule(group, instructor)
 	assessment_plan = _ensure_assessment_plan(group, instructor)
+	guardian = _ensure_guardian_for_students(students)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
 		"employee": employee,
 		"instructor": instructor,
 		"student_group": group,
-		"schedule": schedule,
+		"schedule": schedules[0] if schedules else None,
+		"schedule_count": len(schedules),
 		"assessment_plan": assessment_plan,
 		"branch": branch,
+		"guardian": guardian,
 	}
 
 
@@ -398,35 +403,74 @@ def _ensure_room() -> str:
 	return doc.name
 
 
-def _ensure_schedule(group: str, instructor: str) -> str | None:
+def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
+	"""Mon–Fri sessions for the next school week (portal timetable smoke)."""
 	if not frappe.db.exists("DocType", "Course Schedule"):
-		return None
+		return []
 	course = _ensure_course()
 	room = _ensure_room()
-	schedule_date = add_days(nowdate(), 1)
-	existing = frappe.db.get_value(
-		"Course Schedule",
+	created: list[str] = []
+	for offset in range(1, 6):
+		schedule_date = add_days(nowdate(), offset)
+		existing = frappe.db.get_value(
+			"Course Schedule",
+			{
+				"student_group": group,
+				"instructor": instructor,
+				"schedule_date": schedule_date,
+			},
+			"name",
+		)
+		if existing:
+			created.append(existing)
+			continue
+		doc = frappe.get_doc(
+			{
+				"doctype": "Course Schedule",
+				"student_group": group,
+				"instructor": instructor,
+				"course": course,
+				"program": PROGRAM_KIDS,
+				"schedule_date": schedule_date,
+				"from_time": "09:00:00",
+				"to_time": "10:00:00",
+				"room": room,
+			}
+		)
+		doc.insert(ignore_permissions=True)
+		created.append(doc.name)
+	return created
+
+
+def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:
+	if not student_ids or not frappe.db.exists("DocType", "Guardian"):
+		return None
+	_ensure_user(
+		GUARDIAN_EMAIL,
 		{
-			"student_group": group,
-			"instructor": instructor,
-			"schedule_date": schedule_date,
+			"first_name": "E2E",
+			"roles": ["Guardian"],
+			"password": GUARDIAN_PASSWORD,
 		},
-		"name",
 	)
-	if existing:
-		return existing
-	doc = frappe.get_doc(
-		{
-			"doctype": "Course Schedule",
-			"student_group": group,
-			"instructor": instructor,
-			"course": course,
-			"program": PROGRAM_KIDS,
-			"schedule_date": schedule_date,
-			"from_time": "09:00:00",
-			"to_time": "10:00:00",
-			"room": room,
-		}
-	)
-	doc.insert(ignore_permissions=True)
-	return doc.name
+	guardian_name = frappe.db.get_value("Guardian", {"email_address": GUARDIAN_EMAIL}, "name")
+	if not guardian_name:
+		guardian_name = frappe.get_doc(
+			{
+				"doctype": "Guardian",
+				"guardian_name": "E2E Guardian Parent",
+				"email_address": GUARDIAN_EMAIL,
+			}
+		).insert(ignore_permissions=True).name
+	frappe.db.set_value("Guardian", guardian_name, "user", GUARDIAN_EMAIL)
+	student_name = student_ids[0]
+	student = frappe.get_doc("Student", student_name)
+	linked = {row.guardian for row in student.get("guardians") or []}
+	if guardian_name not in linked:
+		student.append("guardians", {"guardian": guardian_name, "relation": "Father"})
+		student.save(ignore_permissions=True)
+	return {
+		"user": GUARDIAN_EMAIL,
+		"guardian": guardian_name,
+		"student": student_name,
+	}

@@ -656,10 +656,11 @@ def main():
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()
+	users = {email: {"password": spec["password"], "roles": spec["roles"]} for email, spec in USERS.items()}
+	if teacher.get("guardian"):
+		users[teacher["guardian"]["user"]] = {"password": "mys-e2e-guardian", "roles": ["Guardian"]}
 	state = {
-		"users": {
-			email: {"password": spec["password"], "roles": spec["roles"]} for email, spec in USERS.items()
-		},
+		"users": users,
 		"visit": visit,
 		"finding": finding,
 		"invoice": invoice,
@@ -669,6 +670,7 @@ def main():
 		"student_lifecycle": student_lifecycle,
 		"payment": payment,
 		"teacher": teacher,
+		"guardian": teacher.get("guardian"),
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

@@ -3,11 +3,20 @@
 {% block portal_content %}
 <nav class="mys-portal__nav">
 	{% for item in nav_items %}
-	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/teacher/schedule' %} is-active{% endif %}">{{ item.label }}</a>
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/guardian/timetable' %} is-active{% endif %}">{{ item.label }}</a>
 	{% endfor %}
 </nav>
 <h1>{{ portal_title }}</h1>
-<p class="mys-portal__muted">Next 14 days · {{ instructor_name }}</p>
+<p class="mys-portal__muted">Next 14 days for your children's classes.</p>
+
+{% if students|length > 1 %}
+<div class="mys-portal__card mys-portal__actions">
+	{% for child in students %}
+	<a class="mys-portal__btn{% if selected_student == child.name %} is-active{% endif %}" href="/guardian/timetable?student={{ child.name | urlencode }}">{{ child.student_name or child.name }}</a>
+	{% endfor %}
+	<a class="mys-portal__btn{% if not selected_student %} is-active{% endif %}" href="/guardian/timetable">All children</a>
+</div>
+{% endif %}
 
 {% if schedule_days %}
 {% for day in schedule_days %}
@@ -19,6 +28,7 @@
 				<th>Time</th>
 				<th>Course</th>
 				<th>Class</th>
+				<th>Instructor</th>
 				<th>Room</th>
 			</tr>
 		</thead>
@@ -28,6 +38,7 @@
 				<td>{{ row.from_time or '—' }}{% if row.to_time %} – {{ row.to_time }}{% endif %}</td>
 				<td>{{ row.course or row.title or '—' }}</td>
 				<td>{{ row.student_group or '—' }}</td>
+				<td>{{ row.instructor_name or row.instructor or '—' }}</td>
 				<td>{{ row.room or '—' }}</td>
 			</tr>
 			{% endfor %}

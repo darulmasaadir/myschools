@@ -262,5 +262,6 @@ def populate_branch_context(context) -> str:
 		{"label": "Findings", "route": "/branch/findings"},
 		{"label": "Royalty", "route": "/branch/royalty"},
 		{"label": "Fees", "route": "/branch/fees"},
+		{"label": "Timetable", "route": "/branch/timetable"},
 	]
 	return branch

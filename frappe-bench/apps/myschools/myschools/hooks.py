@@ -113,6 +113,8 @@ permission_query_conditions = {
 	"MYS Bulk Fee Run": "myschools.api.fees.bulk_fee_run_query",
 	"MYS Student Transfer": "myschools.api.student_lifecycle.student_transfer_query",
 	"MYS Student Leaving": "myschools.api.student_lifecycle.student_leaving_query",
+	"Student Group": "myschools.api.permissions.student_group_query",
+	"Course Schedule": "myschools.api.permissions.course_schedule_query",
 }
 
 has_permission = {

@@ -46,8 +46,16 @@ export interface TeacherSeed {
 	instructor: string;
 	student_group: string;
 	schedule: string | null;
+	schedule_count?: number;
 	assessment_plan?: string | null;
 	branch: string;
+	guardian?: GuardianSeed | null;
+}
+
+export interface GuardianSeed {
+	user: string;
+	guardian: string;
+	student: string;
 }
 
 export interface SeedState {
@@ -61,6 +69,7 @@ export interface SeedState {
 	student_lifecycle: StudentLifecycleSeed | null;
 	payment: PaymentSeed | null;
 	teacher: TeacherSeed | null;
+	guardian: GuardianSeed | null;
 }
 
 export function loadSeed(): SeedState {

@@ -46,6 +46,18 @@
 </div>
 
 <div class="mys-portal__card">
+	<h2 style="margin-top:0;font-size:1rem;color:var(--mys-primary-dark,#0a5a36);">Timetable</h2>
+	<p class="mys-portal__summary">
+		<span><strong>{{ timetable_summary.session_count }}</strong> sessions</span>
+		<span><strong>{{ timetable_summary.days_with_classes }}</strong> days with classes</span>
+		<span>next 14 days</span>
+	</p>
+	<div class="mys-portal__actions">
+		<a class="mys-portal__btn" href="/branch/timetable">View timetable</a>
+	</div>
+</div>
+
+<div class="mys-portal__card">
 	<h2 style="margin-top:0;font-size:1rem;color:var(--mys-primary-dark,#0a5a36);">Fee collection</h2>
 	<p class="mys-portal__summary">
 		<span>Collected MTD <strong>{{ frappe.utils.fmt_money(fees_summary.collected_mtd) }}</strong></span>
