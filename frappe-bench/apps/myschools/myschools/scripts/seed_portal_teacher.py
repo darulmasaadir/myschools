@@ -286,9 +286,7 @@ def _ensure_assessment_group() -> str:
 		return ""
 	if frappe.db.exists("Assessment Group", ASSESSMENT_GROUP):
 		return ASSESSMENT_GROUP
-	root = frappe.db.get_value(
-		"Assessment Group", {"is_group": 1}, "name", order_by="lft asc"
-	)
+	root = frappe.db.get_value("Assessment Group", {"is_group": 1}, "name", order_by="lft asc")
 	if not root:
 		root_doc = frappe.get_doc(
 			{

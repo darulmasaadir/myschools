@@ -333,9 +333,7 @@ def assert_teacher_owns_plan(plan_name: str, instructor: frappe.Document) -> fra
 	return plan
 
 
-def get_assessment_plans_for_teacher(
-	instructor: frappe.Document, employee: frappe.Document
-) -> list[dict]:
+def get_assessment_plans_for_teacher(instructor: frappe.Document, employee: frappe.Document) -> list[dict]:
 	if not frappe.db.exists("DocType", "Assessment Plan"):
 		return []
 	group_ids = _student_group_ids_for_instructor(instructor.name)
