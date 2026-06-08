@@ -151,6 +151,14 @@ def _check_guardian_timetable(failures: list[str]) -> None:
 		failures.append(f"{email} /guardian/transport: permission denied in body")
 	elif "E2E Transport Route" not in body and "not currently enrolled" not in body:
 		failures.append(f"{email} /guardian/transport: expected seeded transport row")
+	# Phase 13 — library read view: seeded loan on E2E Library Book.
+	status, body = _get(op, "/guardian/library")
+	if status != 200:
+		failures.append(f"{email} /guardian/library: HTTP {status}")
+	elif "You do not have access" in body:
+		failures.append(f"{email} /guardian/library: permission denied in body")
+	elif "E2E Library Book" not in body and "No library loans" not in body:
+		failures.append(f"{email} /guardian/library: expected seeded library loan row")
 
 
 def _check_inspection_user(email: str, failures: list[str]) -> None:

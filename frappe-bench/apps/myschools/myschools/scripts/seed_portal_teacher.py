@@ -63,6 +63,7 @@ def main():
 	assessment_plan = _ensure_assessment_plan(group, instructor)
 	guardian = _ensure_guardian_for_students(students)
 	transport = _ensure_transport(branch, guardian["student"] if guardian else None)
+	library = _ensure_library(branch, guardian["student"] if guardian else None)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
@@ -75,6 +76,7 @@ def main():
 		"branch": branch,
 		"guardian": guardian,
 		"transport": transport,
+		"library": library,
 	}
 
 
@@ -483,6 +485,7 @@ def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 
 VEHICLE_REG = "E2E-BUS-01"
 ROUTE_NAME = "E2E Transport Route"
+LIBRARY_BOOK_TITLE = "E2E Library Book"
 
 
 def _ensure_transport(branch: str, student: str | None) -> dict | None:
@@ -540,6 +543,54 @@ def _ensure_transport(branch: str, student: str | None) -> dict | None:
 			.name
 		)
 	return {"vehicle": vehicle, "route": route, "assignment": assignment, "student": student}
+
+
+def _ensure_library(branch: str, student: str | None) -> dict | None:
+	"""Catalog item + an active loan for the guardian's child (Phase 13)."""
+	if not student or not frappe.db.exists("DocType", "MYS Library Loan"):
+		return None
+	item = frappe.db.get_value("MYS Library Item", {"title": LIBRARY_BOOK_TITLE, "branch": branch}, "name")
+	if not item:
+		item = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Library Item",
+					"title": LIBRARY_BOOK_TITLE,
+					"branch": branch,
+					"author": "E2E Author",
+					"total_copies": 3,
+					"available_copies": 3,
+					"fine_per_day": 75,
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	loan = frappe.db.get_value(
+		"MYS Library Loan",
+		{"student": student, "library_item": item, "status": ["in", ["On Loan", "Overdue"]]},
+		"name",
+	)
+	if not loan:
+		# Reserve one copy for the seeded loan.
+		avail = int(frappe.db.get_value("MYS Library Item", item, "available_copies") or 0)
+		if avail < 1:
+			frappe.db.set_value("MYS Library Item", item, "available_copies", 1, update_modified=False)
+		loan = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Library Loan",
+					"student": student,
+					"library_item": item,
+					"loan_date": today(),
+					"due_date": add_days(today(), 14),
+					"status": "On Loan",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	return {"item": item, "loan": loan, "student": student}
 
 
 def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:

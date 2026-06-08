@@ -67,6 +67,12 @@ export interface TransportSeed {
   student: string;
 }
 
+export interface LibrarySeed {
+  item: string;
+  loan: string;
+  student: string;
+}
+
 export interface SeedState {
   users: Record<string, { password: string; roles: string[] }>;
   visit: string | null;
@@ -80,6 +86,7 @@ export interface SeedState {
   teacher: TeacherSeed | null;
   guardian: GuardianSeed | null;
   transport: TransportSeed | null;
+  library: LibrarySeed | null;
 }
 
 export function loadSeed(): SeedState {

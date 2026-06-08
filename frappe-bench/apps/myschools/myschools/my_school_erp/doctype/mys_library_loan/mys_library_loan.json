@@ -1,0 +1,201 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:LLN-{####}",
+ "creation": "2026-06-08 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "student",
+  "student_name",
+  "column_break_meta",
+  "branch",
+  "status",
+  "section_break_item",
+  "library_item",
+  "item_title",
+  "column_break_dates",
+  "loan_date",
+  "due_date",
+  "return_date",
+  "section_break_fine",
+  "days_overdue",
+  "fine_per_day",
+  "fine_amount",
+  "fine_billed"
+ ],
+ "fields": [
+  {
+   "fieldname": "student",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Student",
+   "options": "Student",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "student.student_name",
+   "fieldname": "student_name",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "Student Name"
+  },
+  {
+   "fieldname": "column_break_meta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "student.mys_branch",
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "MYS Branch",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "On Loan",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "On Loan\nOverdue\nReturned",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_item",
+   "fieldtype": "Section Break",
+   "label": "Item"
+  },
+  {
+   "fieldname": "library_item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Library Item",
+   "options": "MYS Library Item",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "library_item.title",
+   "fieldname": "item_title",
+   "fieldtype": "Read Only",
+   "label": "Item Title"
+  },
+  {
+   "fieldname": "column_break_dates",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "loan_date",
+   "fieldtype": "Date",
+   "label": "Loan Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Due Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "return_date",
+   "fieldtype": "Date",
+   "label": "Return Date"
+  },
+  {
+   "fieldname": "section_break_fine",
+   "fieldtype": "Section Break",
+   "label": "Overdue Fine"
+  },
+  {
+   "fieldname": "days_overdue",
+   "fieldtype": "Int",
+   "label": "Days Overdue",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "library_item.fine_per_day",
+   "fetch_if_empty": 1,
+   "fieldname": "fine_per_day",
+   "fieldtype": "Currency",
+   "label": "Fine Per Day"
+  },
+  {
+   "fieldname": "fine_amount",
+   "fieldtype": "Currency",
+   "label": "Fine Amount",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "fine_billed",
+   "fieldtype": "Check",
+   "label": "Fine Billed",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Library Loan",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Chief Executive",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HO Dept Head"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Director",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Principal",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Admin",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Branch Accountant"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

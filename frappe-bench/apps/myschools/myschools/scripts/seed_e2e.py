@@ -684,6 +684,7 @@ def main():
 		"teacher": teacher,
 		"guardian": teacher.get("guardian"),
 		"transport": teacher.get("transport"),
+		"library": teacher.get("library"),
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

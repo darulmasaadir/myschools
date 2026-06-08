@@ -1,0 +1,46 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/guardian/library' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">Books on loan to your children and any overdue fines.</p>
+{% if loans %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr>
+				<th>Student</th>
+				<th>Book</th>
+				<th>Due Date</th>
+				<th>Status</th>
+				<th>Fine</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in loans %}
+			<tr>
+				<td>{{ row.student_name or row.student }}</td>
+				<td>{{ row.item_title or row.library_item or '—' }}</td>
+				<td>{{ row.due_date or '—' }}</td>
+				<td>{{ row.status }}</td>
+				<td>
+					{% if row.fine_amount and row.fine_amount > 0 %}
+					{{ "{:,.0f}".format(row.fine_amount) }}{% if row.fine_billed %} (billed){% endif %}
+					{% else %}
+					—
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card">
+	<p>No library loans on record for your children.</p>
+</div>
+{% endif %}
+{% endblock %}
