@@ -335,9 +335,7 @@ class TestLibrary(FrappeTestCase):
 		prev = frappe.session.user
 		try:
 			frappe.set_user(director)
-			visible = set(
-				frappe.get_list("MYS Library Loan", pluck="name", limit_page_length=500)
-			)
+			visible = set(frappe.get_list("MYS Library Loan", pluck="name", limit_page_length=500))
 			self.assertIn(a.name, visible)
 			self.assertNotIn(b.name, visible)
 		finally:
