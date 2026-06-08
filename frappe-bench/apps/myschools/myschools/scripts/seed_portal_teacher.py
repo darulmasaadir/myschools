@@ -62,6 +62,7 @@ def main():
 	schedules = _ensure_week_schedule(group, instructor)
 	assessment_plan = _ensure_assessment_plan(group, instructor)
 	guardian = _ensure_guardian_for_students(students)
+	transport = _ensure_transport(branch, guardian["student"] if guardian else None)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
@@ -73,6 +74,7 @@ def main():
 		"assessment_plan": assessment_plan,
 		"branch": branch,
 		"guardian": guardian,
+		"transport": transport,
 	}
 
 
@@ -403,6 +405,33 @@ def _ensure_room() -> str:
 	return doc.name
 
 
+def _find_instructor_slot(
+	instructor: str, schedule_date: str, from_time: str = "09:00:00", to_time: str = "10:00:00"
+) -> str | None:
+	"""Return an existing Course Schedule occupying this instructor slot (overlap-safe)."""
+	rows = frappe.db.sql(
+		"""
+		SELECT name FROM `tabCourse Schedule`
+		WHERE instructor = %(instructor)s AND schedule_date = %(schedule_date)s
+			AND docstatus != 2
+			AND (
+				(from_time > %(from_time)s AND from_time < %(to_time)s)
+				OR (to_time > %(from_time)s AND to_time < %(to_time)s)
+				OR (%(from_time)s > from_time AND %(from_time)s < to_time)
+				OR (%(from_time)s = from_time AND %(to_time)s = to_time)
+			)
+		LIMIT 1
+		""",
+		{
+			"instructor": instructor,
+			"schedule_date": schedule_date,
+			"from_time": from_time,
+			"to_time": to_time,
+		},
+	)
+	return rows[0][0] if rows else None
+
+
 def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 	"""Mon-Fri sessions for the next school week (portal timetable smoke)."""
 	if not frappe.db.exists("DocType", "Course Schedule"):
@@ -412,6 +441,8 @@ def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 	created: list[str] = []
 	for offset in range(1, 6):
 		schedule_date = add_days(nowdate(), offset)
+		from_time = "09:00:00"
+		to_time = "10:00:00"
 		existing = frappe.db.get_value(
 			"Course Schedule",
 			{
@@ -424,6 +455,14 @@ def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 		if existing:
 			created.append(existing)
 			continue
+		# Re-seed after a branch change can leave orphan slots on this instructor;
+		# repoint them to the current group instead of inserting a conflicting row.
+		clash = _find_instructor_slot(instructor, schedule_date, from_time, to_time)
+		if clash:
+			if frappe.db.get_value("Course Schedule", clash, "student_group") != group:
+				frappe.db.set_value("Course Schedule", clash, "student_group", group, update_modified=False)
+			created.append(clash)
+			continue
 		doc = frappe.get_doc(
 			{
 				"doctype": "Course Schedule",
@@ -432,14 +471,75 @@ def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 				"course": course,
 				"program": PROGRAM_KIDS,
 				"schedule_date": schedule_date,
-				"from_time": "09:00:00",
-				"to_time": "10:00:00",
+				"from_time": from_time,
+				"to_time": to_time,
 				"room": room,
 			}
 		)
 		doc.insert(ignore_permissions=True)
 		created.append(doc.name)
 	return created
+
+
+VEHICLE_REG = "E2E-BUS-01"
+ROUTE_NAME = "E2E Transport Route"
+
+
+def _ensure_transport(branch: str, student: str | None) -> dict | None:
+	"""Vehicle + route + an active assignment for the guardian's child (Phase 12)."""
+	if not student or not frappe.db.exists("DocType", "MYS Student Transport"):
+		return None
+	vehicle = frappe.db.get_value("MYS Vehicle", {"registration_no": VEHICLE_REG}, "name")
+	if vehicle:
+		if frappe.db.get_value("MYS Vehicle", vehicle, "branch") != branch:
+			frappe.db.set_value("MYS Vehicle", vehicle, "branch", branch, update_modified=False)
+	else:
+		vehicle = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Vehicle",
+					"registration_no": VEHICLE_REG,
+					"branch": branch,
+					"model": "E2E Coach",
+					"capacity": 40,
+					"driver_name": "E2E Driver",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	route = frappe.db.get_value("MYS Transport Route", {"route_name": ROUTE_NAME, "branch": branch}, "name")
+	if not route:
+		route = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Transport Route",
+					"route_name": ROUTE_NAME,
+					"branch": branch,
+					"vehicle": vehicle,
+					"fee_amount": 4500,
+					"stops": "Main Gate, Market Stop, Park Avenue",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	assignment = frappe.db.get_value("MYS Student Transport", {"student": student, "route": route}, "name")
+	if not assignment:
+		assignment = (
+			frappe.get_doc(
+				{
+					"doctype": "MYS Student Transport",
+					"student": student,
+					"route": route,
+					"pickup_point": "Main Gate",
+					"status": "Active",
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+	return {"vehicle": vehicle, "route": route, "assignment": assignment, "student": student}
 
 
 def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:

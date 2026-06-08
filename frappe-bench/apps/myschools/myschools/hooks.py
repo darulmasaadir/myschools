@@ -115,6 +115,9 @@ permission_query_conditions = {
 	"MYS Student Leaving": "myschools.api.student_lifecycle.student_leaving_query",
 	"Student Group": "myschools.api.permissions.student_group_query",
 	"Course Schedule": "myschools.api.permissions.course_schedule_query",
+	"MYS Vehicle": "myschools.api.transport.vehicle_query",
+	"MYS Transport Route": "myschools.api.transport.transport_route_query",
+	"MYS Student Transport": "myschools.api.transport.student_transport_query",
 }
 
 has_permission = {

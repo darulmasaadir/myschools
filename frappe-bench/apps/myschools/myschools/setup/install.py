@@ -8,6 +8,8 @@ Guardian) to our MYS Cluster / Branch / Campus structure.
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
+from myschools.api.transport import ensure_transport_fee_category
+
 FRANCHISE_ROLES = [
 	"Chief Executive",
 	"HO Dept Head",
@@ -36,6 +38,9 @@ def after_install():
 	grant_franchise_role_permissions()
 	restrict_split_brain_billing_paths()
 	backfill_module_profiles()
+	# Transport Fee Category is created in `after_migrate` (not here): Education's
+	# Fee Category hook creates an ERPNext Item which needs stock UOM — absent on
+	# a bare `after_install` during fresh CI install-app.
 	# NOTE: `set_default_print_formats` is intentionally NOT called here.
 	# Frappe runs `after_install` BEFORE `sync_fixtures`, so the Print Format
 	# records don't exist yet — the function would silently no-op. Instead it's
@@ -63,6 +68,7 @@ def after_migrate():
 	sync_mys_branch_fee_admin_workspace()
 	backfill_module_profiles()
 	backfill_guardian_user_links()
+	ensure_transport_fee_category()
 	set_default_print_formats()
 	frappe.db.commit()
 
@@ -440,6 +446,14 @@ for _role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Acc
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
 			FRANCHISE_ROLE_READS[_role].append(_dt)
 
+# Transport desk (Phase 12): branch roles manage vehicles/routes/assignments;
+# create/write come from the doctype JSON perms, row scope from transport queries.
+_TRANSPORT_READS = ("MYS Vehicle", "MYS Transport Route", "MYS Student Transport")
+for _role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Accountant"):
+	for _dt in _TRANSPORT_READS:
+		if _dt not in FRANCHISE_ROLE_READS[_role]:
+			FRANCHISE_ROLE_READS[_role].append(_dt)
+
 # Payroll oversight (Phase 8d): branch finance roles + HO/cluster read Payroll
 # Entry (frappe/hrms); row scope is enforced by api.hr.payroll_entry_query so
 # each role only sees their own branch/cluster runs. Creating payroll still uses
@@ -742,6 +756,15 @@ def create_custom_franchise_fields():
 			"read_only": 1,
 			"default": "0",
 			"description": "Set when a late-fee invoice has been generated for this Fees.",
+		},
+		{
+			"fieldname": "mys_transport_for",
+			"label": "Transport For",
+			"fieldtype": "Link",
+			"options": "MYS Student Transport",
+			"insert_after": "mys_late_fee_applied",
+			"read_only": 1,
+			"description": "Set on transport invoices — points to the MYS Student Transport assignment.",
 		},
 	]
 

@@ -100,10 +100,22 @@ def _ensure_user(email, spec):
 
 
 def _ensure_franchise_tree():
-	"""Run seed_demo if there's no branch yet. Returns the first branch."""
-	branch = frappe.db.get_value("MYS Branch", {}, "name")
+	"""Run seed_demo if needed. Returns the primary demo branch (not unit-test stubs)."""
+	for code in ("BR014", "BR001"):
+		branch = frappe.db.get_value("MYS Branch", {"branch_code": code}, "name")
+		if branch:
+			return branch
+	branch = frappe.db.sql(
+		"""
+		SELECT name FROM `tabMYS Branch`
+		WHERE name NOT LIKE '_TEST\\_%' ESCAPE '\\\\'
+			AND (branch_code IS NULL OR branch_code NOT LIKE '_TEST\\_%' ESCAPE '\\\\')
+		ORDER BY creation ASC
+		LIMIT 1
+		"""
+	)
 	if branch:
-		return branch
+		return branch[0][0]
 	# ci_bootstrap creates "MY School Head Office" via ERPNext's setup_complete
 	# as a non-group Company. seed_demo creates cluster Companies parented to
 	# HO, which requires HO to be a group. Flip it before chaining seed_demo.
@@ -671,6 +683,7 @@ def main():
 		"payment": payment,
 		"teacher": teacher,
 		"guardian": teacher.get("guardian"),
+		"transport": teacher.get("transport"),
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)
