@@ -117,17 +117,24 @@ def _assert_capacity(doc) -> None:
 # Fee Category bootstrap (idempotent — called from install)
 # ---------------------------------------------------------------------------
 def ensure_transport_fee_category() -> None:
+	"""Idempotent — safe to call from after_migrate or before billing."""
 	if not frappe.db.exists("DocType", "Fee Category"):
 		return
 	if frappe.db.exists("Fee Category", TRANSPORT_FEE_CATEGORY):
 		return
-	frappe.get_doc(
-		{
-			"doctype": "Fee Category",
-			"category_name": TRANSPORT_FEE_CATEGORY,
-			"description": "Monthly student transport charges (Phase 12).",
-		}
-	).insert(ignore_permissions=True)
+	# Education's after_insert creates an ERPNext Item (needs stock UOM).
+	if not frappe.db.get_all("UOM", limit=1):
+		return
+	try:
+		frappe.get_doc(
+			{
+				"doctype": "Fee Category",
+				"category_name": TRANSPORT_FEE_CATEGORY,
+				"description": "Monthly student transport charges (Phase 12).",
+			}
+		).insert(ignore_permissions=True)
+	except frappe.MandatoryError:
+		return
 
 
 # ---------------------------------------------------------------------------

@@ -38,7 +38,9 @@ def after_install():
 	grant_franchise_role_permissions()
 	restrict_split_brain_billing_paths()
 	backfill_module_profiles()
-	ensure_transport_fee_category()
+	# Transport Fee Category is created in `after_migrate` (not here): Education's
+	# Fee Category hook creates an ERPNext Item which needs stock UOM — absent on
+	# a bare `after_install` during fresh CI install-app.
 	# NOTE: `set_default_print_formats` is intentionally NOT called here.
 	# Frappe runs `after_install` BEFORE `sync_fixtures`, so the Print Format
 	# records don't exist yet — the function would silently no-op. Instead it's
