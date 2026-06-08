@@ -57,6 +57,11 @@ class TestTransport(FrappeTestCase):
 			if doc.docstatus == 1:
 				doc.cancel()
 			frappe.delete_doc("Fees", fee, force=True, ignore_permissions=True)
+		for br in (BRANCH_A, BRANCH_B):
+			if frappe.db.exists("MYS Branch", br):
+				frappe.delete_doc("MYS Branch", br, force=True, ignore_permissions=True)
+		if frappe.db.exists("MYS Cluster", CLUSTER):
+			frappe.delete_doc("MYS Cluster", CLUSTER, force=True, ignore_permissions=True)
 		frappe.db.commit()
 		super().tearDownClass()
 
