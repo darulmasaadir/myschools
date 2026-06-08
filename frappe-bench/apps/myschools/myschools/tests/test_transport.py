@@ -260,6 +260,30 @@ class TestTransport(FrappeTestCase):
 		with self.assertRaises(frappe.ValidationError):
 			second.insert(ignore_permissions=True)
 
+	def test_vehicle_capacity_accepts_string_input(self):
+		# REST / form set_value can hand capacity over as a string; validate must
+		# coerce before comparing (regression: '<=' str vs int TypeError).
+		veh = frappe.get_doc(
+			{
+				"doctype": "MYS Vehicle",
+				"registration_no": "TR-BUS-STR",
+				"branch": self.branch_a,
+				"capacity": "40",
+			}
+		)
+		veh.insert(ignore_permissions=True)
+		self.assertEqual(frappe.db.get_value("MYS Vehicle", veh.name, "capacity"), 40)
+		bad = frappe.get_doc(
+			{
+				"doctype": "MYS Vehicle",
+				"registration_no": "TR-BUS-ZERO",
+				"branch": self.branch_a,
+				"capacity": "0",
+			}
+		)
+		with self.assertRaises(frappe.ValidationError):
+			bad.insert(ignore_permissions=True)
+
 	def test_transport_fee_generation_and_idempotency(self):
 		st = self._new_assignment(self.student_a, self.route_a)
 		st.insert(ignore_permissions=True)
