@@ -170,9 +170,7 @@ def _enrollment_billing_context(student: str, branch: str, enrollment: str) -> d
 	if not company:
 		return None
 	campus = frappe.db.get_value("Student", student, "mys_campus")
-	fs, _source = resolve_fee_structure(
-		branch, pe.program, pe.academic_year, company, campus=campus or None
-	)
+	fs, _source = resolve_fee_structure(branch, pe.program, pe.academic_year, company, campus=campus or None)
 	if not fs:
 		return None
 	return {**pe, "fee_structure": fs, "company": company}
