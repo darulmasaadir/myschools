@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-08
-**Up next:** Phase 13 — Library (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)). Phase 12 — Transport is 🟡 in flight on `feature/phase-12-transport`.
+**Up next:** Phase 13 — Library (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -37,7 +37,7 @@ These bind every phase:
 | 9 | Teacher Portal | ✅ | PR [#22](https://github.com/darulmasaadir/myschools/pull/22) (`09185cb`) |
 | 10 | Attendance + Examination | ✅ | PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`) |
 | 11 | Academic scheduling | ✅ | PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`) + e2e backfill PR [#25](https://github.com/darulmasaadir/myschools/pull/25) (`e747c60`) |
-| 12 | Transport | 🟡 | `feature/phase-12-transport` — branch open, PR pending |
+| 12 | Transport | ✅ | PR [#27](https://github.com/darulmasaadir/myschools/pull/27) (`e4a0179`) |
 | 13+ | Remaining modules (Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
@@ -339,18 +339,18 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
-## Phase 12 — Transport 🟡
+## Phase 12 — Transport ✅
 
-**Branch:** `feature/phase-12-transport` (PR pending).
+**Merged:** PR [#27](https://github.com/darulmasaadir/myschools/pull/27) (`e4a0179`).
 
 Custom desk doctypes for fleet + routing, with billing riding the existing Fees engine (no parallel ledger):
 
 - **DocTypes:** `MYS Vehicle` (registration, branch, capacity, driver), `MYS Transport Route` (branch, vehicle, monthly fee, stops), `MYS Student Transport` (student→route assignment, pickup point, per-student fee, status).
 - **`api/transport.py`** — branch-scoped `permission_query_conditions` for all three; `validate_student_transport` (branch consistency + vehicle capacity); `generate_transport_fee` / `generate_transport_fees_for_branch` create submitted `Fees` rows under a `Transport Fee` category tied to the student's Program Enrollment; `get_transport_for_guardian` for the portal.
-- **Fee Category** `Transport Fee` + `mys_transport_for` Custom Field on `Fees` created idempotently in `install.py` (after_install/after_migrate).
+- **Fee Category** `Transport Fee` + `mys_transport_for` Custom Field on `Fees` created idempotently in `install.py` (after_migrate).
 - **Guardian portal:** `/guardian/transport` read view (route, pickup, monthly fee, status) + nav link.
 - **Seed** extends `seed_portal_teacher` with a vehicle/route/active assignment for the e2e guardian's child.
-- **Tests:** `test_transport.py` (branch consistency, capacity, fee generation + idempotency, stopped-not-billed, desk scoping, guardian read); HTTP battery `/guardian/transport`; Playwright `phase12_transport.spec.ts` (guardian view, nav, desk list scoping for Student Transport / Route / Vehicle).
+- **Tests:** `test_transport.py` (8 tests incl. string-capacity coercion); HTTP battery `/guardian/transport`; Playwright `phase12_transport.spec.ts` (5 tests incl. desk create→assign Vehicle→Route→Student Transport).
 
 ---
 
@@ -402,7 +402,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 11 | Teacher Portal | ✅ | `/teacher` portal (Phase 9, PR #22) |
 | 12 | Communication | ✅ | Comm Log + notifications + SMS adapters (Phase 4/8c) |
 | 13 | Monitoring & Inspection | ✅ | Full workflow + inspection portal (Phase 0/7d) |
-| 14 | Transport | 🟡 | Vehicles/Routes/Student assignments + transport fee on Fees engine (Phase 12, PR pending) |
+| 14 | Transport | ✅ | Vehicles/Routes/Student assignments + transport fee on Fees engine (Phase 12, PR #27) |
 | 15 | Library | ⬜ | **Not built** |
 | 16 | LMS | ⬜ | **Not built** — integrate `frappe/lms` |
 | 17 | Document Mgmt | ⬜ | **Not built** |

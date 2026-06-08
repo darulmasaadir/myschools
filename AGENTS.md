@@ -46,7 +46,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - ✅ **Phase 9**: Teacher Portal — PR #22 (`09185cb`)
 - ✅ **Phase 10**: Attendance + Examination — PR #23 (`584a0d0`)
 - ✅ **Phase 11**: Academic scheduling — PR #24 (`98821d9`) + e2e backfill PR #25 (`e747c60`)
-- 🟡 **Phase 12**: Transport — `feature/phase-12-transport`, PR pending (vehicles/routes/assignments + transport fee on Fees engine; guardian `/guardian/transport`)
+- ✅ **Phase 12**: Transport — PR #27 (`e4a0179`) — vehicles/routes/assignments + transport fee on Fees engine; guardian `/guardian/transport`; desk create→assign Playwright
 - ⬜ **Up next:** Phase 13 — Library (see [`docs/roadmap.md`](docs/roadmap.md))
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

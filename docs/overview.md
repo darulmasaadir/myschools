@@ -99,7 +99,7 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
 - ✅ **Phase 9:** Teacher portal — `/teacher` routes (dashboard, classes, roster, schedule); PR #22 `09185cb`
 - ✅ **Phase 10:** Attendance + examination — teacher marking + `MYS Report Card`; PR #23 `584a0d0`
 - ✅ **Phase 11:** Academic scheduling — branch/guardian/teacher timetable portals + desk `Course Schedule` scoping; PR #24 `98821d9` + e2e backfill PR #25 `e747c60`
-- 🟡 **Phase 12:** Transport — `MYS Vehicle`/`Transport Route`/`Student Transport` desk doctypes (branch-scoped) + transport fee on the Fees engine + guardian `/guardian/transport`; `feature/phase-12-transport`, PR pending
+- ✅ **Phase 12:** Transport — `MYS Vehicle`/`Transport Route`/`Student Transport` desk doctypes (branch-scoped) + transport fee on the Fees engine + guardian `/guardian/transport`; PR #27 (`e4a0179`)
 
 The system is **live for one demo branch network** (BR001 + BR014, three
 campuses each, one fully-submitted royalty invoice on file). Phases 8–11 are
