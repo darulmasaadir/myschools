@@ -154,6 +154,30 @@ def _student_enrollment(student: str) -> str | None:
 	)
 
 
+def _enrollment_billing_context(student: str, branch: str, enrollment: str) -> dict | None:
+	"""Program/year/term + resolved Fee Structure for a transport invoice."""
+	from myschools.api.fees import resolve_fee_structure
+
+	pe = frappe.db.get_value(
+		"Program Enrollment",
+		enrollment,
+		["program", "academic_year", "academic_term"],
+		as_dict=True,
+	)
+	if not pe:
+		return None
+	company = _branch_company(branch)
+	if not company:
+		return None
+	campus = frappe.db.get_value("Student", student, "mys_campus")
+	fs, _source = resolve_fee_structure(
+		branch, pe.program, pe.academic_year, company, campus=campus or None
+	)
+	if not fs:
+		return None
+	return {**pe, "fee_structure": fs, "company": company}
+
+
 def generate_transport_fee(student_transport: str, posting_date: str | None = None) -> dict:
 	"""Create one submitted ``Fees`` doc for a student's monthly transport charge.
 
@@ -186,6 +210,10 @@ def generate_transport_fee(student_transport: str, posting_date: str | None = No
 	if not enrollment:
 		return {"status": "skipped", "message": _("Student has no submitted Program Enrollment")}
 
+	billing = _enrollment_billing_context(st.student, st.branch, enrollment)
+	if not billing:
+		return {"status": "skipped", "message": _("No Fee Structure for student program/year")}
+
 	if _existing_transport_fee(st.name, posting_date):
 		return {"status": "skipped", "message": _("Already billed for {0}").format(posting_date)}
 
@@ -194,8 +222,12 @@ def generate_transport_fee(student_transport: str, posting_date: str | None = No
 			"doctype": "Fees",
 			"student": st.student,
 			"program_enrollment": enrollment,
-			"company": company,
-			"receivable_account": _company_receivable(company),
+			"program": billing["program"],
+			"fee_structure": billing["fee_structure"],
+			"company": billing["company"],
+			"receivable_account": _company_receivable(billing["company"]),
+			"academic_year": billing.get("academic_year"),
+			"academic_term": billing.get("academic_term"),
 			"posting_date": posting_date,
 			"due_date": posting_date,
 			"components": [

@@ -38,6 +38,14 @@ class TestTransport(FrappeTestCase):
 		cls.route_a = cls._ensure_route(cls.branch_a, "TR Route A", cls.vehicle_a, 4500)
 		cls.route_b = cls._ensure_route(cls.branch_b, "TR Route B", None, 5000)
 		cls._ensure_enrollment(cls.student_a)
+		pe = frappe.db.get_value(
+			"Program Enrollment",
+			{"student": cls.student_a, "docstatus": 1},
+			["program", "academic_year"],
+			as_dict=True,
+		)
+		if pe:
+			cls._ensure_fee_structure(cls.branch_a, pe.program, pe.academic_year)
 		# Commit fixtures so per-test ``tearDown`` rollbacks revert only the rows a
 		# test created, leaving the shared fixtures intact across the class.
 		frappe.db.commit()
@@ -179,6 +187,41 @@ class TestTransport(FrappeTestCase):
 		pe.insert(ignore_permissions=True)
 		pe.submit()
 		return pe.name
+
+	@classmethod
+	def _ensure_fee_structure(cls, branch: str, program: str, year: str) -> str:
+		receivable = frappe.db.get_value(
+			"Account",
+			{"company": cls.company, "account_type": "Receivable", "is_group": 0},
+			"name",
+		)
+		if not receivable:
+			raise RuntimeError("No receivable account for transport fee tests")
+		fs = frappe.db.get_value(
+			"Fee Structure",
+			{"program": program, "academic_year": year, "company": cls.company},
+			"name",
+		)
+		if fs:
+			return fs
+		category = frappe.db.get_value("Fee Category", {}, "name")
+		if not category:
+			ensure_transport_fee_category()
+			category = TRANSPORT_FEE_CATEGORY
+		return (
+			frappe.get_doc(
+				{
+					"doctype": "Fee Structure",
+					"program": program,
+					"academic_year": year,
+					"company": cls.company,
+					"receivable_account": receivable,
+					"components": [{"fees_category": category, "amount": 1000}],
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
 
 	def _new_assignment(self, student: str, route: str, status: str = "Active"):
 		return frappe.get_doc(
