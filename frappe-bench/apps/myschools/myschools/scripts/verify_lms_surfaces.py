@@ -1,4 +1,4 @@
-"""Role × surface verification for Phase 15 LMS (run via bench execute).
+"""Role x surface verification for Phase 15 LMS (run via bench execute).
 
   bench --site SITE execute myschools.scripts.verify_lms_surfaces.run
 
@@ -33,7 +33,7 @@ def run():
 		print("FAILED —", len(failures), "issue(s):")
 		for f in failures:
 			print(f"  ✗ {f}")
-		frappe.throw("LMS role × surface verification failed")
+		frappe.throw("LMS role x surface verification failed")
 	print(f"OK — LMS surfaces verified for {DIRECTOR}, {TEACHER}")
 
 

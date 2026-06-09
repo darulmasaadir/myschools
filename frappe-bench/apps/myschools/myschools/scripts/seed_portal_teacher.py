@@ -257,20 +257,26 @@ def _ensure_student_group(branch: str, instructor: str) -> str:
 
 
 def _ensure_group_students(group: str, branch: str, campus: str | None) -> list[str]:
-	filters: dict = {"mys_branch": branch}
+	filters: dict = {"mys_branch": branch, "enabled": 1}
 	if campus:
 		filters["mys_campus"] = campus
 	students = frappe.get_all("Student", filters, pluck="name", limit=3)
 	if not students:
-		frappe.throw("No students on branch after minimal seed.")
+		frappe.throw("No active students on branch after minimal seed.")
 	sg = frappe.get_doc("Student Group", group)
-	existing = {row.student for row in sg.get("students") or []}
+	existing_rows = list(sg.get("students") or [])
+	existing = {row.student for row in existing_rows}
+	pruned = False
+	for row in existing_rows:
+		if not frappe.db.get_value("Student", row.student, "enabled"):
+			sg.remove(row)
+			pruned = True
 	added = False
 	for student in students:
 		if student not in existing:
 			sg.append("students", {"student": student, "active": 1})
 			added = True
-	if added:
+	if added or pruned:
 		sg.save(ignore_permissions=True)
 	return students
 
