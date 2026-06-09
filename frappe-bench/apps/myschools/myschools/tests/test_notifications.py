@@ -27,6 +27,7 @@ EXPECTED_NAMES = [
 	"MYS - Inspection Finding Overdue",
 	"MYS - Corrective Action Overdue",
 	"MYS - Franchise Agreement Expiring",
+	"MYS - Branch Document Expiring",
 ]
 
 EXPECTED_NOTIFICATION_META = {
@@ -36,6 +37,7 @@ EXPECTED_NOTIFICATION_META = {
 	"MYS - Inspection Finding Overdue": ("MYS Inspection Finding", "Days After"),
 	"MYS - Corrective Action Overdue": ("MYS Corrective Action", "Days After"),
 	"MYS - Franchise Agreement Expiring": ("MYS Franchise Agreement", "Days Before"),
+	"MYS - Branch Document Expiring": ("MYS Document", "Days Before"),
 }
 
 
@@ -144,6 +146,15 @@ class TestNotificationJinjaRenders(FrappeTestCase):
 			"status": "Active",
 			"end_date": "2026-12-31",
 		},
+		"MYS Document": {
+			"doctype": "MYS Document",
+			"name": "DOC-TEST-0001",
+			"title": "Fire Safety Certificate",
+			"branch": "BR-TEST",
+			"category": "Certificate",
+			"status": "Active",
+			"expiry_date": "2026-12-31",
+		},
 	}
 
 	def _stub_doc(self, doctype):
@@ -156,7 +167,7 @@ class TestNotificationJinjaRenders(FrappeTestCase):
 			filters={"name": ["like", "MYS - %"]},
 			fields=["name", "document_type", "subject", "message"],
 		)
-		self.assertEqual(len(notifs), 6, "expected 6 MYS notifications")
+		self.assertEqual(len(notifs), 7, "expected 7 MYS notifications")
 		for n in notifs:
 			with self.subTest(notification=n["name"]):
 				doc = self._stub_doc(n["document_type"])

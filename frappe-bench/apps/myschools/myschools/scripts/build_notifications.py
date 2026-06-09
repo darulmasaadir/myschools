@@ -237,6 +237,37 @@ NOTIFICATIONS = [
 		"recipients_doc_fields": [],
 		"attach_print": 0,
 	},
+	{
+		"name": "MYS - Branch Document Expiring",
+		"document_type": "MYS Document",
+		"event": "Days Before",
+		"date_changed": "expiry_date",
+		"days_in_advance": 7,
+		"condition": "doc.status == 'Active' and doc.expiry_date",
+		"subject": "Document {{ doc.title }} expires in 7 days — {{ doc.branch }}",
+		"body": wrap(
+			"<p>A branch compliance document is due to expire in 7 days. "
+			"Renew or archive it before the expiry date.</p>"
+			"<table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'>"
+			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Document</td>"
+			"<td style='font-weight:600'>{{ doc.title }}</td></tr>"
+			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td>"
+			"<td>{{ doc.branch }}</td></tr>"
+			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Category</td>"
+			"<td>{{ doc.category }}</td></tr>"
+			"<tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Expiry Date</td>"
+			"<td><strong>{{ frappe.utils.formatdate(doc.expiry_date, 'long') }}</strong></td></tr>"
+			"</table>"
+		),
+		"recipients_roles": [
+			"Branch Director",
+			"Branch Principal",
+			"Branch Admin",
+			"HO Dept Head",
+		],
+		"recipients_doc_fields": [],
+		"attach_print": 0,
+	},
 ]
 
 

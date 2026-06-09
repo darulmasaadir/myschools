@@ -64,6 +64,7 @@ def main():
 	guardian = _ensure_guardian_for_students(students)
 	transport = _ensure_transport(branch, guardian["student"] if guardian else None)
 	library = _ensure_library(branch, guardian["student"] if guardian else None)
+	document = _ensure_document(branch)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
@@ -77,6 +78,7 @@ def main():
 		"guardian": guardian,
 		"transport": transport,
 		"library": library,
+		"document": document,
 	}
 
 
@@ -486,6 +488,7 @@ def _ensure_week_schedule(group: str, instructor: str) -> list[str]:
 VEHICLE_REG = "E2E-BUS-01"
 ROUTE_NAME = "E2E Transport Route"
 LIBRARY_BOOK_TITLE = "E2E Library Book"
+DOCUMENT_TITLE = "E2E Compliance Certificate"
 
 
 def _ensure_transport(branch: str, student: str | None) -> dict | None:
@@ -591,6 +594,30 @@ def _ensure_library(branch: str, student: str | None) -> dict | None:
 			.name
 		)
 	return {"item": item, "loan": loan, "student": student}
+
+
+def _ensure_document(branch: str) -> dict | None:
+	"""One active compliance document for desk/e2e list smoke (Phase 14)."""
+	if not frappe.db.exists("DocType", "MYS Document"):
+		return None
+	existing = frappe.db.get_value(
+		"MYS Document", {"title": DOCUMENT_TITLE, "branch": branch}, "name"
+	)
+	if existing:
+		return {"document": existing, "branch": branch}
+	doc = frappe.get_doc(
+		{
+			"doctype": "MYS Document",
+			"title": DOCUMENT_TITLE,
+			"branch": branch,
+			"category": "Certificate",
+			"expiry_date": add_days(today(), 30),
+			"status": "Active",
+			"description": "E2E seeded branch compliance certificate.",
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"document": doc.name, "branch": branch}
 
 
 def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:
