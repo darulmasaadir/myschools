@@ -600,9 +600,7 @@ def _ensure_document(branch: str) -> dict | None:
 	"""One active compliance document for desk/e2e list smoke (Phase 14)."""
 	if not frappe.db.exists("DocType", "MYS Document"):
 		return None
-	existing = frappe.db.get_value(
-		"MYS Document", {"title": DOCUMENT_TITLE, "branch": branch}, "name"
-	)
+	existing = frappe.db.get_value("MYS Document", {"title": DOCUMENT_TITLE, "branch": branch}, "name")
 	if existing:
 		return {"document": existing, "branch": branch}
 	doc = frappe.get_doc(
