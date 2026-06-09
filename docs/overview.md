@@ -102,6 +102,7 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
 - ✅ **Phase 12:** Transport — `MYS Vehicle`/`Transport Route`/`Student Transport` desk doctypes (branch-scoped) + transport fee on the Fees engine + guardian `/guardian/transport`; PR #27 (`e4a0179`)
 - ✅ **Phase 13:** Library — `MYS Library Item`/`MYS Library Loan` desk doctypes (branch-scoped) + overdue fines on the Fees engine + guardian `/guardian/library`; PR #28 (`c48f7db`)
 - ✅ **Phase 14:** Document Mgmt — `MYS Document` desk registry wrapping Frappe `File` (branch-scoped) + expiry status scheduler + `MYS - Branch Document Expiring` notification; PR #29 (`1bd2ea8`)
+- ✅ **Phase 15:** LMS — upstream `frappe/lms` via `required_apps` + branch-scoped `LMS Course` custom fields + franchise role links; desk list + teacher `/lms` Playwright; PR #30 (`805c5c0`)
 
 The system is **live for one demo branch network** (BR001 + BR014, three
 campuses each, one fully-submitted royalty invoice on file). Phases 8–11 are

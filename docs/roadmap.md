@@ -340,18 +340,19 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
-## Phase 15 — LMS 🟡
+## Phase 15 — LMS ✅
 
-**Branch:** `feature/phase-15-lms` (in flight).
+**Merged:** PR [#30](https://github.com/darulmasaadir/myschools/pull/30) (`805c5c0`).
 
 Integrate upstream `frappe/lms` (pinned `v2.55.0`) + `frappe/payments` (`version-15`) via `required_apps` — no fork, no parallel LMS UI:
 
 - **`required_apps`:** `payments` + `lms` (SSO via shared Frappe `User` records).
 - **Custom Fields on `LMS Course`:** `mys_branch` (required), `mys_program` (Link → Education `Program`).
-- **`api/lms.py`** — `lms_course_query` / `lms_course_has_permission` / `validate_mys_lms_course`; `ensure_lms_course_permissions` grants branch management roles desk create/write.
-- **CI:** `payments@version-15` + `lms@v2.55.0` in fresh-install chain; Node 22 for LMS frontend build; `/lms` SPA built in e2e job.
+- **`api/lms.py`** — `lms_course_query` / `lms_course_has_permission` / `validate_mys_lms_course`; `ensure_lms_course_permissions` grants branch management roles desk create/write; `ensure_lms_franchise_role_links` mirrors franchise roles → LMS roles (`Teacher` → `LMS Student`, branch management → `Course Creator`).
+- **`add_to_apps_screen`** + `ensure_default_desk_app` — post-LMS install desk lands on MY School ERP, not `/apps` picker.
+- **CI:** `payments@version-15` + `lms@v2.55.0` in fresh-install chain; Node 22 for LMS frontend build; `/lms` SPA built in e2e job; `verify_lms_surfaces.py` role × surface matrix.
 - **Seed** extends `seed_portal_teacher` with one published course for e2e branch.
-- **Tests:** `test_lms.py` (4); Playwright `phase15_lms.spec.ts` (2: desk list + `/lms` load).
+- **Tests:** `test_lms.py` (5); Playwright `phase15_lms.spec.ts` (2: desk list + teacher `/lms` course card).
 
 ---
 
@@ -449,7 +450,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 13 | Monitoring & Inspection | ✅ | Full workflow + inspection portal (Phase 0/7d) |
 | 14 | Transport | ✅ | Vehicles/Routes/Student assignments + transport fee on Fees engine (Phase 12, PR #27) |
 | 15 | Library | ✅ | Catalog + loans + overdue fines on Fees engine (Phase 13, PR #28) |
-| 16 | LMS | 🟡 | Phase 15 in flight — `frappe/lms` + branch-scoped `LMS Course` |
+| 16 | LMS | ✅ | `frappe/lms` + branch-scoped `LMS Course` (Phase 15, PR #30) |
 | 17 | Document Mgmt | ✅ | `MYS Document` registry + expiry notifications (Phase 14, PR #29) |
 | 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
 | 19 | Mobile App | 🟡 | Portals are mobile-responsive web; no PWA/native decision yet |

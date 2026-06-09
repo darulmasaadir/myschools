@@ -3,7 +3,7 @@
  *
  * Surfaces the phase added (spec-completeness audit):
  *  - Desk list for LMS Course (branch role can open, seeded row visible)
- *  - Upstream /lms SPA loads for an authenticated user
+ *  - Upstream /lms SPA loads for teacher and shows seeded course card
  *
  * Pre-req: bench execute myschools.scripts.seed_e2e.main
  */
@@ -37,15 +37,23 @@ test.describe("Phase 15 — LMS", () => {
     }
   });
 
-  test("Authenticated user can load upstream /lms SPA", async ({ page }) => {
-    const teacher = seed.teacher?.user ?? director;
-    const password =
-      seed.users[teacher]?.password ?? seed.users[director].password;
-    await loginAs(page, teacher, password);
+  test("Teacher sees seeded course on upstream /lms SPA", async ({ page }) => {
+    test.skip(!seed.teacher?.user, "run seed_e2e.main first (teacher seed)");
+    const teacher = seed.teacher!.user;
+    await loginAs(page, teacher, seed.users[teacher].password);
     const response = await page.goto("/lms");
     expect(response?.status()).toBeLessThan(400);
     await expect(page.locator("body")).not.toContainText(
       /Not Permitted|does not exist/i,
     );
+    await expect(page.locator("body")).toContainText("Learning", {
+      timeout: 15_000,
+    });
+    if (seed.lms_course?.course) {
+      await expect(page.locator("body")).toContainText(
+        "E2E Portal Math LMS",
+        { timeout: 15_000 },
+      );
+    }
   });
 });

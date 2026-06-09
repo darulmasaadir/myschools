@@ -47,6 +47,14 @@ def validate_mys_lms_course(doc, method=None) -> None:
 
 _LMS_COURSE_WRITE_ROLES = ("Branch Director", "Branch Principal", "Branch Admin")
 
+# Franchise role → upstream LMS role (SSO; no separate LMS user table).
+_FRANCHISE_TO_LMS_ROLE = {
+	"Teacher": "LMS Student",
+	"Branch Director": "Course Creator",
+	"Branch Principal": "Course Creator",
+	"Branch Admin": "Course Creator",
+}
+
 # Users that must land on the ERP desk (/app), not the /apps picker, in CI/e2e.
 _DEFAULT_DESK_APP_USERS = (
 	"Administrator",
@@ -77,6 +85,24 @@ def ensure_default_desk_app() -> None:
 	for email in _DEFAULT_DESK_APP_USERS:
 		if frappe.db.exists("User", email):
 			frappe.db.set_value("User", email, "default_app", "myschools", update_modified=False)
+
+
+def ensure_lms_franchise_role_links() -> None:
+	"""Mirror franchise roles onto frappe/lms roles so /lms is reachable (idempotent)."""
+	if "lms" not in frappe.get_installed_apps():
+		return
+	for franchise_role, lms_role in _FRANCHISE_TO_LMS_ROLE.items():
+		if not frappe.db.exists("Role", lms_role):
+			continue
+		users = frappe.get_all(
+			"Has Role",
+			filters={"role": franchise_role, "parenttype": "User"},
+			pluck="parent",
+		)
+		for user in users:
+			if lms_role in frappe.get_roles(user):
+				continue
+			frappe.get_doc("User", user).add_roles(lms_role)
 
 
 def ensure_lms_course_permissions() -> None:

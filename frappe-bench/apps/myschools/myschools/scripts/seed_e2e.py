@@ -665,6 +665,9 @@ def main():
 	from myschools.scripts.seed_portal_teacher import main as seed_teacher_portal
 
 	teacher = seed_teacher_portal()
+	from myschools.api.lms import ensure_lms_franchise_role_links
+
+	ensure_lms_franchise_role_links()
 	visit, finding = _ensure_resolved_finding()
 	invoice = _ensure_overdue_invoice()
 	frappe.db.commit()

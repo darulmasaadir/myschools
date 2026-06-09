@@ -81,6 +81,7 @@ This table is the architectural view — module by module, what it ships:
 | Transport (Phase 12) | ✅ | `MYS Vehicle` / `MYS Transport Route` / `MYS Student Transport` doctypes; `api/transport.py`; `vehicle_query` / `transport_route_query` / `student_transport_query` | Billing rides the Fees engine (`Transport Fee` category + `mys_transport_for` field), not a parallel ledger; capacity + branch-consistency validation; guardian `/guardian/transport`. PR #27. |
 | Library (Phase 13) | ✅ | `MYS Library Item` / `MYS Library Loan` doctypes; `api/library.py`; `library_item_query` / `library_loan_query` | Copy counter (not ERPNext Stock); overdue fines on Fees engine (`Library Fine` + `mys_library_loan_for`); guardian `/guardian/library`. PR #28. |
 | Document Mgmt (Phase 14) | ✅ | `MYS Document` doctype wrapping Frappe `File`; `api/documents.py`; `document_query` | No parallel storage layer (Attach → Frappe `File`); daily `scheduled_mark_documents_expired`; `MYS - Branch Document Expiring` notification (Phase 4 pattern); desk-only (no portal). PR #29. |
+| LMS (Phase 15) | ✅ | Upstream `frappe/lms` via `required_apps`; Custom Fields on `LMS Course`; `api/lms.py`; `lms_course_query` | Franchise role → LMS role links; desk branch scoping; upstream `/lms` SPA (no fork). `verify_lms_surfaces.py`. PR #30. |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 

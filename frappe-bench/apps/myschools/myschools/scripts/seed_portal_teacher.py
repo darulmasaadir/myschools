@@ -13,6 +13,7 @@ from __future__ import annotations
 import frappe
 from frappe.utils import add_days, nowdate, today
 
+from myschools.api.lms import ensure_lms_franchise_role_links
 from myschools.scripts import seed_education
 from myschools.scripts.seed_e2e import _ensure_franchise_tree, _ensure_user
 from myschools.setup.install import create_franchise_roles, grant_franchise_role_permissions
@@ -66,6 +67,7 @@ def main():
 	library = _ensure_library(branch, guardian["student"] if guardian else None)
 	document = _ensure_document(branch)
 	lms_course = _ensure_lms_course(branch, EMAIL, PROGRAM_KIDS)
+	ensure_lms_franchise_role_links()
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
