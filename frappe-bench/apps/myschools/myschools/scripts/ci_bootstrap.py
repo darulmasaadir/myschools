@@ -32,6 +32,9 @@ def run():
 		for app in ("frappe", "erpnext"):
 			frappe.db.set_value("Installed Application", {"app_name": app}, "is_setup_complete", 1)
 		disable_future_access()
+		from myschools.api.lms import ensure_default_desk_app
+
+		ensure_default_desk_app()
 		frappe.db.commit()
 		return
 
@@ -67,6 +70,9 @@ def run():
 		frappe.db.set_value("Installed Application", {"app_name": app}, "is_setup_complete", 1)
 	disable_future_access()
 	_ensure_head_office_is_group()
+	from myschools.api.lms import ensure_default_desk_app
+
+	ensure_default_desk_app()
 	frappe.db.commit()
 	print("CI bootstrap complete: ran ERPNext setup_complete with " f"company={HEAD_OFFICE_COMPANY!r}.")
 

@@ -7,6 +7,17 @@ app_license = "agpl-3.0"
 
 required_apps = ["erpnext", "education", "hrms", "payments", "lms"]
 
+# Desk launcher tile — ensures /apps picker has an explicit ERP entry when
+# frappe/lms (route /lms) is also installed.
+add_to_apps_screen = [
+	{
+		"name": "myschools",
+		"logo": "/assets/myschools/images/mys-logo.svg",
+		"title": "MY School ERP",
+		"route": "/app",
+	}
+]
+
 # Brand
 # -----
 app_logo_url = "/assets/myschools/images/mys-logo.svg"

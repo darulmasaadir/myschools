@@ -9,7 +9,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 from myschools.api.library import ensure_library_fine_category
-from myschools.api.lms import ensure_lms_course_permissions
+from myschools.api.lms import ensure_default_desk_app, ensure_lms_course_permissions
 from myschools.api.transport import ensure_transport_fee_category
 
 FRANCHISE_ROLES = [
@@ -73,6 +73,7 @@ def after_migrate():
 	ensure_transport_fee_category()
 	ensure_library_fine_category()
 	ensure_lms_course_permissions()
+	ensure_default_desk_app()
 	set_default_print_formats()
 	frappe.db.commit()
 

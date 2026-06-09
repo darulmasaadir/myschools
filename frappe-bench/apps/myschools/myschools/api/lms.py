@@ -47,6 +47,37 @@ def validate_mys_lms_course(doc, method=None) -> None:
 
 _LMS_COURSE_WRITE_ROLES = ("Branch Director", "Branch Principal", "Branch Admin")
 
+# Users that must land on the ERP desk (/app), not the /apps picker, in CI/e2e.
+_DEFAULT_DESK_APP_USERS = (
+	"Administrator",
+	"e2e_teacher@mys.local",
+	"e2e_guardian@mys.local",
+	"e2e_director@mys.local",
+	"ceo@mys.local",
+	"ho.head@mys.local",
+	"cluster.dir@mys.local",
+	"monitor@mys.local",
+	"audit@mys.local",
+	"branch.dir@mys.local",
+	"principal@mys.local",
+	"branch.admin@mys.local",
+	"accountant@mys.local",
+	"campus@mys.local",
+)
+
+
+def ensure_default_desk_app() -> None:
+	"""Pin MY School ERP as the post-login app when frappe/lms is installed.
+
+	LMS registers route ``/lms``, so Frappe's default-path logic sends users to
+	``/apps`` unless ``User.default_app`` is set. Idempotent.
+	"""
+	if "lms" not in frappe.get_installed_apps():
+		return
+	for email in _DEFAULT_DESK_APP_USERS:
+		if frappe.db.exists("User", email):
+			frappe.db.set_value("User", email, "default_app", "myschools", update_modified=False)
+
 
 def ensure_lms_course_permissions() -> None:
 	"""Grant franchise roles desk access to LMS Course (idempotent).
