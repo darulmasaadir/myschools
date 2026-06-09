@@ -78,6 +78,12 @@ export interface DocumentSeed {
   branch: string;
 }
 
+export interface LmsCourseSeed {
+  course: string;
+  branch: string;
+  program: string | null;
+}
+
 export interface SeedState {
   users: Record<string, { password: string; roles: string[] }>;
   visit: string | null;
@@ -93,6 +99,7 @@ export interface SeedState {
   transport: TransportSeed | null;
   library: LibrarySeed | null;
   document: DocumentSeed | null;
+  lms_course: LmsCourseSeed | null;
 }
 
 export function loadSeed(): SeedState {

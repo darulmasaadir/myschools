@@ -686,6 +686,7 @@ def main():
 		"transport": teacher.get("transport"),
 		"library": teacher.get("library"),
 		"document": teacher.get("document"),
+		"lms_course": teacher.get("lms_course"),
 	}
 	with open(STATE_FILE, "w") as f:
 		json.dump(state, f, indent=2)

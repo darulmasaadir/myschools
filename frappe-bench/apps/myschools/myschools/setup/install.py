@@ -9,6 +9,7 @@ import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 from myschools.api.library import ensure_library_fine_category
+from myschools.api.lms import ensure_lms_course_permissions
 from myschools.api.transport import ensure_transport_fee_category
 
 FRANCHISE_ROLES = [
@@ -71,6 +72,7 @@ def after_migrate():
 	backfill_guardian_user_links()
 	ensure_transport_fee_category()
 	ensure_library_fine_category()
+	ensure_lms_course_permissions()
 	set_default_print_formats()
 	frappe.db.commit()
 
@@ -478,6 +480,22 @@ for _role in (
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
 			FRANCHISE_ROLE_READS[_role].append(_dt)
 
+# LMS desk (Phase 15): branch roles see/create franchise-scoped LMS courses.
+_LMS_COURSE_READS = ("LMS Course",)
+for _role in (
+	"Branch Director",
+	"Branch Principal",
+	"Branch Admin",
+	"Branch Accountant",
+	"Audit Officer",
+	"Cluster Director",
+	"HO Dept Head",
+	"Chief Executive",
+):
+	for _dt in _LMS_COURSE_READS:
+		if _dt not in FRANCHISE_ROLE_READS[_role]:
+			FRANCHISE_ROLE_READS[_role].append(_dt)
+
 # Payroll oversight (Phase 8d): branch finance roles + HO/cluster read Payroll
 # Entry (frappe/hrms); row scope is enforced by api.hr.payroll_entry_query so
 # each role only sees their own branch/cluster runs. Creating payroll still uses
@@ -828,6 +846,30 @@ def create_custom_franchise_fields():
 				"fieldtype": "Link",
 				"options": "MYS Campus",
 				"insert_after": "mys_branch",
+			},
+		]
+
+	# LMS Course ships with frappe/lms (Phase 15). Guard for sites mid-migrate.
+	if frappe.db.exists("DocType", "LMS Course"):
+		field_map["LMS Course"] = [
+			{
+				"fieldname": "mys_branch",
+				"label": "MYS Branch",
+				"fieldtype": "Link",
+				"options": "MYS Branch",
+				"insert_after": "category",
+				"reqd": 1,
+				"in_standard_filter": 1,
+				"in_list_view": 1,
+				"description": "Franchise branch that owns this LMS course.",
+			},
+			{
+				"fieldname": "mys_program",
+				"label": "Education Program",
+				"fieldtype": "Link",
+				"options": "Program",
+				"insert_after": "mys_branch",
+				"description": "Optional link to the Education Program this course supports.",
 			},
 		]
 

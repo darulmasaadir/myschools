@@ -5,7 +5,7 @@ app_description = "Multi-tier franchise school management system for myschools.p
 app_email = "info@myschools.pk"
 app_license = "agpl-3.0"
 
-required_apps = ["erpnext", "education", "hrms"]
+required_apps = ["erpnext", "education", "hrms", "payments", "lms"]
 
 # Brand
 # -----
@@ -74,6 +74,9 @@ doc_events = {
 	"Payroll Entry": {
 		"validate": "myschools.api.hr.set_payroll_entry_company_from_branch",
 	},
+	"LMS Course": {
+		"validate": "myschools.api.lms.validate_mys_lms_course",
+	},
 }
 
 # Role-based landing pages
@@ -121,12 +124,14 @@ permission_query_conditions = {
 	"MYS Library Item": "myschools.api.library.library_item_query",
 	"MYS Library Loan": "myschools.api.library.library_loan_query",
 	"MYS Document": "myschools.api.documents.document_query",
+	"LMS Course": "myschools.api.lms.lms_course_query",
 }
 
 has_permission = {
 	"Student": "myschools.api.permissions.student_has_permission",
 	"Employee": "myschools.api.permissions.employee_has_permission",
 	"Payroll Entry": "myschools.api.hr.payroll_entry_has_permission",
+	"LMS Course": "myschools.api.lms.lms_course_has_permission",
 }
 
 # Scheduled jobs

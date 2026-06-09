@@ -65,6 +65,7 @@ def main():
 	transport = _ensure_transport(branch, guardian["student"] if guardian else None)
 	library = _ensure_library(branch, guardian["student"] if guardian else None)
 	document = _ensure_document(branch)
+	lms_course = _ensure_lms_course(branch, EMAIL, PROGRAM_KIDS)
 	frappe.db.commit()
 	return {
 		"user": EMAIL,
@@ -79,6 +80,7 @@ def main():
 		"transport": transport,
 		"library": library,
 		"document": document,
+		"lms_course": lms_course,
 	}
 
 
@@ -489,6 +491,7 @@ VEHICLE_REG = "E2E-BUS-01"
 ROUTE_NAME = "E2E Transport Route"
 LIBRARY_BOOK_TITLE = "E2E Library Book"
 DOCUMENT_TITLE = "E2E Compliance Certificate"
+LMS_COURSE_TITLE = "E2E Portal Math LMS"
 
 
 def _ensure_transport(branch: str, student: str | None) -> dict | None:
@@ -594,6 +597,29 @@ def _ensure_library(branch: str, student: str | None) -> dict | None:
 			.name
 		)
 	return {"item": item, "loan": loan, "student": student}
+
+
+def _ensure_lms_course(branch: str, instructor_user: str, program: str | None) -> dict | None:
+	"""One published LMS course for desk/e2e list smoke (Phase 15)."""
+	if not frappe.db.exists("DocType", "LMS Course"):
+		return None
+	existing = frappe.db.get_value("LMS Course", {"title": LMS_COURSE_TITLE, "mys_branch": branch}, "name")
+	if existing:
+		return {"course": existing, "branch": branch, "program": program}
+	doc = frappe.get_doc(
+		{
+			"doctype": "LMS Course",
+			"title": LMS_COURSE_TITLE,
+			"short_introduction": "E2E seeded LMS course for portal math.",
+			"description": "<p>E2E seeded LMS course linked to the teacher portal class.</p>",
+			"mys_branch": branch,
+			"mys_program": program,
+			"instructors": [{"instructor": instructor_user}],
+			"published": 1,
+		}
+	)
+	doc.insert(ignore_permissions=True)
+	return {"course": doc.name, "branch": branch, "program": program}
 
 
 def _ensure_document(branch: str) -> dict | None:
