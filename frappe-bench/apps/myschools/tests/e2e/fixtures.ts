@@ -128,7 +128,12 @@ export async function loginAs(page: Page, email: string, password: string) {
     .locator('button.btn-login, button:has-text("Login")')
     .first()
     .click();
-  // Frappe redirects to /app on success. Wait for the desk shell to render.
+  // With frappe/lms installed, desk users may land on /apps (multi-app picker)
+  // instead of /app. Accept either, then force the ERP desk shell.
+  await page.waitForURL(/\/(apps|app)(\/|$|\?)/, { timeout: 20_000 });
+  if (/\/apps(\/|$|\?)/.test(page.url())) {
+    await page.goto("/app");
+  }
   await page.waitForURL(/\/app(\/|$)/, { timeout: 20_000 });
   // The sidebar / top navbar is the unambiguous signal we're in.
   await expect(
