@@ -101,6 +101,7 @@ Tracked by status: ✅ shipped & tested · 🟡 partial · ⬜ planned.
 - ✅ **Phase 11:** Academic scheduling — branch/guardian/teacher timetable portals + desk `Course Schedule` scoping; PR #24 `98821d9` + e2e backfill PR #25 `e747c60`
 - ✅ **Phase 12:** Transport — `MYS Vehicle`/`Transport Route`/`Student Transport` desk doctypes (branch-scoped) + transport fee on the Fees engine + guardian `/guardian/transport`; PR #27 (`e4a0179`)
 - ✅ **Phase 13:** Library — `MYS Library Item`/`MYS Library Loan` desk doctypes (branch-scoped) + overdue fines on the Fees engine + guardian `/guardian/library`; PR #28 (`c48f7db`)
+- ✅ **Phase 14:** Document Mgmt — `MYS Document` desk registry wrapping Frappe `File` (branch-scoped) + expiry status scheduler + `MYS - Branch Document Expiring` notification; PR #29 (`1bd2ea8`)
 
 The system is **live for one demo branch network** (BR001 + BR014, three
 campuses each, one fully-submitted royalty invoice on file). Phases 8–11 are

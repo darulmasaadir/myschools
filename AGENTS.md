@@ -48,6 +48,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - ✅ **Phase 11**: Academic scheduling — PR #24 (`98821d9`) + e2e backfill PR #25 (`e747c60`)
 - ✅ **Phase 12**: Transport — PR #27 (`e4a0179`) — vehicles/routes/assignments + transport fee on Fees engine; guardian `/guardian/transport`; desk create→assign Playwright
 - ✅ **Phase 13**: Library — PR #28 (`c48f7db`) — catalog/loans + Library Fine on Fees engine; guardian `/guardian/library`; desk Item→Loan Playwright
-- ⬜ **Up next:** Phase 14 — Document Mgmt (see [`docs/roadmap.md`](docs/roadmap.md))
+- ✅ **Phase 14**: Document Mgmt — PR #29 (`1bd2ea8`) — `MYS Document` registry wrapping Frappe `File`; expiry scheduler + `MYS - Branch Document Expiring` notification; desk-only
+- ⬜ **Up next:** Phase 15 — LMS (see [`docs/roadmap.md`](docs/roadmap.md))
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

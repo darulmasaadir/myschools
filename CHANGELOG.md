@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 14 — Document Mgmt (PR #29, `1bd2ea8`).** Custom desk doctype `MYS Document`
+  (branch-scoped via `permission_query_conditions`) wrapping Frappe `File` — no parallel
+  storage layer; `api/documents.py` with expiry status sync on save, daily
+  `scheduled_mark_documents_expired`, and `documents_expiring_within` desk helper; new
+  `MYS - Branch Document Expiring` notification (Days Before `expiry_date`, 7 days) following
+  the Phase 4 fixture pattern; `_DOCUMENT_READS` install grants for branch + oversight roles;
+  e2e seed compliance certificate; `test_documents.py` (5 tests), jinja render test (7
+  notifications total), Playwright `phase14_documents.spec.ts` (2 tests incl. desk create flow).
 - **Phase 13 — Library (PR #28, `c48f7db`).** Custom desk doctypes `MYS Library Item`,
   `MYS Library Loan` (branch-scoped via `permission_query_conditions`); `api/library.py`
   with copy tracking on issue/return and `generate_library_fine` riding the existing
