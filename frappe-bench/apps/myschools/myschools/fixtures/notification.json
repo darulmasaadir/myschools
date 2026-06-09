@@ -234,5 +234,45 @@
   ],
   "date_changed": "end_date",
   "days_in_advance": 30
+ },
+ {
+  "name": "MYS - Branch Document Expiring",
+  "creation": "2026-05-26 12:00:00.000000",
+  "docstatus": 0,
+  "doctype": "Notification",
+  "modified": "2026-05-26 12:00:00.000000",
+  "modified_by": "Administrator",
+  "owner": "Administrator",
+  "module": "MY School ERP",
+  "enabled": 1,
+  "channel": "Email",
+  "document_type": "MYS Document",
+  "event": "Days Before",
+  "condition": "doc.status == 'Active' and doc.expiry_date",
+  "subject": "Document {{ doc.title }} expires in 7 days — {{ doc.branch }}",
+  "message_type": "HTML",
+  "message": "<div style=\"font-family:Inter,Arial,sans-serif;color:#1A1A1A;font-size:14px;line-height:1.55;max-width:640px\"><div style=\"background:#0F7A4A;color:#fff;padding:14px 18px;font-weight:700;font-size:15px;letter-spacing:0.3px\">MY Schools</div><div style=\"padding:18px;border:1px solid #E5E7EB;border-top:none\"><p>A branch compliance document is due to expire in 7 days. Renew or archive it before the expiry date.</p><table style='border-collapse:collapse;font-size:13px;margin:10px 0 14px 0'><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Document</td><td style='font-weight:600'>{{ doc.title }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Branch</td><td>{{ doc.branch }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Category</td><td>{{ doc.category }}</td></tr><tr><td style='padding:4px 12px 4px 0;color:#6B7280'>Expiry Date</td><td><strong>{{ frappe.utils.formatdate(doc.expiry_date, 'long') }}</strong></td></tr></table><hr style=\"border:none;border-top:1px solid #E5E7EB;margin:20px 0 10px 0\"><div style=\"font-size:11px;color:#6B7280\">This is an automated message from MY Schools ERP. Replies are not monitored — log into the system to act on this notification.</div></div></div>",
+  "send_to_all_assignees": 0,
+  "attach_print": 0,
+  "recipients": [
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Director"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Principal"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "Branch Admin"
+   },
+   {
+    "doctype": "Notification Recipient",
+    "receiver_by_role": "HO Dept Head"
+   }
+  ],
+  "date_changed": "expiry_date",
+  "days_in_advance": 7
  }
 ]

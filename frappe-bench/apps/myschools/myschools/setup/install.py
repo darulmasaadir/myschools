@@ -463,6 +463,21 @@ for _role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Acc
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
 			FRANCHISE_ROLE_READS[_role].append(_dt)
 
+# Document registry (Phase 14): branch roles manage compliance docs; row scope from document_query.
+_DOCUMENT_READS = ("MYS Document",)
+for _role in (
+	"Branch Director",
+	"Branch Principal",
+	"Branch Admin",
+	"Branch Accountant",
+	"Audit Officer",
+	"Cluster Director",
+	"HO Dept Head",
+):
+	for _dt in _DOCUMENT_READS:
+		if _dt not in FRANCHISE_ROLE_READS[_role]:
+			FRANCHISE_ROLE_READS[_role].append(_dt)
+
 # Payroll oversight (Phase 8d): branch finance roles + HO/cluster read Payroll
 # Entry (frappe/hrms); row scope is enforced by api.hr.payroll_entry_query so
 # each role only sees their own branch/cluster runs. Creating payroll still uses

@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-08
-**Up next:** Phase 14 — Document Mgmt (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
+**Up next:** Phase 15 — LMS (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -340,6 +340,20 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
+## Phase 14 — Document Mgmt 🟡
+
+**Branch:** `feature/phase-14-document-mgmt` (in flight).
+
+Custom desk registry wrapping Frappe `File` — branch-scoped compliance documents with expiry tracking:
+
+- **DocType:** `MYS Document` (title, branch, category, status, Attach `file`, expiry_date, description).
+- **`api/documents.py`** — branch-scoped `permission_query_conditions`; `validate_mys_document` / `refresh_document_expiry_status`; `documents_expiring_within` desk helper; daily `scheduled_mark_documents_expired`.
+- **Notification:** `MYS - Branch Document Expiring` (Days Before `expiry_date`, 7 days) — Phase 4 fixture pattern.
+- **Seed** extends `seed_portal_teacher` with one active compliance certificate for e2e list smoke.
+- **Tests:** `test_documents.py` (5); notification jinja render (7 total); Playwright `phase14_documents.spec.ts` (2 incl. desk create flow).
+
+---
+
 ## Phase 13 — Library ✅
 
 **Merged:** PR [#28](https://github.com/darulmasaadir/myschools/pull/28) (`c48f7db`).
@@ -421,7 +435,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 14 | Transport | ✅ | Vehicles/Routes/Student assignments + transport fee on Fees engine (Phase 12, PR #27) |
 | 15 | Library | ✅ | Catalog + loans + overdue fines on Fees engine (Phase 13, PR #28) |
 | 16 | LMS | ⬜ | **Not built** — integrate `frappe/lms` |
-| 17 | Document Mgmt | ⬜ | **Not built** |
+| 17 | Document Mgmt | 🟡 | Phase 14 in flight — `MYS Document` + expiry notifications |
 | 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
 | 19 | Mobile App | 🟡 | Portals are mobile-responsive web; no PWA/native decision yet |
 | 20 | Unique ID | ✅ | Student + staff ID generators (Phase 0) |

@@ -1,0 +1,161 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:DOC-{####}",
+ "creation": "2026-06-09 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "branch",
+  "column_break_meta",
+  "category",
+  "status",
+  "section_break_file",
+  "file",
+  "column_break_dates",
+  "expiry_date",
+  "section_break_detail",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Branch",
+   "options": "MYS Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_meta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Compliance",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Category",
+   "options": "Agreement\nCertificate\nPolicy\nCompliance\nLicense\nOther"
+  },
+  {
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Active\nExpired\nArchived",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_file",
+   "fieldtype": "Section Break",
+   "label": "File"
+  },
+  {
+   "description": "Stored via Frappe File — no parallel document storage layer.",
+   "fieldname": "file",
+   "fieldtype": "Attach",
+   "label": "Document File"
+  },
+  {
+   "fieldname": "column_break_dates",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Expiry Date"
+  },
+  {
+   "fieldname": "section_break_detail",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-09 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "MY School ERP",
+ "name": "MYS Document",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Chief Executive",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HO Dept Head"
+  },
+  {
+   "read": 1,
+   "role": "Cluster Director"
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Director",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Principal",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Branch Admin",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Branch Accountant"
+  },
+  {
+   "read": 1,
+   "role": "Audit Officer"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

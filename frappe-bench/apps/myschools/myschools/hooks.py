@@ -120,6 +120,7 @@ permission_query_conditions = {
 	"MYS Student Transport": "myschools.api.transport.student_transport_query",
 	"MYS Library Item": "myschools.api.library.library_item_query",
 	"MYS Library Loan": "myschools.api.library.library_loan_query",
+	"MYS Document": "myschools.api.documents.document_query",
 }
 
 has_permission = {
@@ -140,6 +141,7 @@ scheduler_events = {
 		"0 6 * * *": [
 			"myschools.api.fees.scheduled_apply_late_fees",
 			"myschools.api.library.scheduled_mark_library_overdue",
+			"myschools.api.documents.scheduled_mark_documents_expired",
 		],
 	},
 }
