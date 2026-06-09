@@ -8,6 +8,7 @@ Guardian) to our MYS Cluster / Branch / Campus structure.
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
+from myschools.api.library import ensure_library_fine_category
 from myschools.api.transport import ensure_transport_fee_category
 
 FRANCHISE_ROLES = [
@@ -69,6 +70,7 @@ def after_migrate():
 	backfill_module_profiles()
 	backfill_guardian_user_links()
 	ensure_transport_fee_category()
+	ensure_library_fine_category()
 	set_default_print_formats()
 	frappe.db.commit()
 
@@ -454,6 +456,13 @@ for _role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Acc
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
 			FRANCHISE_ROLE_READS[_role].append(_dt)
 
+# Library desk (Phase 13): branch roles manage catalog + loans; row scope from library queries.
+_LIBRARY_READS = ("MYS Library Item", "MYS Library Loan")
+for _role in ("Branch Director", "Branch Principal", "Branch Admin", "Branch Accountant"):
+	for _dt in _LIBRARY_READS:
+		if _dt not in FRANCHISE_ROLE_READS[_role]:
+			FRANCHISE_ROLE_READS[_role].append(_dt)
+
 # Payroll oversight (Phase 8d): branch finance roles + HO/cluster read Payroll
 # Entry (frappe/hrms); row scope is enforced by api.hr.payroll_entry_query so
 # each role only sees their own branch/cluster runs. Creating payroll still uses
@@ -765,6 +774,15 @@ def create_custom_franchise_fields():
 			"insert_after": "mys_late_fee_applied",
 			"read_only": 1,
 			"description": "Set on transport invoices — points to the MYS Student Transport assignment.",
+		},
+		{
+			"fieldname": "mys_library_loan_for",
+			"label": "Library Loan For",
+			"fieldtype": "Link",
+			"options": "MYS Library Loan",
+			"insert_after": "mys_transport_for",
+			"read_only": 1,
+			"description": "Set on library fine invoices — points to the MYS Library Loan.",
 		},
 	]
 

@@ -193,6 +193,7 @@ def populate_guardian_context(context) -> frappe.Document:
 		{"label": "Attendance", "route": "/guardian/attendance"},
 		{"label": "Timetable", "route": "/guardian/timetable"},
 		{"label": "Transport", "route": "/guardian/transport"},
+		{"label": "Library", "route": "/guardian/library"},
 		{"label": "Feedback", "route": "/guardian-feedback"},
 	]
 	return guardian

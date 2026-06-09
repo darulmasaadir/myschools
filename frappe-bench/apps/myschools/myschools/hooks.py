@@ -118,6 +118,8 @@ permission_query_conditions = {
 	"MYS Vehicle": "myschools.api.transport.vehicle_query",
 	"MYS Transport Route": "myschools.api.transport.transport_route_query",
 	"MYS Student Transport": "myschools.api.transport.student_transport_query",
+	"MYS Library Item": "myschools.api.library.library_item_query",
+	"MYS Library Loan": "myschools.api.library.library_loan_query",
 }
 
 has_permission = {
@@ -137,6 +139,7 @@ scheduler_events = {
 		# 06:00 daily — late fees on overdue student invoices
 		"0 6 * * *": [
 			"myschools.api.fees.scheduled_apply_late_fees",
+			"myschools.api.library.scheduled_mark_library_overdue",
 		],
 	},
 }

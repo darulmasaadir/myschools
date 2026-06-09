@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-08
-**Up next:** Phase 13 — Library (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
+**Up next:** Phase 14 — Document Mgmt (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)). Phase 13 — Library is 🟡 in flight on `feature/phase-13-library`.
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -38,7 +38,8 @@ These bind every phase:
 | 10 | Attendance + Examination | ✅ | PR [#23](https://github.com/darulmasaadir/myschools/pull/23) (`584a0d0`) |
 | 11 | Academic scheduling | ✅ | PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`) + e2e backfill PR [#25](https://github.com/darulmasaadir/myschools/pull/25) (`e747c60`) |
 | 12 | Transport | ✅ | PR [#27](https://github.com/darulmasaadir/myschools/pull/27) (`e4a0179`) |
-| 13+ | Remaining modules (Library, Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
+| 13 | Library | 🟡 | `feature/phase-13-library` — branch open, PR pending |
+| 14+ | Remaining modules (Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
 
@@ -339,6 +340,21 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
+## Phase 13 — Library 🟡
+
+**Branch:** `feature/phase-13-library` (PR pending).
+
+Custom desk doctypes for catalog + loans, with overdue fines riding the existing Fees engine:
+
+- **DocTypes:** `MYS Library Item` (title, branch, copies, fine per day), `MYS Library Loan` (student→item, due/return dates, status, fine amount).
+- **`api/library.py`** — branch-scoped `permission_query_conditions`; copy tracking on issue/return; `generate_library_fine` / `return_library_loan` create submitted `Fees` under `Library Fine` category; `get_loans_for_guardian` for the portal; daily `scheduled_mark_library_overdue`.
+- **Fee Category** `Library Fine` + `mys_library_loan_for` Custom Field on `Fees` (after_migrate).
+- **Guardian portal:** `/guardian/library` read view + nav link.
+- **Seed** extends `seed_portal_teacher` with catalog item + active loan for the e2e guardian's child.
+- **Tests:** `test_library.py`; HTTP battery `/guardian/library`; Playwright `phase13_library.spec.ts`.
+
+---
+
 ## Phase 12 — Transport ✅
 
 **Merged:** PR [#27](https://github.com/darulmasaadir/myschools/pull/27) (`e4a0179`).
@@ -403,7 +419,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 12 | Communication | ✅ | Comm Log + notifications + SMS adapters (Phase 4/8c) |
 | 13 | Monitoring & Inspection | ✅ | Full workflow + inspection portal (Phase 0/7d) |
 | 14 | Transport | ✅ | Vehicles/Routes/Student assignments + transport fee on Fees engine (Phase 12, PR #27) |
-| 15 | Library | ⬜ | **Not built** |
+| 15 | Library | 🟡 | Catalog + loans + overdue fines on Fees engine (Phase 13, PR pending) |
 | 16 | LMS | ⬜ | **Not built** — integrate `frappe/lms` |
 | 17 | Document Mgmt | ⬜ | **Not built** |
 | 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
