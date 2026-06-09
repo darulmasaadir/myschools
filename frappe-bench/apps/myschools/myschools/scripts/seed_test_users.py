@@ -76,6 +76,9 @@ def run():
 		if role in BRANCH_SCOPED_ROLES or role in INSPECTION_SCOPED_ROLES:
 			_ensure_employee(email, first_name, last_name)
 
+	from myschools.api.lms import ensure_default_desk_app
+
+	ensure_default_desk_app()
 	frappe.db.commit()
 	_print_summary()
 

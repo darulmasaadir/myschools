@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-09
-**Up next:** Phase 15 — LMS (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
+**Up next:** Phase 16 — Mobile PWA (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -340,6 +340,21 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
+## Phase 15 — LMS 🟡
+
+**Branch:** `feature/phase-15-lms` (in flight).
+
+Integrate upstream `frappe/lms` (pinned `v2.55.0`) + `frappe/payments` (`version-15`) via `required_apps` — no fork, no parallel LMS UI:
+
+- **`required_apps`:** `payments` + `lms` (SSO via shared Frappe `User` records).
+- **Custom Fields on `LMS Course`:** `mys_branch` (required), `mys_program` (Link → Education `Program`).
+- **`api/lms.py`** — `lms_course_query` / `lms_course_has_permission` / `validate_mys_lms_course`; `ensure_lms_course_permissions` grants branch management roles desk create/write.
+- **CI:** `payments@version-15` + `lms@v2.55.0` in fresh-install chain; Node 22 for LMS frontend build; `/lms` SPA built in e2e job.
+- **Seed** extends `seed_portal_teacher` with one published course for e2e branch.
+- **Tests:** `test_lms.py` (4); Playwright `phase15_lms.spec.ts` (2: desk list + `/lms` load).
+
+---
+
 ## Phase 14 — Document Mgmt ✅
 
 **Merged:** PR [#29](https://github.com/darulmasaadir/myschools/pull/29) (`1bd2ea8`).
@@ -434,7 +449,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 13 | Monitoring & Inspection | ✅ | Full workflow + inspection portal (Phase 0/7d) |
 | 14 | Transport | ✅ | Vehicles/Routes/Student assignments + transport fee on Fees engine (Phase 12, PR #27) |
 | 15 | Library | ✅ | Catalog + loans + overdue fines on Fees engine (Phase 13, PR #28) |
-| 16 | LMS | ⬜ | **Not built** — integrate `frappe/lms` |
+| 16 | LMS | 🟡 | Phase 15 in flight — `frappe/lms` + branch-scoped `LMS Course` |
 | 17 | Document Mgmt | ✅ | `MYS Document` registry + expiry notifications (Phase 14, PR #29) |
 | 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
 | 19 | Mobile App | 🟡 | Portals are mobile-responsive web; no PWA/native decision yet |

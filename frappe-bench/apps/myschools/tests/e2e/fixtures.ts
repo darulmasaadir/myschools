@@ -78,6 +78,12 @@ export interface DocumentSeed {
   branch: string;
 }
 
+export interface LmsCourseSeed {
+  course: string;
+  branch: string;
+  program: string | null;
+}
+
 export interface SeedState {
   users: Record<string, { password: string; roles: string[] }>;
   visit: string | null;
@@ -93,6 +99,7 @@ export interface SeedState {
   transport: TransportSeed | null;
   library: LibrarySeed | null;
   document: DocumentSeed | null;
+  lms_course: LmsCourseSeed | null;
 }
 
 export function loadSeed(): SeedState {
@@ -111,17 +118,21 @@ export function loadSeed(): SeedState {
  * a real user's would be.
  */
 export async function loginAs(page: Page, email: string, password: string) {
-  await page.goto("/login");
-  await page.fill('input[name="login_email"], input#login_email', email);
-  await page.fill(
-    'input[name="login_password"], input#login_password',
-    password,
-  );
-  await page
-    .locator('button.btn-login, button:has-text("Login")')
-    .first()
-    .click();
-  // Frappe redirects to /app on success. Wait for the desk shell to render.
+  const loginResp = await page.request.post("/api/method/login", {
+    form: { usr: email, pwd: password },
+  });
+  expect(loginResp.ok()).toBeTruthy();
+
+  await page.goto("/app");
+  // frappe/lms adds a /lms app tile — without default_app users land on /apps.
+  if (/\/apps(\/|$|\?)/.test(page.url())) {
+    const desk = page.locator('a[href="/app"]').first();
+    if (await desk.count()) {
+      await desk.click();
+    } else {
+      await page.locator('a[href^="/app/"]').first().click();
+    }
+  }
   await page.waitForURL(/\/app(\/|$)/, { timeout: 20_000 });
   // The sidebar / top navbar is the unambiguous signal we're in.
   await expect(
