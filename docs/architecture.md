@@ -79,6 +79,7 @@ This table is the architectural view — module by module, what it ships:
 | Attendance + Examination (Phase 10) | ✅ | Teacher portal marking on Education `Student Attendance` + `Assessment Plan`/`Result`; `MYS Report Card` print format | Whitelist APIs: `save_class_attendance`, `save_assessment_scores`, `download_report_card`. PR #23 `584a0d0`. |
 | Academic scheduling (Phase 11) | ✅ | `api/scheduling.py`; Education `Course Schedule` + `Student Group`; `course_schedule_query` / `student_group_query` | `/branch/timetable`, `/guardian/timetable`, week-grouped `/teacher/schedule`; branch dashboard timetable card. PR #24 `98821d9` + e2e PR #25 `e747c60`. |
 | Transport (Phase 12) | ✅ | `MYS Vehicle` / `MYS Transport Route` / `MYS Student Transport` doctypes; `api/transport.py`; `vehicle_query` / `transport_route_query` / `student_transport_query` | Billing rides the Fees engine (`Transport Fee` category + `mys_transport_for` field), not a parallel ledger; capacity + branch-consistency validation; guardian `/guardian/transport`. PR #27. |
+| Library (Phase 13) | ✅ | `MYS Library Item` / `MYS Library Loan` doctypes; `api/library.py`; `library_item_query` / `library_loan_query` | Copy counter (not ERPNext Stock); overdue fines on Fees engine (`Library Fine` + `mys_library_loan_for`); guardian `/guardian/library`. PR #28. |
 
 Full module-to-coverage map for the original 22-module spec is in [overview.md](overview.md#scope).
 

@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 13 — Library (PR #28, `c48f7db`).** Custom desk doctypes `MYS Library Item`,
+  `MYS Library Loan` (branch-scoped via `permission_query_conditions`); `api/library.py`
+  with copy tracking on issue/return and `generate_library_fine` riding the existing
+  Fees engine (`Library Fine` category + `mys_library_loan_for` Custom Field);
+  guardian `/guardian/library` read view + nav; seed catalog item + active loan for the
+  e2e guardian's child; `test_library.py` (8 tests), HTTP battery `/guardian/library`,
+  Playwright `phase13_library.spec.ts` (4 tests incl. desk Item→Loan create flow).
 - **Phase 12 — Transport (PR #27, `e4a0179`).** Custom desk doctypes `MYS Vehicle`,
   `MYS Transport Route`, `MYS Student Transport` (branch-scoped via
   `permission_query_conditions`); `api/transport.py` with capacity + branch-
