@@ -9,7 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Phase 16 — Mobile PWA (PR #32).** Installable PWA shell over the existing
+- **Staging deployment runbook** (`docs/deployment.md`) — Frappe Cloud Sites plan
+  guidance, CI-matched app pins, install order, post-deploy smoke, and CEO review
+  checklist.
+- **`seed_staging_review.run`** — one-command idempotent demo seed chaining
+  `seed_demo` → `seed_education` → `demo_royalty_invoice` → `seed_test_users` →
+  `seed_portal_teacher`; prints a reviewer access guide with a shared password.
+- **Phase 16 — Mobile PWA (PR #32, `f690714`).** Installable PWA shell over the existing
   `www/` portals — no parallel SPA: web app manifest (`public/pwa/manifest.json`,
   `start_url: /portal`), service worker served at `/mys-pwa-sw.js` via a Frappe
   `page_renderer` (`ServiceWorkerPageRenderer`, `application/javascript` +

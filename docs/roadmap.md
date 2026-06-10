@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
 **Last updated:** 2026-06-10
-**Up next:** Phase 17 — Reporting expansion (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
+**Up next:** Staging deployment for CEO review, then Phase 17 — Reporting expansion (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -41,7 +41,7 @@ These bind every phase:
 | 13 | Library | ✅ | PR [#28](https://github.com/darulmasaadir/myschools/pull/28) (`c48f7db`) |
 | 14 | Document Mgmt | ✅ | PR [#29](https://github.com/darulmasaadir/myschools/pull/29) (`1bd2ea8`) |
 | 15 | LMS | ✅ | PR [#30](https://github.com/darulmasaadir/myschools/pull/30) (`805c5c0`) + follow-up PR [#31](https://github.com/darulmasaadir/myschools/pull/31) (`bdd42d1`) |
-| 16 | Mobile PWA | 🟡 | `feature/phase-16-pwa` — manifest + service worker for portal surfaces |
+| 16 | Mobile PWA | ✅ | PR [#32](https://github.com/darulmasaadir/myschools/pull/32) (`f690714`) |
 | 17+ | Reporting expansion | ⬜ | Continuous per-module reports — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
@@ -343,9 +343,9 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
-## Phase 16 — Mobile PWA 🟡
+## Phase 16 — Mobile PWA ✅
 
-**Branch:** `feature/phase-16-pwa` (in flight).
+**Merged:** PR [#32](https://github.com/darulmasaadir/myschools/pull/32) (`f690714`).
 
 Harden existing `www/` portals as an installable PWA — upgrade-safe, no parallel SPA:
 
@@ -471,7 +471,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 16 | LMS | ✅ | `frappe/lms` + branch-scoped `LMS Course` (Phase 15, PR #30) |
 | 17 | Document Mgmt | ✅ | `MYS Document` registry + expiry notifications (Phase 14, PR #29) |
 | 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
-| 19 | Mobile App | 🟡 | Phase 16 in flight — installable PWA shell over existing portals |
+| 19 | Mobile App | ✅ | Installable PWA shell over existing portals (Phase 16, PR #32) |
 | 20 | Unique ID | ✅ | Student + staff ID generators (Phase 0) |
 | 21 | Reporting | 🟡 | 4 Query Reports + Central Dashboard (Phase 6); expands as modules land |
 
