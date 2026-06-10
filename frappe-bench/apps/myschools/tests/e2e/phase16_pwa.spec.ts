@@ -53,14 +53,30 @@ test.describe("Phase 16 — Mobile PWA", () => {
     );
     await expect(page.locator('script[src*="portal_pwa.js"]')).toHaveCount(1);
 
-    const registered = await page.evaluate(async () => {
-      if (!("serviceWorker" in navigator)) {
-        return false;
-      }
-      await navigator.serviceWorker.register("/mys-pwa-sw.js", { scope: "/" });
-      const reg = await navigator.serviceWorker.getRegistration("/");
-      return Boolean(reg);
-    });
-    expect(registered).toBe(true);
+    // portal_pwa.js registers on window "load" — poll until active (CI can be slow).
+    await page.waitForFunction(
+      async () => {
+        if (!("serviceWorker" in navigator)) {
+          return false;
+        }
+        let reg = await navigator.serviceWorker.getRegistration("/");
+        if (!reg) {
+          try {
+            reg = await navigator.serviceWorker.register("/mys-pwa-sw.js", {
+              scope: "/",
+            });
+          } catch {
+            reg = await navigator.serviceWorker.getRegistration("/");
+          }
+        }
+        if (!reg) {
+          return false;
+        }
+        await navigator.serviceWorker.ready;
+        return Boolean(reg.active || reg.installing || reg.waiting);
+      },
+      null,
+      { timeout: 15_000 },
+    );
   });
 });
