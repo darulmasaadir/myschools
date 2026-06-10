@@ -25,14 +25,57 @@ can be wiped and re-seeded at any time.
 
 ## 2. Frappe Cloud plan (initial recommendation)
 
-Use a **Sites** (managed bench) plan — not a raw Server VM — for the first
-staging cut:
+Use a **Sites** plan with a **Private Bench** — not a Server VM — for a
+single CEO-review site. Pricing reference:
+[frappe.io/cloud/pricing](https://frappe.io/cloud/pricing).
 
-| Choice | Why |
+### Why not the $5 / $10 tiers?
+
+`myschools` is a **custom app**. Frappe Cloud's cheapest shared-bench tiers only
+allow marketplace apps; custom-app deployment requires a **Private Bench**, which
+starts at **$25/mo** on the Sites family. See
+[Frappe Cloud shared hosting](https://frappe.io/cloud/shared-hosting) (Shared vs
+Private comparison).
+
+### Recommended tier
+
+| Choice | Recommendation |
 |---|---|
-| **Sites — mid tier** (e.g. *Pro* / *Business* class, 4 GB+ RAM) | MY School installs **six** apps (`erpnext`, `education`, `hrms`, `payments`, `lms`, `myschools`). Multi-app benches need headroom for `bench build`, asset compilation, and Playwright-scale migrations. |
-| **Region** | Pick closest to Lahore reviewers (often `ap-south-1` / Singapore) unless latency testing says otherwise. |
-| **Separate site from production** | Always `staging.myschools.pk` (or `review.myschools.pk`) — never seed review data on prod. |
+| **Plan family** | **Sites** (not Servers). Servers ($20+/mo VM) pay off when you host multiple sites/benches; one throwaway review site is cheaper on Sites. |
+| **Tier** | **$38/mo** — 3 CPU-hr/day, **1.5 GB DB**, 37.5 GB storage. Safer headroom for six apps + demo seed. **$25/mo** works if DB stays under ~850 MB after install (check Analytics). |
+| **Bench type** | **Private** (mandatory for `myschools`) |
+| **Region** | **AWS Mumbai** (`ap-south-1`) — lowest latency to Lahore reviewers |
+| **Provider** | **AWS**, not Hetzner — Hetzner is cheaper but EU-only; fine for dev, sluggish for a live PK demo |
+
+Sites tier limits (Private bench eligible from $25 upward):
+
+| Plan | CPU / day | DB | Storage |
+|---|---|---|---|
+| $25/mo | 2.0 hr | 1.0 GB | 25 GB |
+| **$38/mo** | **3.0 hr** | **1.5 GB** | **37.5 GB** |
+| $50/mo | 4.0 hr | 2.0 GB | 50 GB |
+
+### Billing model (important for short reviews)
+
+Frappe Cloud bills **per active day**, not upfront for the full month:
+
+- Daily rate = plan price ÷ 30 (e.g. $38 ÷ 30 ≈ **$1.27/day**).
+- You are charged for **each calendar day the site exists**, regardless of how
+  many hours the CEO actually clicks around.
+- Charges accumulate and are invoiced at **month-end** (card or prepaid credit
+  wallet) — choosing $38 does **not** charge $38 immediately.
+- **Delete the site** to stop billing. Idle sites still accrue ~$1.27/day.
+
+**Example — 2-day CEO review on $38:**
+
+```text
+2 days × ($38 / 30) ≈ $2.54 total
+```
+
+Then delete the site (see §10) → $0 further charges.
+
+**Payment tip for throwaway demos:** load a small **prepaid credit** balance
+($5–10) so a short review cannot surprise you at month-end.
 
 Upgrade path: when production goes live, clone the **app pin set** from staging
 to a second production site on the same bench (or a larger plan), not the
@@ -87,7 +130,7 @@ manual "Import" step for workspaces, workflows, or print formats.
 ### 4.1 Create the bench & site
 
 1. Log in to [frappecloud.com](https://frappecloud.com) → **New Site**.
-2. Choose a **Sites** plan with enough RAM for six apps (see §2).
+2. Choose a **Sites** plan — **$38/mo Private Bench** recommended (see §2).
 3. Site name: `staging.myschools.pk` (or your review subdomain).
 4. Frappe version: **v15**.
 5. Connect the GitHub repo `darulmasaadir/myschools` (or your fork) and set the
@@ -233,7 +276,62 @@ test users will leak. Always: fresh site → install apps → migrate → review
 
 ---
 
-## 10. Production (later)
+## 10. Teardown after review (cost control)
+
+When the CEO walk is done, **delete the site** — do not leave it running idle.
+Billing stops only when the site no longer exists (see §2 billing model).
+
+### 10.1 Optional backup (only if you need a snapshot)
+
+The review environment is fully reproducible from code + `seed_staging_review`
+(§5). A database backup is **optional** — skip it unless you have staging-only
+changes you cannot recreate.
+
+If you want a snapshot anyway:
+
+1. Frappe Cloud dashboard → your site → **Backups**.
+2. Click **Download** on the latest backup (or trigger **Backup Now** first).
+3. Store the file locally; it is **not** needed to redeploy the demo.
+
+### 10.2 Delete the site (stops billing)
+
+1. Frappe Cloud dashboard → your site → **Settings** (or site actions menu).
+2. **Delete Site** → confirm.
+
+After deletion:
+
+- No further daily charges for that site.
+- The `*.frappe.cloud` URL and any custom DNS CNAME stop working.
+- Demo users, seeded data, and review passwords are gone — by design.
+
+**Do not** rely on "turning off" or ignoring the site; existence = billing.
+
+### 10.3 Redeploy for a future review
+
+Because the demo is seed-driven, spinning up again is cheap:
+
+1. Create a new site on the same plan tier (§2, §4).
+2. Install apps in order (§3).
+3. Run `seed_staging_review.run` with a fresh password (§5).
+4. Run post-deploy smoke (§6).
+
+Total cost for another 2-day window: again ≈ **$2.54** on $38/mo — no standing
+monthly fee between reviews.
+
+### 10.4 Teardown checklist
+
+| Step | Done? |
+|---|---|
+| CEO / reviewers finished | ☐ |
+| Optional backup downloaded | ☐ |
+| Outbound email already disabled (§8) | ☐ |
+| Site deleted in Frappe Cloud | ☐ |
+| Custom DNS CNAME removed (if used) | ☐ |
+| Review password rotated / discarded | ☐ |
+
+---
+
+## 11. Production (later)
 
 Production cut is a **separate** site with:
 
