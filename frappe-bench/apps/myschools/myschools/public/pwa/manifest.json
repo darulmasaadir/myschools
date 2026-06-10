@@ -1,0 +1,25 @@
+{
+  "name": "MY School",
+  "short_name": "MY School",
+  "description": "MY School parent and staff portal — fees, attendance, timetable, and more.",
+  "start_url": "/portal",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#0f7a4a",
+  "icons": [
+    {
+      "src": "/assets/myschools/images/mys-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/myschools/images/mys-favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

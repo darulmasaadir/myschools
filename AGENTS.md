@@ -38,7 +38,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - Build scripts (source-of-truth for fixtures): [`frappe-bench/apps/myschools/myschools/scripts/`](frappe-bench/apps/myschools/myschools/scripts/)
 - Process docs: [`docs/processes/`](docs/processes/)
 
-## Status snapshot (as of 2026-06-09)
+## Status snapshot (as of 2026-06-10)
 
 - ✅ Phases 0–6: foundations, branding, workspaces, print formats, notifications, workflows, setup wizard + reports
 - ✅ **Phase 7**: Portals — 7a–7d merged (PR #15, `9b02a81`)
@@ -49,7 +49,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - ✅ **Phase 12**: Transport — PR #27 (`e4a0179`) — vehicles/routes/assignments + transport fee on Fees engine; guardian `/guardian/transport`; desk create→assign Playwright
 - ✅ **Phase 13**: Library — PR #28 (`c48f7db`) — catalog/loans + Library Fine on Fees engine; guardian `/guardian/library`; desk Item→Loan Playwright
 - ✅ **Phase 14**: Document Mgmt — PR #29 (`1bd2ea8`) — `MYS Document` registry wrapping Frappe `File`; expiry scheduler + `MYS - Branch Document Expiring` notification; desk-only
-- ✅ **Phase 15**: LMS — PR #30 (`805c5c0`) — `frappe/lms` + branch-scoped `LMS Course`; franchise role → LMS role links; teacher `/lms` e2e
-- ⬜ **Up next:** Phase 16 — Mobile PWA (see [`docs/roadmap.md`](docs/roadmap.md))
+- ✅ **Phase 15**: LMS — PR #30 (`805c5c0`) + follow-up PR #31 (`bdd42d1`) — franchise role links, verify matrix, teacher `/lms` e2e
+- 🟡 **Phase 16**: Mobile PWA — `feature/phase-16-pwa` in flight (manifest + service worker over existing portals)
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.
