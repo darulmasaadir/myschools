@@ -73,6 +73,7 @@ def run(password: str = DEFAULT_PASSWORD):
 		seed_test_users,
 	)
 	from myschools.scripts.seed_portal_teacher import main as seed_teacher_portal
+	from myschools.scripts.verify_all_roles import run as verify_all_roles
 
 	# 1. Franchise tree + companies + royalty agreement/overrides.
 	seed_demo.run()
@@ -87,6 +88,7 @@ def run(password: str = DEFAULT_PASSWORD):
 
 	_apply_review_password(password, teacher)
 	frappe.db.commit()
+	verify_all_roles()
 	_print_guide(password)
 	return {"password": password, "logins": [row["email"] for row in build_access_guide(password)]}
 
