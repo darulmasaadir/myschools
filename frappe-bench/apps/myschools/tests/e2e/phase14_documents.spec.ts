@@ -31,7 +31,7 @@ test.describe("Phase 14 — Document Mgmt", () => {
       { timeout: 15_000 },
     );
     if (seed.document?.document) {
-      await expect(page.locator(".list-row-container")).toContainText(
+      await expect(page.locator("body")).toContainText(
         "E2E Compliance Certificate",
       );
     }

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 15 — LMS (PR #30, `805c5c0`).** Upstream `frappe/lms` (pinned `v2.55.0`) +
+  `frappe/payments` (`version-15`) via `required_apps`; Custom Fields on `LMS Course`
+  (`mys_branch`, `mys_program`); `api/lms.py` branch-scoped permission hooks +
+  `ensure_lms_franchise_role_links` (Teacher → LMS Student, branch management →
+  Course Creator); `add_to_apps_screen` / `ensure_default_desk_app` for post-LMS desk
+  landing; seed published course for e2e branch; `test_lms.py` (5 tests),
+  `verify_lms_surfaces.py` role × surface matrix, Playwright `phase15_lms.spec.ts`
+  (desk list + teacher `/lms` course card).
 - **Phase 14 — Document Mgmt (PR #29, `1bd2ea8`).** Custom desk doctype `MYS Document`
   (branch-scoped via `permission_query_conditions`) wrapping Frappe `File` — no parallel
   storage layer; `api/documents.py` with expiry status sync on save, daily

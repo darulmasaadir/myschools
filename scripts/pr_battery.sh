@@ -63,6 +63,7 @@ step_student_lifecycle_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute 
 step_sms_adapters() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_sms_adapters.run ); }
 step_payment_adapters() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_payment_adapters.run ); }
 step_hr_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_hr_surfaces.run ); }
+step_lms_matrix() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.verify_lms_surfaces.run ); }
 step_teacher_portal_seed() { ( cd "$BENCH" && bench --site "$SITE" execute myschools.scripts.seed_portal_teacher.main ); }
 
 echo "PR battery — site=${SITE} branch=${BRANCH} commit=${HEAD_SHA:0:12}"
@@ -74,6 +75,7 @@ run_step "8. Role x surface (branch desk)" step_branch_matrix
 run_step "8. Role x surface (fee admin)"   step_fee_admin_matrix
 run_step "8. Role x surface (student lifecycle)" step_student_lifecycle_matrix
 run_step "8. Role x surface (HR / Employee)" step_hr_matrix
+run_step "8. Role x surface (LMS)"         step_lms_matrix
 run_step "SMS adapter smoke (8c)"          step_sms_adapters
 run_step "Payment adapter smoke (8e)"      step_payment_adapters
 run_step "Late-fee scheduler e2e (8a)"     step_late_fee_e2e

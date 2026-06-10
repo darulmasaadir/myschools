@@ -9,6 +9,7 @@ from frappe.tests.utils import FrappeTestCase
 
 from myschools.api.lms import (
 	ensure_lms_course_permissions,
+	ensure_lms_franchise_role_links,
 	lms_course_has_permission,
 	lms_course_query,
 	validate_mys_lms_course,
@@ -210,3 +211,23 @@ class TestLmsIntegration(FrappeTestCase):
 		meta = frappe.get_meta("LMS Course")
 		self.assertTrue(meta.has_field("mys_branch"))
 		self.assertTrue(meta.has_field("mys_program"))
+
+	def test_franchise_role_links_assign_lms_roles(self):
+		if not self.has_lms:
+			self.skipTest("lms not installed")
+		if not frappe.db.exists("Role", "LMS Student"):
+			self.skipTest("LMS Student role missing")
+		teacher = "lms-teacher@test.local"
+		if not frappe.db.exists("User", teacher):
+			user = frappe.get_doc(
+				{
+					"doctype": "User",
+					"email": teacher,
+					"first_name": "LMS Teacher",
+					"send_welcome_email": 0,
+				}
+			)
+			user.insert(ignore_permissions=True)
+			user.add_roles("Teacher")
+		ensure_lms_franchise_role_links()
+		self.assertIn("LMS Student", frappe.get_roles(teacher))
