@@ -75,7 +75,7 @@ NEGATIVE_DENY: dict[str, str] = {
 
 def run():
 	failures: list[str] = []
-	roles = list(FRANCHISE_ROLES) + ["Guardian"]
+	roles = [*FRANCHISE_ROLES, "Guardian"]
 
 	for role in roles:
 		email = ROLE_USER.get(role)
@@ -124,9 +124,7 @@ def run():
 					allowed = set(branches)
 					frappe.set_user(email)
 					try:
-						rows = frappe.get_list(
-							"Student", fields=["name", "mys_branch"], limit_page_length=0
-						)
+						rows = frappe.get_list("Student", fields=["name", "mys_branch"], limit_page_length=0)
 					finally:
 						frappe.set_user("Administrator")
 					leaked = [r.name for r in rows if r.mys_branch and r.mys_branch not in allowed]
