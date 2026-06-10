@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 16 — Mobile PWA (PR #32).** Installable PWA shell over the existing
+  `www/` portals — no parallel SPA: web app manifest (`public/pwa/manifest.json`,
+  `start_url: /portal`), service worker served at `/mys-pwa-sw.js` via a Frappe
+  `page_renderer` (`ServiceWorkerPageRenderer`, `application/javascript` +
+  `Service-Worker-Allowed: /`), offline shell for portal navigations,
+  `portal_pwa.js` registering the worker on guardian/teacher/branch/inspection/portal
+  routes, and manifest/theme-color/apple-touch meta in `mys_portal_base.html`;
+  `test_pwa.py` (7 tests), `verify_pwa_surfaces.py` role × surface matrix + HTTP
+  battery manifest/SW smoke, Playwright `phase16_pwa.spec.ts` (3 tests).
 - **Phase 15 — LMS (PR #30, `805c5c0`).** Upstream `frappe/lms` (pinned `v2.55.0`) +
   `frappe/payments` (`version-15`) via `required_apps`; Custom Fields on `LMS Course`
   (`mys_branch`, `mys_program`); `api/lms.py` branch-scoped permission hooks +

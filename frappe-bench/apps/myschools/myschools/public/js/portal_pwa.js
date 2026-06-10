@@ -14,10 +14,8 @@
 	}
 
 	window.addEventListener("load", function () {
-		navigator.serviceWorker
-			.register("/mys-pwa-sw.js", { scope: "/" })
-			.catch(function () {
-				/* Non-fatal — portal still works without SW */
-			});
+		navigator.serviceWorker.register("/mys-pwa-sw.js", { scope: "/" }).catch(function () {
+			/* Non-fatal — portal still works without SW */
+		});
 	});
 })();

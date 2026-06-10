@@ -23,9 +23,7 @@ def is_portal_path(path: str | None) -> bool:
 	if not path:
 		return False
 	normalized = path if path.startswith("/") else f"/{path}"
-	return any(
-		normalized == prefix or normalized.startswith(f"{prefix}/") for prefix in PORTAL_PREFIXES
-	)
+	return any(normalized == prefix or normalized.startswith(f"{prefix}/") for prefix in PORTAL_PREFIXES)
 
 
 def load_manifest() -> dict:

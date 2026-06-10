@@ -39,6 +39,8 @@ These bind every phase:
 | 11 | Academic scheduling | ✅ | PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`) + e2e backfill PR [#25](https://github.com/darulmasaadir/myschools/pull/25) (`e747c60`) |
 | 12 | Transport | ✅ | PR [#27](https://github.com/darulmasaadir/myschools/pull/27) (`e4a0179`) |
 | 13 | Library | ✅ | PR [#28](https://github.com/darulmasaadir/myschools/pull/28) (`c48f7db`) |
+| 14 | Document Mgmt | ✅ | PR [#29](https://github.com/darulmasaadir/myschools/pull/29) (`1bd2ea8`) |
+| 15 | LMS | ✅ | PR [#30](https://github.com/darulmasaadir/myschools/pull/30) (`805c5c0`) + follow-up PR [#31](https://github.com/darulmasaadir/myschools/pull/31) (`bdd42d1`) |
 | 16 | Mobile PWA | 🟡 | `feature/phase-16-pwa` — manifest + service worker for portal surfaces |
 | 17+ | Reporting expansion | ⬜ | Continuous per-module reports — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
