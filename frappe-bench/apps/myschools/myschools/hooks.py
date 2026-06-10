@@ -29,6 +29,9 @@ website_context = {
 app_include_css = ["/assets/myschools/css/myschools.css"]
 web_include_css = ["/assets/myschools/css/myschools.css"]
 
+# Phase 16 — portal PWA (manifest + service worker at /mys-pwa-sw.js)
+page_renderer = ["myschools.api.pwa.ServiceWorkerPageRenderer"]
+
 # Setup wizard
 # ------------
 # `setup_wizard_requires` loads our JS slide *after* ERPNext's slides

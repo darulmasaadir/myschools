@@ -302,6 +302,10 @@ jobs:
         working-directory: frappe-bench
         run: bench --site test_site execute myschools.scripts.verify_lms_surfaces.run
 
+      - name: Verify PWA role × surface matrix (Phase 16)
+        working-directory: frappe-bench
+        run: bench --site test_site execute myschools.scripts.verify_pwa_surfaces.run
+
       - name: Make test_site resolve to loopback
         run: |
           echo "127.0.0.1 test_site" | sudo tee -a /etc/hosts

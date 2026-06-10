@@ -54,6 +54,7 @@ def run(host: str = DEFAULT_HOST):
 	_check_teacher_user(failures)
 	_check_guardian_timetable(failures)
 	_check_admission_enquiry_public(failures)
+	_check_pwa_assets(failures)
 	if failures:
 		print("HTTP BATTERY FAILED:")
 		for f in failures:
@@ -61,8 +62,25 @@ def run(host: str = DEFAULT_HOST):
 		raise SystemExit(1)
 	print(
 		"HTTP BATTERY OK — Administrator + 4 branch + "
-		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + teacher portal + /admission-enquiry"
+		f"{len(ROLE_LANDING)} desk roles + 2 inspection users + teacher portal + "
+		"/admission-enquiry + PWA manifest/SW"
 	)
+
+
+def _check_pwa_assets(failures: list[str]) -> None:
+	"""Phase 16 — manifest JSON + service worker route (guest-accessible)."""
+	status, body = _get_guest("/assets/myschools/pwa/manifest.json")
+	if status != 200:
+		failures.append(f"PWA manifest HTTP {status}")
+		return
+	if '"name": "MY School"' not in body and '"name":"MY School"' not in body.replace(" ", ""):
+		failures.append("PWA manifest missing MY School name")
+	status, body = _get_guest("/mys-pwa-sw.js")
+	if status != 200:
+		failures.append(f"PWA service worker HTTP {status}")
+		return
+	if "addEventListener" not in body:
+		failures.append("PWA service worker body missing worker script")
 
 
 def _check_teacher_user(failures: list[str]) -> None:
@@ -281,6 +299,15 @@ def _post_json(opener, path: str, data: dict) -> dict:
 		method="POST",
 	)
 	return json.loads(opener.open(req, timeout=30).read())
+
+
+def _get_guest(path: str) -> tuple[int, str]:
+	req = urllib.request.Request(f"{BASE}{path}", headers={"Host": HOST})
+	try:
+		resp = urllib.request.urlopen(req, timeout=30)
+		return resp.status, resp.read().decode("utf-8", errors="replace")
+	except urllib.error.HTTPError as exc:
+		return exc.code, exc.read().decode("utf-8", errors="replace")
 
 
 def _get(opener, path: str) -> tuple[int, str]:

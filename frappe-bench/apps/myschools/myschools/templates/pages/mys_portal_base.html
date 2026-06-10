@@ -2,6 +2,13 @@
 
 {% block head_include %}
 {{ super() }}
+<link rel="manifest" href="/assets/myschools/pwa/manifest.json">
+<meta name="theme-color" content="#0f7a4a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MY School">
+<link rel="apple-touch-icon" href="/assets/myschools/images/mys-favicon.svg">
+<script src="/assets/myschools/js/portal_pwa.js" defer></script>
 <style>
 	.mys-portal {
 		max-width: 42rem;

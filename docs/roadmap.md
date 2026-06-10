@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-06-09
-**Up next:** Phase 16 — Mobile PWA (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
+**Last updated:** 2026-06-10
+**Up next:** Phase 17 — Reporting expansion (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -39,7 +39,8 @@ These bind every phase:
 | 11 | Academic scheduling | ✅ | PR [#24](https://github.com/darulmasaadir/myschools/pull/24) (`98821d9`) + e2e backfill PR [#25](https://github.com/darulmasaadir/myschools/pull/25) (`e747c60`) |
 | 12 | Transport | ✅ | PR [#27](https://github.com/darulmasaadir/myschools/pull/27) (`e4a0179`) |
 | 13 | Library | ✅ | PR [#28](https://github.com/darulmasaadir/myschools/pull/28) (`c48f7db`) |
-| 14+ | Remaining modules (Doc Mgmt, LMS, Mobile PWA, Reporting) | ⬜ | Scoped — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
+| 16 | Mobile PWA | 🟡 | `feature/phase-16-pwa` — manifest + service worker for portal surfaces |
+| 17+ | Reporting expansion | ⬜ | Continuous per-module reports — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
 
@@ -340,6 +341,21 @@ Attendance/exam marking shipped in **Phase 10** (PR #23).
 
 ---
 
+## Phase 16 — Mobile PWA 🟡
+
+**Branch:** `feature/phase-16-pwa` (in flight).
+
+Harden existing `www/` portals as an installable PWA — upgrade-safe, no parallel SPA:
+
+- **`public/pwa/manifest.json`** — web app manifest (`start_url: /portal`, MY School branding).
+- **`public/pwa/sw.js`** + **`ServiceWorkerPageRenderer`** — serves `/mys-pwa-sw.js` with `application/javascript` + `Service-Worker-Allowed: /`.
+- **`public/js/portal_pwa.js`** — registers the worker on guardian/teacher/branch/inspection/portal routes.
+- **`mys_portal_base.html`** — manifest link, theme-color, apple-mobile-web-app meta.
+- **`verify_pwa_surfaces.py`** role x surface matrix; HTTP battery manifest + SW smoke.
+- **Tests:** `test_pwa.py` (7); Playwright `phase16_pwa.spec.ts` (3: manifest, SW route, guardian registration).
+
+---
+
 ## Phase 15 — LMS ✅
 
 **Merged:** PR [#30](https://github.com/darulmasaadir/myschools/pull/30) (`805c5c0`).
@@ -453,7 +469,7 @@ This is the whole-map view across the module list in [`project-myschools`](../.c
 | 16 | LMS | ✅ | `frappe/lms` + branch-scoped `LMS Course` (Phase 15, PR #30) |
 | 17 | Document Mgmt | ✅ | `MYS Document` registry + expiry notifications (Phase 14, PR #29) |
 | 18 | Security / Role | ✅ | `permission_query_conditions` + role landing + module profiles |
-| 19 | Mobile App | 🟡 | Portals are mobile-responsive web; no PWA/native decision yet |
+| 19 | Mobile App | 🟡 | Phase 16 in flight — installable PWA shell over existing portals |
 | 20 | Unique ID | ✅ | Student + staff ID generators (Phase 0) |
 | 21 | Reporting | 🟡 | 4 Query Reports + Central Dashboard (Phase 6); expands as modules land |
 
