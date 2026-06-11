@@ -36,9 +36,13 @@ PAYROLL = "Payroll Entry"
 # live leak check below. No franchise user should ever see another branch's roster.
 EXPECTED: dict[str, tuple[bool, str]] = {
 	"ceo@mys.local": (True, "global"),
+	# HO dept heads are global-scoped, but Employee doctype VISIBILITY is curated
+	# per dept (HO_DEPT_ROLE_READS): only Finance / Administration / Training need
+	# the staff roster. Academic & Monitoring heads are global but not granted
+	# Employee read — their scope is still unscoped if they ever gain it.
 	"finance.head@mys.local": (True, "global"),
-	"academic.head@mys.local": (True, "global"),
-	"monitoring.head@mys.local": (True, "global"),
+	"academic.head@mys.local": (False, "global"),
+	"monitoring.head@mys.local": (False, "global"),
 	"admin.head@mys.local": (True, "global"),
 	"training.head@mys.local": (True, "global"),
 	"campus.admin@mys.local": (True, "scoped"),
