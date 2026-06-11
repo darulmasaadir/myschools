@@ -50,6 +50,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - ✅ **Phase 13**: Library — PR #28 (`c48f7db`) — catalog/loans + Library Fine on Fees engine; guardian `/guardian/library`; desk Item→Loan Playwright
 - ✅ **Phase 14**: Document Mgmt — PR #29 (`1bd2ea8`) — `MYS Document` registry wrapping Frappe `File`; expiry scheduler + `MYS - Branch Document Expiring` notification; desk-only
 - ✅ **Phase 15**: LMS — PR #30 (`805c5c0`) + follow-up PR #31 (`bdd42d1`) — franchise role links, verify matrix, teacher `/lms` e2e
-- 🟡 **Phase 16**: Mobile PWA — `feature/phase-16-pwa` in flight (manifest + service worker over existing portals)
+- ✅ **Phase 16**: Mobile PWA — PR #32 (`f690714`) — installable manifest + service worker over existing portals
+- ⬜ **Up next:** Staging deployment for CEO review (Frappe Cloud), then Phase 17 — Reporting expansion
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

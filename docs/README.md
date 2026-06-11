@@ -60,7 +60,9 @@ Read in this order:
 4. **[development.md](development.md)** — bench bootstrap, running tests
    (Frappe + Playwright), branching, commit conventions, releasing,
    debugging tips.
-5. **[api/royalty.md](api/royalty.md)** and **[api/inspection.md](api/inspection.md)** —
+5. **[deployment.md](deployment.md)** — Frappe Cloud staging runbook, app pins,
+   review seed, post-deploy smoke.
+6. **[api/royalty.md](api/royalty.md)** and **[api/inspection.md](api/inspection.md)** —
    function reference for the two core APIs.
 
 ## I am writing or reviewing a PR
@@ -80,6 +82,7 @@ docs/
 ├── architecture.md                 ← technical: how it's built
 ├── data-model.md                   ← DocType field reference
 ├── development.md                  ← dev onboarding + workflows
+├── deployment.md                   ← Frappe Cloud staging + review seed
 ├── processes/
 │   ├── royalty-billing.md          ← operator-facing: monthly royalty cycle
 │   ├── inspection-workflow.md      ← operator-facing: inspection lifecycle
