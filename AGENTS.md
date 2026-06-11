@@ -51,6 +51,7 @@ Full scope: [`project-myschools`](.cursor/rules/project-myschools.mdc). Baseline
 - ✅ **Phase 14**: Document Mgmt — PR #29 (`1bd2ea8`) — `MYS Document` registry wrapping Frappe `File`; expiry scheduler + `MYS - Branch Document Expiring` notification; desk-only
 - ✅ **Phase 15**: LMS — PR #30 (`805c5c0`) + follow-up PR #31 (`bdd42d1`) — franchise role links, verify matrix, teacher `/lms` e2e
 - ✅ **Phase 16**: Mobile PWA — PR #32 (`f690714`) — installable manifest + service worker over existing portals
-- ⬜ **Up next:** Staging deployment for CEO review (Frappe Cloud), then Phase 17 — Reporting expansion
+- 🟡 **Phase 17**: Role model & access governance — branch `feature/phase-17-role-model`. Splits `HO Dept Head` into 5 dept heads, adds `Campus Admin` + Student portal (`/student`), and makes the desk sidebar an enforced allow-list (`verify_sidebar_surfaces.py`). 18-role model; `role_model.py` is the single source of truth.
+- ⬜ **Up next:** merge Phase 17, then staging deployment for CEO review (Frappe Cloud), then Phase 18 — Reporting expansion
 
 Authoritative version: [`docs/roadmap.md`](docs/roadmap.md). If this file disagrees with the roadmap, **the roadmap wins** — fix this file in the same PR that updates the roadmap.

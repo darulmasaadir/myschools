@@ -146,6 +146,21 @@ def get_schedules_for_branch(branch: str, days: int = 14, limit: int = 500) -> l
 	)
 
 
+def get_schedules_for_student(
+	student_name: str,
+	days: int = 14,
+	limit: int = 500,
+) -> list[dict]:
+	group_ids = get_student_group_ids_for_students([student_name])
+	from_date, to_date = schedule_date_window(days=days)
+	return fetch_course_schedules(
+		group_ids=group_ids,
+		from_date=from_date,
+		to_date=to_date,
+		limit=limit,
+	)
+
+
 def get_schedules_for_guardian(
 	guardian: frappe.Document,
 	student_name: str | None = None,

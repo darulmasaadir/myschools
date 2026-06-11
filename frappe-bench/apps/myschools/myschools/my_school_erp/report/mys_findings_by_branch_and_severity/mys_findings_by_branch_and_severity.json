@@ -19,7 +19,7 @@
  "report_type": "Script Report",
  "roles": [
   {"role": "Chief Executive"},
-  {"role": "HO Dept Head"},
+  {"role": "Finance Dept Head"},
   {"role": "Cluster Director"},
   {"role": "Branch Director"},
   {"role": "Academic Monitor"},

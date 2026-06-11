@@ -49,12 +49,13 @@ REVIEW_LOGINS: tuple[tuple[str, str, str, str], ...] = (
 	("/app", "Academic Monitor", "monitor@mys.local", "Inspection desk + monitoring dashboard"),
 	("/teacher", "Teacher", "e2e_teacher@mys.local", "Teacher portal: classes, attendance, marks"),
 	("/guardian", "Guardian", "e2e_guardian@mys.local", "Parent portal: fees, timetable, transport, library"),
+	("/student", "Student", "e2e-student@mys.local", "Student portal: profile, fees, attendance, timetable"),
 	("/lms", "Teacher (LMS)", "e2e_teacher@mys.local", "Learning portal: seeded course"),
 )
 
 # Portal users get role-specific passwords in their own seeds; we reset the
 # two portal logins to the shared review password for a single hand-out.
-PORTAL_LOGINS = ("e2e_teacher@mys.local", "e2e_guardian@mys.local")
+PORTAL_LOGINS = ("e2e_teacher@mys.local", "e2e_guardian@mys.local", "e2e-student@mys.local")
 
 
 def build_access_guide(password: str) -> list[dict]:
@@ -74,6 +75,7 @@ def run(password: str = DEFAULT_PASSWORD):
 	)
 	from myschools.scripts.seed_portal_teacher import main as seed_teacher_portal
 	from myschools.scripts.verify_all_roles import run as verify_all_roles
+	from myschools.scripts.verify_sidebar_surfaces import run as verify_sidebar_surfaces
 
 	# 1. Franchise tree + companies + royalty agreement/overrides.
 	seed_demo.run()
@@ -89,6 +91,7 @@ def run(password: str = DEFAULT_PASSWORD):
 	_apply_review_password(password, teacher)
 	frappe.db.commit()
 	verify_all_roles()
+	verify_sidebar_surfaces()
 	_print_guide(password)
 	return {"password": password, "logins": [row["email"] for row in build_access_guide(password)]}
 

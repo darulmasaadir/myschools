@@ -34,7 +34,7 @@ ROLE_AUDIT = "Audit Officer"
 ROLE_BR_DIRECTOR = "Branch Director"
 ROLE_BR_PRINCIPAL = "Branch Principal"
 ROLE_BR_ACCOUNTANT = "Branch Accountant"
-ROLE_HO_DEPT_HEAD = "HO Dept Head"
+ROLE_FINANCE_DEPT_HEAD = "Finance Dept Head"
 ROLE_CEO = "Chief Executive"
 
 
@@ -85,7 +85,7 @@ FINDING_TRANSITIONS = [
 ]
 
 ROYALTY_STATES = [
-	("Draft", 0, [ROLE_HO_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
+	("Draft", 0, [ROLE_FINANCE_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
 	("Unpaid", 1, []),
 	("Partial", 1, []),
 	("Paid", 1, []),
@@ -94,8 +94,8 @@ ROYALTY_STATES = [
 ]
 
 ROYALTY_TRANSITIONS = [
-	("Draft", "Submit", "Unpaid", [ROLE_HO_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
-	("Unpaid", "Cancel", "Cancelled", [ROLE_CEO, ROLE_HO_DEPT_HEAD]),
+	("Draft", "Submit", "Unpaid", [ROLE_FINANCE_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
+	("Unpaid", "Cancel", "Cancelled", [ROLE_CEO, ROLE_FINANCE_DEPT_HEAD]),
 	("Partial", "Cancel", "Cancelled", [ROLE_CEO]),
 	("Overdue", "Cancel", "Cancelled", [ROLE_CEO]),
 ]

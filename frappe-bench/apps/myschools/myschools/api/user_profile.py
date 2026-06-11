@@ -16,15 +16,17 @@ import frappe
 
 # Highest tier first — first role match wins. Tuple shape:
 #   (Module Profile name, default Workspace slug, set of roles in this tier)
+from myschools.setup.role_model import CAMPUS_ADMIN_ROLE, HO_DEPT_HEAD_ROLES
+
 TIER_ORDER = [
-	("MYS HO", "mys-head-office", {"Chief Executive", "HO Dept Head"}),
+	("MYS HO", "mys-head-office", {"Chief Executive", *HO_DEPT_HEAD_ROLES}),
 	("MYS Cluster", "mys-cluster", {"Cluster Director"}),
 	(
 		"MYS Branch",
 		"mys-branch",
 		{"Branch Director", "Branch Principal", "Branch Admin", "Branch Accountant"},
 	),
-	("MYS Campus", "mys-campus", {"Campus Incharge"}),
+	("MYS Campus", "mys-campus", {"Campus Incharge", CAMPUS_ADMIN_ROLE}),
 	("MYS Inspection", "mys-inspection", {"Academic Monitor", "Audit Officer"}),
 ]
 

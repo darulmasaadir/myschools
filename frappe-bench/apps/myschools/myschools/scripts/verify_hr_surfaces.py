@@ -36,7 +36,12 @@ PAYROLL = "Payroll Entry"
 # live leak check below. No franchise user should ever see another branch's roster.
 EXPECTED: dict[str, tuple[bool, str]] = {
 	"ceo@mys.local": (True, "global"),
-	"ho.head@mys.local": (True, "global"),
+	"finance.head@mys.local": (True, "global"),
+	"academic.head@mys.local": (True, "global"),
+	"monitoring.head@mys.local": (True, "global"),
+	"admin.head@mys.local": (True, "global"),
+	"training.head@mys.local": (True, "global"),
+	"campus.admin@mys.local": (True, "scoped"),
 	"cluster.dir@mys.local": (True, "scoped"),
 	"monitor@mys.local": (True, "scoped"),
 	"audit@mys.local": (True, "scoped"),

@@ -68,7 +68,7 @@ NOTIFICATIONS = [
 		),
 		"recipients_roles": [
 			"Chief Executive",
-			"HO Dept Head",
+			"Finance Dept Head",
 			"Branch Director",
 			"Branch Accountant",
 		],
@@ -102,7 +102,7 @@ NOTIFICATIONS = [
 		),
 		"recipients_roles": [
 			"Chief Executive",
-			"HO Dept Head",
+			"Finance Dept Head",
 			"Branch Director",
 			"Branch Accountant",
 		],
@@ -230,7 +230,8 @@ NOTIFICATIONS = [
 		),
 		"recipients_roles": [
 			"Chief Executive",
-			"HO Dept Head",
+			"Finance Dept Head",
+			"Administration Dept Head",
 			"Cluster Director",
 			"Branch Director",
 		],
@@ -263,7 +264,8 @@ NOTIFICATIONS = [
 			"Branch Director",
 			"Branch Principal",
 			"Branch Admin",
-			"HO Dept Head",
+			"Administration Dept Head",
+			"Monitoring Dept Head",
 		],
 		"recipients_doc_fields": [],
 		"attach_print": 0,

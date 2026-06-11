@@ -32,7 +32,7 @@ EXPECTED: dict[str, dict[str, set[str]]] = {
 		POLICY: {"read", "create", "write"},
 		BULK: {"read", "create", "write"},
 	},
-	"ho.head@mys.local": {
+	"finance.head@mys.local": {
 		OVERRIDE: {"read"},
 		POLICY: {"read"},
 		BULK: {"read"},

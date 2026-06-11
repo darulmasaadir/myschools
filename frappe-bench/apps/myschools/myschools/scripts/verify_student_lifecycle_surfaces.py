@@ -23,7 +23,7 @@ EXPECTED: dict[str, dict[str, set[str]]] = {
 		TRANSFER: {"read", "create", "write", "submit"},
 		LEAVING: {"read", "create", "write", "submit"},
 	},
-	"ho.head@mys.local": {
+	"admin.head@mys.local": {
 		TRANSFER: {"read"},
 		LEAVING: {"read"},
 	},

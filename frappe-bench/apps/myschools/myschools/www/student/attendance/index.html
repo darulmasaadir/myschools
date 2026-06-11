@@ -1,0 +1,43 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/student/attendance' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">Last 90 days of attendance.</p>
+
+{% if attendance_summary %}
+<div class="mys-portal__card">
+	<p>
+		Present: {{ attendance_summary.Present }}
+		· Absent: {{ attendance_summary.Absent }}
+		· Leave: {{ attendance_summary.Leave }}
+	</p>
+</div>
+{% endif %}
+
+{% if attendance %}
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<thead>
+			<tr><th>Date</th><th>Status</th></tr>
+		</thead>
+		<tbody>
+			{% for row in attendance %}
+			<tr>
+				<td>{{ row.date }}</td>
+				<td>{{ row.status }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% else %}
+<div class="mys-portal__card">
+	<p>No attendance records found.</p>
+</div>
+{% endif %}
+{% endblock %}

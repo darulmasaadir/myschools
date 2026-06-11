@@ -23,6 +23,8 @@ class TestPwaHelpers(FrappeTestCase):
 	def test_is_portal_path_guardian_and_teacher(self):
 		self.assertTrue(is_portal_path("/guardian"))
 		self.assertTrue(is_portal_path("/guardian/fees"))
+		self.assertTrue(is_portal_path("/student"))
+		self.assertTrue(is_portal_path("/student/fees"))
 		self.assertTrue(is_portal_path("/teacher/schedule"))
 		self.assertTrue(is_portal_path("/branch/timetable"))
 		self.assertTrue(is_portal_path("/inspection/visits"))

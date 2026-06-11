@@ -6,7 +6,7 @@ These hooks are wired in `myschools/hooks.py` under
 Frappe appends to every list/report query for a given DocType.
 
 Tier rules:
-  * System Manager / Chief Executive / HO Dept Head — no scoping (see all)
+  * System Manager / Chief Executive / HO dept heads — no scoping (see all)
   * Cluster Director / Academic Monitor / Audit Officer — scoped to their cluster
   * Branch Director / Principal / Admin / Accountant / Campus Incharge — scoped to their branch(es)
   * All other users (Student, Guardian) — handled by upstream education app
@@ -14,7 +14,9 @@ Tier rules:
 
 import frappe
 
-GLOBAL_ROLES = {"System Manager", "Administrator", "Chief Executive", "HO Dept Head"}
+from myschools.setup.role_model import CAMPUS_ADMIN_ROLE, GLOBAL_DESK_ROLES
+
+GLOBAL_ROLES = {"System Manager", "Administrator", *GLOBAL_DESK_ROLES}
 CLUSTER_ROLES = {"Cluster Director", "Academic Monitor", "Audit Officer"}
 BRANCH_ROLES = {
 	"Branch Director",
@@ -22,6 +24,7 @@ BRANCH_ROLES = {
 	"Branch Admin",
 	"Branch Accountant",
 	"Campus Incharge",
+	CAMPUS_ADMIN_ROLE,
 }
 
 
@@ -69,7 +72,26 @@ def _branch_filter(field: str, user: str) -> str:
 	return f"`{field}` IN ({in_list})"
 
 
+def _student_ids_for_portal_user(user: str) -> list[str]:
+	"""Return Student doc names owned by a portal Student login."""
+	if "Student" not in _user_roles(user):
+		return []
+	if frappe.get_meta("Student").has_field("user"):
+		by_user = frappe.db.get_value("Student", {"user": user}, "name")
+		if by_user:
+			return [by_user]
+	email = frappe.db.get_value("User", user, "email")
+	if not email:
+		return []
+	name = frappe.db.get_value("Student", {"student_email_id": email}, "name")
+	return [name] if name else []
+
+
 def student_query(user):
+	student_ids = _student_ids_for_portal_user(user)
+	if student_ids:
+		in_list = ", ".join(frappe.db.escape(s) for s in student_ids)
+		return f"`tabStudent`.name IN ({in_list})"
 	return _branch_filter("mys_branch", user) or ""
 
 
@@ -107,6 +129,8 @@ def student_has_permission(doc, ptype="read", user=None):
 	"""Per-document permission check for Student records."""
 	user = user or frappe.session.user
 	roles = _user_roles(user)
+	if "Student" in roles:
+		return doc.name in _student_ids_for_portal_user(user)
 	if roles & GLOBAL_ROLES:
 		return True
 	scope, branches = _user_scope(user)

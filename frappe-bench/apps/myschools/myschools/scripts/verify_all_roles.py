@@ -4,7 +4,7 @@
 
 This is the umbrella matrix that guarantees the per-feature verify_* scripts
 never silently drop a role. For EVERY role MY School defines
-(``FRANCHISE_ROLES`` + the ``Guardian`` portal role) it asserts:
+(``FRANCHISE_ROLES`` + portal roles) it asserts:
 
   1. A login user exists, is enabled, and actually carries the role
      (so "no role is skipped" is mechanically true, not a hope).
@@ -15,10 +15,11 @@ never silently drop a role. For EVERY role MY School defines
      scoping isn't accidentally wide open).
   5. Branch/cluster/campus-scoped roles get a non-empty row window on
      ``Student`` and never leak another branch's rows (live get_list check).
-  6. Portal roles (Teacher, Guardian) pass their api permission gate.
+  6. Portal roles (Teacher, Guardian, Student) pass their api permission gate.
 
 Run the seeds first so every role has a backing user:
   bench --site SITE execute myschools.scripts.seed_e2e.main
+  bench --site SITE execute myschools.scripts.seed_test_users.run
 """
 
 from __future__ import annotations
@@ -28,22 +29,7 @@ from frappe.permissions import has_permission
 
 from myschools.api.permissions import _user_scope, student_query
 from myschools.setup.install import FRANCHISE_ROLE_READS, FRANCHISE_ROLES
-
-# Canonical login per role (seed_test_users + seed_portal_teacher).
-ROLE_USER: dict[str, str] = {
-	"Chief Executive": "ceo@mys.local",
-	"HO Dept Head": "ho.head@mys.local",
-	"Cluster Director": "cluster.dir@mys.local",
-	"Academic Monitor": "monitor@mys.local",
-	"Audit Officer": "audit@mys.local",
-	"Branch Director": "branch.dir@mys.local",
-	"Branch Principal": "principal@mys.local",
-	"Branch Admin": "branch.admin@mys.local",
-	"Branch Accountant": "accountant@mys.local",
-	"Campus Incharge": "campus@mys.local",
-	"Teacher": "e2e_teacher@mys.local",
-	"Guardian": "e2e_guardian@mys.local",
-}
+from myschools.setup.role_model import CAMPUS_ADMIN_ROLE, GLOBAL_DESK_ROLES, ROLE_SEED_USER
 
 # Roles whose data is branch/cluster/campus-scoped (expect a row window + no leak).
 SCOPED_ROLES = {
@@ -55,19 +41,25 @@ SCOPED_ROLES = {
 	"Branch Admin",
 	"Branch Accountant",
 	"Campus Incharge",
+	CAMPUS_ADMIN_ROLE,
 }
 
-# Global desk roles see an unscoped window.
-GLOBAL_ROLES = {"Chief Executive", "HO Dept Head"}
+GLOBAL_ROLES = set(GLOBAL_DESK_ROLES)
 
-# Representative doctype each role must be DENIED (clearest separation-of-duty
-# cases). Finance docs for non-finance roles; Fees for inspection-only roles.
+# Representative doctype each role must be DENIED (clearest separation-of-duty cases).
 NEGATIVE_DENY: dict[str, str] = {
+	"Finance Dept Head": "MYS Inspection Checklist Template",
+	"Academic Dept Head": "MYS Royalty Invoice",
+	"Monitoring Dept Head": "Fees",
+	"Administration Dept Head": "MYS Royalty Invoice",
+	"Training Dept Head": "MYS Royalty Invoice",
 	"Academic Monitor": "Fees",
 	"Audit Officer": "Fees",
 	"Campus Incharge": "MYS Royalty Invoice",
+	CAMPUS_ADMIN_ROLE: "MYS Royalty Invoice",
 	"Teacher": "MYS Royalty Invoice",
 	"Guardian": "MYS Royalty Invoice",
+	"Student": "MYS Royalty Invoice",
 	"Branch Accountant": "MYS Inspection Checklist Template",
 	"Branch Admin": "MYS Corrective Action",
 }
@@ -75,12 +67,12 @@ NEGATIVE_DENY: dict[str, str] = {
 
 def run():
 	failures: list[str] = []
-	roles = [*FRANCHISE_ROLES, "Guardian"]
+	roles = [*FRANCHISE_ROLES, "Guardian", "Student"]
 
 	for role in roles:
-		email = ROLE_USER.get(role)
+		email = ROLE_SEED_USER.get(role)
 		if not email:
-			failures.append(f"{role}: no canonical seed user mapped in ROLE_USER")
+			failures.append(f"{role}: no canonical seed user mapped in ROLE_SEED_USER")
 			continue
 
 		# 1. Login user exists, enabled, carries the role.
@@ -93,7 +85,7 @@ def run():
 			failures.append(f"{role}: user {email} does not carry role {role!r}")
 			continue
 
-		# 2. Landing page configured.
+		# 2. Landing page configured (desk roles use workspace slug; portals use route).
 		home = (frappe.get_hooks("role_home_page") or {}).get(role)
 		if not home:
 			failures.append(f"{role}: no role_home_page mapping")
@@ -101,7 +93,7 @@ def run():
 		# 3. Positive — can read every granted doctype.
 		for dt in FRANCHISE_ROLE_READS.get(role, []):
 			if not frappe.db.exists("DocType", dt):
-				continue  # optional upstream app not installed
+				continue
 			if not has_permission(dt, "read", user=email):
 				failures.append(f"{role}: cannot read granted doctype {dt!r}")
 
@@ -116,6 +108,8 @@ def run():
 			window = student_query(email) or ""
 			if role in GLOBAL_ROLES and window != "":
 				failures.append(f"{role}: expected unscoped Student window, got {window!r}")
+			if role == "Student" and "name IN" not in window:
+				failures.append(f"{role}: expected own-record Student window, got {window!r}")
 			if role in SCOPED_ROLES:
 				if "mys_branch" not in window and "mys_campus" not in window:
 					failures.append(f"{role}: expected scoped Student window, got {window!r}")
@@ -136,7 +130,7 @@ def run():
 	# 6. Portal gates.
 	_check_portal_gates(failures)
 
-	roster = ", ".join(f"{r}={ROLE_USER[r]}" for r in roles if r in ROLE_USER)
+	roster = ", ".join(f"{r}={ROLE_SEED_USER[r]}" for r in roles if r in ROLE_SEED_USER)
 	if failures:
 		print(f"FAILED — {len(failures)} issue(s) across {len(roles)} roles:")
 		for f in failures:
@@ -147,9 +141,10 @@ def run():
 
 
 def _check_portal_gates(failures: list[str]) -> None:
-	"""Teacher + Guardian must pass their portal api permission gate."""
-	teacher = ROLE_USER["Teacher"]
-	guardian = ROLE_USER["Guardian"]
+	"""Teacher, Guardian, and Student must pass their portal api permission gates."""
+	teacher = ROLE_SEED_USER["Teacher"]
+	guardian = ROLE_SEED_USER["Guardian"]
+	student_user = ROLE_SEED_USER["Student"]
 
 	if frappe.db.exists("User", teacher):
 		from myschools.api.teacher_portal import TEACHER_ROLES
@@ -158,7 +153,14 @@ def _check_portal_gates(failures: list[str]) -> None:
 			failures.append(f"Teacher: {teacher} fails teacher_portal role gate")
 
 	if frappe.db.exists("User", guardian):
-		# Guardian portal scopes by Guardian.user; assert the link exists.
 		linked = frappe.db.get_value("Guardian", {"user": guardian}, "name")
 		if not linked:
 			failures.append(f"Guardian: no Guardian record linked to {guardian}")
+
+	if frappe.db.exists("User", student_user):
+		from myschools.api.student_portal import get_student_for_user
+
+		if "Student" not in frappe.get_roles(student_user):
+			failures.append(f"Student: {student_user} missing Student role")
+		elif not get_student_for_user(student_user):
+			failures.append(f"Student: no Student record linked to {student_user}")
