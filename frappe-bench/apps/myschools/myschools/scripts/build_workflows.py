@@ -150,11 +150,12 @@ WORKFLOWS = [
 	),
 ]
 
-# Workflow State + Workflow Action Master rows that aren't pre-seeded in core.
-# Core ships: Draft, Pending, Approved, Rejected, Submitted, Cancelled (states)
-#             and Submit, Cancel, Approve, Reject, Review (actions).
-# We need: Open, In Progress, Resolved, Verified, Unpaid, Partial, Paid, Overdue.
+# Workflow State + Workflow Action Master rows shipped as fixtures.
+# Draft / Cancelled are documented in core but are NOT guaranteed on a bare
+# fresh-install CI site — include them so workflow transitions never 404.
 WORKFLOW_STATE_NAMES = [
+	("Draft", "primary"),
+	("Cancelled", "danger"),
 	("Open", "warning"),
 	("In Progress", "primary"),
 	("Resolved", "info"),

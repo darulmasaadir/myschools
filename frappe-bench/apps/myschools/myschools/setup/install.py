@@ -594,6 +594,17 @@ def grant_franchise_role_permissions():
 			update_permission_property("MYS Communication Log", "Guardian", 0, "read", 1)
 			update_permission_property("MYS Communication Log", "Guardian", 0, "create", 1)
 
+	# Workflow desk buttons (Verify / Submit / Cancel) need read on Workflow State.
+	_workflow_meta = ("Workflow", "Workflow State", "Workflow Action Master")
+	for role in FRANCHISE_ROLES:
+		if not frappe.db.exists("Role", role):
+			continue
+		for doctype in _workflow_meta:
+			if not frappe.db.exists("DocType", doctype):
+				continue
+			add_permission(doctype, role, 0)
+			update_permission_property(doctype, role, 0, "read", 1)
+
 
 def backfill_module_profiles():
 	"""Attach the right MYS Module Profile to every existing user — called
