@@ -1,7 +1,11 @@
 {
  "allow_roles": [
   {"role": "Chief Executive"},
-  {"role": "HO Dept Head"},
+  {"role": "Finance Dept Head"},
+  {"role": "Academic Dept Head"},
+  {"role": "Monitoring Dept Head"},
+  {"role": "Administration Dept Head"},
+  {"role": "Training Dept Head"},
   {"role": "Cluster Director"},
   {"role": "Branch Director"},
   {"role": "Branch Principal"},

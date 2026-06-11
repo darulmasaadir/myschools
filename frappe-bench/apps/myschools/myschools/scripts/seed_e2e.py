@@ -674,6 +674,11 @@ def main():
 	users = {email: {"password": spec["password"], "roles": spec["roles"]} for email, spec in USERS.items()}
 	if teacher.get("guardian"):
 		users[teacher["guardian"]["user"]] = {"password": "mys-e2e-guardian", "roles": ["Guardian"]}
+	if teacher.get("student_portal"):
+		users[teacher["student_portal"]["user"]] = {
+			"password": "mys-e2e-student",
+			"roles": ["Student"],
+		}
 	state = {
 		"users": users,
 		"visit": visit,
@@ -686,6 +691,7 @@ def main():
 		"payment": payment,
 		"teacher": teacher,
 		"guardian": teacher.get("guardian"),
+		"student_portal": teacher.get("student_portal"),
 		"transport": teacher.get("transport"),
 		"library": teacher.get("library"),
 		"document": teacher.get("document"),

@@ -3,7 +3,7 @@
   "doctype": "Workflow State",
   "name": "Draft",
   "workflow_state_name": "Draft",
-  "style": "danger"
+  "style": "primary"
  },
  {
   "doctype": "Workflow State",

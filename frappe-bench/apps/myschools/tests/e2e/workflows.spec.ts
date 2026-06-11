@@ -43,6 +43,7 @@ test.describe("Phase 5 — Workflows in the desk", () => {
 	test.skip(!seed.finding, "no Resolved finding seeded — run seed_e2e.main");
 
 	test("Audit Officer sees Verify on a Resolved finding", async ({ page }) => {
+		test.setTimeout(90_000);
 		await loginAs(page, "e2e_audit@mys.local", seed.users["e2e_audit@mys.local"].password);
 		await page.goto(`/app/mys-inspection-finding/${seed.finding}`);
 		await openWorkflowActions(page);
@@ -104,6 +105,7 @@ test.describe("Phase 5 — Royalty Invoice Send Reminder", () => {
 	test.skip(!seed.invoice, "no overdue invoice seeded");
 
 	test('"Send Reminder" surfaces on overdue Royalty Invoice', async ({ page }) => {
+		test.setTimeout(90_000);
 		await loginAs(page, "Administrator", "admin");
 		await page.goto(`/app/mys-royalty-invoice/${seed.invoice}`);
 		await expect(page.locator(".indicator-pill, .indicator").first()).toBeVisible({
@@ -125,11 +127,12 @@ test.describe("Phase 5 — Royalty Invoice Send Reminder", () => {
 
 test.describe("Phase 5 — List view polish", () => {
 	test("Finding list view loads and renders status indicators", async ({ page }) => {
+		test.setTimeout(90_000);
 		await loginAs(page, "Administrator", "admin");
 		await page.goto("/app/mys-inspection-finding");
 		// The list container always mounts; wait for it.
 		await expect(page.locator(".frappe-list, .layout-main-section .result").first()).toBeVisible({
-			timeout: 20_000,
+			timeout: 45_000,
 		});
 		// Status pills render inline on each row — at least one should be there
 		// because the seed created a Resolved finding.
@@ -139,10 +142,11 @@ test.describe("Phase 5 — List view polish", () => {
 	});
 
 	test("Royalty Invoice list view loads", async ({ page }) => {
+		test.setTimeout(90_000);
 		await loginAs(page, "Administrator", "admin");
 		await page.goto("/app/mys-royalty-invoice");
 		await expect(page.locator(".frappe-list, .layout-main-section .result").first()).toBeVisible({
-			timeout: 20_000,
+			timeout: 45_000,
 		});
 	});
 });

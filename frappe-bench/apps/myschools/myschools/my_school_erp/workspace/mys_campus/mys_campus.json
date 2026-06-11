@@ -103,6 +103,9 @@
  "roles": [
   {
    "role": "Campus Incharge"
+  },
+  {
+   "role": "Campus Admin"
   }
  ],
  "sequence_id": 4.0,

@@ -15,24 +15,20 @@ from myschools.api.lms import (
 	ensure_lms_franchise_role_links,
 )
 from myschools.api.transport import ensure_transport_fee_category
+from myschools.setup.role_model import (
+	CAMPUS_ADMIN_READS,
+	CAMPUS_ADMIN_ROLE,
+	FRANCHISE_ROLES,
+	HO_DEPT_HEAD_ROLES,
+	HO_DEPT_ROLE_READS,
+	LEGACY_HO_DEPT_HEAD,
+	STUDENT_PORTAL_READS,
+)
 
-FRANCHISE_ROLES = [
-	"Chief Executive",
-	"HO Dept Head",
-	"Cluster Director",
-	"Academic Monitor",
-	"Audit Officer",
-	"Branch Director",
-	"Branch Principal",
-	"Branch Admin",
-	"Branch Accountant",
-	"Campus Incharge",
-	"Teacher",
-]
-
-# Website-only role for parent/guardian portal (no Desk access).
+# Website-only roles for portal users (no Desk access).
 PORTAL_ROLES = {
 	"Guardian": {"desk_access": 0},
+	"Student": {"desk_access": 0},
 }
 
 
@@ -73,6 +69,10 @@ def after_migrate():
 	sync_workspace_number_card_content_labels()
 	sync_mys_branch_fee_admin_workspace()
 	backfill_module_profiles()
+	sync_franchise_workspace_roles()
+	sync_module_onboarding_roles()
+	migrate_legacy_ho_dept_head()
+	mirror_ho_dept_head_doctype_perms()
 	backfill_guardian_user_links()
 	ensure_transport_fee_category()
 	ensure_library_fine_category()
@@ -281,21 +281,6 @@ FRANCHISE_ROLE_READS = {
 		"Employee",
 		"Guardian",
 	],
-	"HO Dept Head": [
-		"MYS Cluster",
-		"MYS Branch",
-		"MYS Campus",
-		"MYS Department",
-		"MYS Franchise Agreement",
-		"MYS Royalty Invoice",
-		"MYS Royalty Payment",
-		"MYS Communication Log",
-		"MYS Inspection Visit",
-		"MYS Inspection Finding",
-		"Student",
-		"Fees",
-		"Employee",
-	],
 	"Cluster Director": [
 		"MYS Cluster",
 		"MYS Branch",
@@ -426,6 +411,12 @@ FRANCHISE_ROLE_READS = {
 	],
 }
 
+# Phase 17 — specialized HO dept heads, campus admin, student portal reads.
+for _role, _reads in HO_DEPT_ROLE_READS.items():
+	FRANCHISE_ROLE_READS[_role] = list(_reads)
+FRANCHISE_ROLE_READS[CAMPUS_ADMIN_ROLE] = list(CAMPUS_ADMIN_READS)
+FRANCHISE_ROLE_READS["Student"] = list(STUDENT_PORTAL_READS)
+
 # Fee-admin roles need read on the link-target doctypes their Phase 8a forms
 # (MYS Bulk Fee Run / Fee Structure Override / Late Fee Policy) reference —
 # otherwise desk link-field validation rejects the values and the forms can't
@@ -438,13 +429,13 @@ _FEE_ADMIN_LINK_READS = [
 	"Student Group",
 	"Fee Category",
 ]
-for _role in ("Branch Director", "Branch Accountant", "Branch Admin"):
+for _role in ("Branch Director", "Branch Accountant", "Branch Admin", "Finance Dept Head"):
 	for _dt in _FEE_ADMIN_LINK_READS:
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
 			FRANCHISE_ROLE_READS[_role].append(_dt)
 
 # Enrollment desk: branch staff create Program Enrollment (Education upstream doctype).
-for _role in ("Branch Director", "Branch Principal", "Branch Admin"):
+for _role in ("Branch Director", "Branch Principal", "Branch Admin", CAMPUS_ADMIN_ROLE):
 	if "Program Enrollment" not in FRANCHISE_ROLE_READS[_role]:
 		FRANCHISE_ROLE_READS[_role].append("Program Enrollment")
 
@@ -480,7 +471,9 @@ for _role in (
 	"Branch Accountant",
 	"Audit Officer",
 	"Cluster Director",
-	"HO Dept Head",
+	"Monitoring Dept Head",
+	"Administration Dept Head",
+	"Chief Executive",
 ):
 	for _dt in _DOCUMENT_READS:
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
@@ -495,8 +488,9 @@ for _role in (
 	"Branch Accountant",
 	"Audit Officer",
 	"Cluster Director",
-	"HO Dept Head",
 	"Chief Executive",
+	"Academic Dept Head",
+	"Training Dept Head",
 ):
 	for _dt in _LMS_COURSE_READS:
 		if _dt not in FRANCHISE_ROLE_READS[_role]:
@@ -509,7 +503,8 @@ for _role in (
 # grant_franchise_role_permissions via the DocType existence check).
 for _role in (
 	"Chief Executive",
-	"HO Dept Head",
+	"Finance Dept Head",
+	"Administration Dept Head",
 	"Cluster Director",
 	"Branch Director",
 	"Branch Accountant",
@@ -599,6 +594,17 @@ def grant_franchise_role_permissions():
 			update_permission_property("MYS Communication Log", "Guardian", 0, "read", 1)
 			update_permission_property("MYS Communication Log", "Guardian", 0, "create", 1)
 
+	# Workflow desk buttons (Verify / Submit / Cancel) need read on Workflow State.
+	_workflow_meta = ("Workflow", "Workflow State", "Workflow Action Master")
+	for role in FRANCHISE_ROLES:
+		if not frappe.db.exists("Role", role):
+			continue
+		for doctype in _workflow_meta:
+			if not frappe.db.exists("DocType", doctype):
+				continue
+			add_permission(doctype, role, 0)
+			update_permission_property(doctype, role, 0, "read", 1)
+
 
 def backfill_module_profiles():
 	"""Attach the right MYS Module Profile to every existing user — called
@@ -607,6 +613,136 @@ def backfill_module_profiles():
 	from myschools.api.user_profile import backfill_existing_users
 
 	backfill_existing_users()
+
+
+def _sync_has_role_child_table(parent: str, parenttype: str, parentfield: str, roles: set[str]) -> None:
+	"""Replace a Has Role child table without re-saving the parent (avoids Workspace validate)."""
+	current = set(
+		frappe.get_all(
+			"Has Role",
+			filters={"parent": parent, "parenttype": parenttype, "parentfield": parentfield},
+			pluck="role",
+		)
+	)
+	if current == roles:
+		return
+	frappe.db.delete(
+		"Has Role",
+		{"parent": parent, "parenttype": parenttype, "parentfield": parentfield},
+	)
+	for role in sorted(roles):
+		frappe.get_doc(
+			{
+				"doctype": "Has Role",
+				"parent": parent,
+				"parenttype": parenttype,
+				"parentfield": parentfield,
+				"role": role,
+			}
+		).insert(ignore_permissions=True)
+
+
+def sync_franchise_workspace_roles():
+	"""Ensure desk workspace role gates match Phase 17 (fixture JSON is not always re-imported)."""
+	expected = {
+		"mys-head-office": {"Chief Executive", *HO_DEPT_HEAD_ROLES},
+		"mys-cluster": {"Cluster Director"},
+		"mys-branch": {
+			"Branch Director",
+			"Branch Principal",
+			"Branch Admin",
+			"Branch Accountant",
+		},
+		"mys-campus": {"Campus Incharge", CAMPUS_ADMIN_ROLE},
+		"mys-inspection": {"Academic Monitor", "Audit Officer"},
+	}
+	for ws_name, roles in expected.items():
+		if frappe.db.exists("Workspace", ws_name):
+			_sync_has_role_child_table(ws_name, "Workspace", "roles", roles)
+
+
+def sync_module_onboarding_roles():
+	"""Back-fill Module Onboarding allow_roles after HO dept split (Phase 17a)."""
+	name = "MYS Franchise Setup"
+	if not frappe.db.exists("Module Onboarding", name):
+		return
+	expected = {
+		"Chief Executive",
+		*HO_DEPT_HEAD_ROLES,
+		"Cluster Director",
+		"Branch Director",
+		"Branch Principal",
+		"Branch Admin",
+	}
+	filters = {"parent": name, "parenttype": "Module Onboarding", "parentfield": "allow_roles"}
+	current = set(frappe.get_all("Onboarding Permission", filters=filters, pluck="role"))
+	if current == expected:
+		return
+	frappe.db.delete("Onboarding Permission", filters)
+	for role in sorted(expected):
+		frappe.get_doc(
+			{
+				"doctype": "Onboarding Permission",
+				"parent": name,
+				"parenttype": "Module Onboarding",
+				"parentfield": "allow_roles",
+				"role": role,
+			}
+		).insert(ignore_permissions=True)
+
+
+def migrate_legacy_ho_dept_head():
+	"""Strip the deprecated generic HO Dept Head role from all users (Phase 17a)."""
+	if not frappe.db.exists("Role", LEGACY_HO_DEPT_HEAD):
+		return
+	for user in frappe.get_all(
+		"Has Role",
+		filters={"role": LEGACY_HO_DEPT_HEAD, "parenttype": "User"},
+		pluck="parent",
+	):
+		if user in ("Administrator", "Guest"):
+			continue
+		doc = frappe.get_doc("User", user)
+		doc.remove_roles(LEGACY_HO_DEPT_HEAD)
+
+
+def mirror_ho_dept_head_doctype_perms():
+	"""Copy DocType-level perms from legacy HO Dept Head to each specialized HO head."""
+	if not frappe.db.exists("Role", LEGACY_HO_DEPT_HEAD):
+		return
+	from frappe.permissions import add_permission, update_permission_property
+
+	_perm_fields = (
+		"read",
+		"write",
+		"create",
+		"submit",
+		"cancel",
+		"amend",
+		"delete",
+		"report",
+		"export",
+		"import",
+		"share",
+		"print",
+		"email",
+	)
+	for doctype in frappe.get_all("DocType", filters={"istable": 0}, pluck="name"):
+		source_perms = frappe.get_all(
+			"DocPerm",
+			filters={"parent": doctype, "role": LEGACY_HO_DEPT_HEAD},
+			fields=["permlevel", *_perm_fields],
+		)
+		if not source_perms:
+			continue
+		src = source_perms[0]
+		for target in HO_DEPT_HEAD_ROLES:
+			if not frappe.db.exists("Role", target):
+				continue
+			add_permission(doctype, target, src.permlevel)
+			for field in _perm_fields:
+				if src.get(field):
+					update_permission_property(doctype, target, src.permlevel, field, 1)
 
 
 def create_franchise_roles():

@@ -218,7 +218,19 @@
    "role": "Chief Executive"
   },
   {
-   "role": "HO Dept Head"
+   "role": "Finance Dept Head"
+  },
+  {
+   "role": "Academic Dept Head"
+  },
+  {
+   "role": "Monitoring Dept Head"
+  },
+  {
+   "role": "Administration Dept Head"
+  },
+  {
+   "role": "Training Dept Head"
   }
  ],
  "sequence_id": 1.0,

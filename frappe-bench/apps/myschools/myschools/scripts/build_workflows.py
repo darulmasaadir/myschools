@@ -34,7 +34,7 @@ ROLE_AUDIT = "Audit Officer"
 ROLE_BR_DIRECTOR = "Branch Director"
 ROLE_BR_PRINCIPAL = "Branch Principal"
 ROLE_BR_ACCOUNTANT = "Branch Accountant"
-ROLE_HO_DEPT_HEAD = "HO Dept Head"
+ROLE_FINANCE_DEPT_HEAD = "Finance Dept Head"
 ROLE_CEO = "Chief Executive"
 
 
@@ -85,7 +85,7 @@ FINDING_TRANSITIONS = [
 ]
 
 ROYALTY_STATES = [
-	("Draft", 0, [ROLE_HO_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
+	("Draft", 0, [ROLE_FINANCE_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
 	("Unpaid", 1, []),
 	("Partial", 1, []),
 	("Paid", 1, []),
@@ -94,8 +94,8 @@ ROYALTY_STATES = [
 ]
 
 ROYALTY_TRANSITIONS = [
-	("Draft", "Submit", "Unpaid", [ROLE_HO_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
-	("Unpaid", "Cancel", "Cancelled", [ROLE_CEO, ROLE_HO_DEPT_HEAD]),
+	("Draft", "Submit", "Unpaid", [ROLE_FINANCE_DEPT_HEAD, ROLE_BR_ACCOUNTANT]),
+	("Unpaid", "Cancel", "Cancelled", [ROLE_CEO, ROLE_FINANCE_DEPT_HEAD]),
 	("Partial", "Cancel", "Cancelled", [ROLE_CEO]),
 	("Overdue", "Cancel", "Cancelled", [ROLE_CEO]),
 ]
@@ -150,11 +150,12 @@ WORKFLOWS = [
 	),
 ]
 
-# Workflow State + Workflow Action Master rows that aren't pre-seeded in core.
-# Core ships: Draft, Pending, Approved, Rejected, Submitted, Cancelled (states)
-#             and Submit, Cancel, Approve, Reject, Review (actions).
-# We need: Open, In Progress, Resolved, Verified, Unpaid, Partial, Paid, Overdue.
+# Workflow State + Workflow Action Master rows shipped as fixtures.
+# Draft / Cancelled are documented in core but are NOT guaranteed on a bare
+# fresh-install CI site — include them so workflow transitions never 404.
 WORKFLOW_STATE_NAMES = [
+	("Draft", "primary"),
+	("Cancelled", "danger"),
 	("Open", "warning"),
 	("In Progress", "primary"),
 	("Resolved", "info"),

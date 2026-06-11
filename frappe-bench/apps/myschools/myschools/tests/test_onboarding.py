@@ -19,7 +19,11 @@ EXPECTED_STEPS = [
 
 EXPECTED_ROLES = {
 	"Chief Executive",
-	"HO Dept Head",
+	"Finance Dept Head",
+	"Academic Dept Head",
+	"Monitoring Dept Head",
+	"Administration Dept Head",
+	"Training Dept Head",
 	"Cluster Director",
 	"Branch Director",
 	"Branch Principal",

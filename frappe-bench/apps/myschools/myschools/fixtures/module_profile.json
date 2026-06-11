@@ -18,7 +18,10 @@
    {"doctype": "Block Module", "module": "Support"},
    {"doctype": "Block Module", "module": "Projects"},
    {"doctype": "Block Module", "module": "Utilities"},
-   {"doctype": "Block Module", "module": "EDI"}
+   {"doctype": "Block Module", "module": "EDI"},
+   {"doctype": "Block Module", "module": "Website"},
+   {"doctype": "Block Module", "module": "Automation"},
+   {"doctype": "Block Module", "module": "Integrations"}
   ]
  },
  {
@@ -43,7 +46,14 @@
    {"doctype": "Block Module", "module": "EDI"},
    {"doctype": "Block Module", "module": "Accounts"},
    {"doctype": "Block Module", "module": "CRM"},
-   {"doctype": "Block Module", "module": "Selling"}
+   {"doctype": "Block Module", "module": "Selling"},
+   {"doctype": "Block Module", "module": "HR"},
+   {"doctype": "Block Module", "module": "Payroll"},
+   {"doctype": "Block Module", "module": "LMS"},
+   {"doctype": "Block Module", "module": "Website"},
+   {"doctype": "Block Module", "module": "Automation"},
+   {"doctype": "Block Module", "module": "Integrations"},
+   {"doctype": "Block Module", "module": "Setup"}
   ]
  },
  {
@@ -68,7 +78,12 @@
    {"doctype": "Block Module", "module": "EDI"},
    {"doctype": "Block Module", "module": "Accounts"},
    {"doctype": "Block Module", "module": "CRM"},
-   {"doctype": "Block Module", "module": "Selling"}
+   {"doctype": "Block Module", "module": "Selling"},
+   {"doctype": "Block Module", "module": "LMS"},
+   {"doctype": "Block Module", "module": "Website"},
+   {"doctype": "Block Module", "module": "Automation"},
+   {"doctype": "Block Module", "module": "Integrations"},
+   {"doctype": "Block Module", "module": "Setup"}
   ]
  },
  {
@@ -93,7 +108,14 @@
    {"doctype": "Block Module", "module": "EDI"},
    {"doctype": "Block Module", "module": "CRM"},
    {"doctype": "Block Module", "module": "Selling"},
-   {"doctype": "Block Module", "module": "Accounts"}
+   {"doctype": "Block Module", "module": "Accounts"},
+   {"doctype": "Block Module", "module": "HR"},
+   {"doctype": "Block Module", "module": "Payroll"},
+   {"doctype": "Block Module", "module": "LMS"},
+   {"doctype": "Block Module", "module": "Website"},
+   {"doctype": "Block Module", "module": "Automation"},
+   {"doctype": "Block Module", "module": "Integrations"},
+   {"doctype": "Block Module", "module": "Setup"}
   ]
  },
  {
@@ -119,7 +141,14 @@
    {"doctype": "Block Module", "module": "CRM"},
    {"doctype": "Block Module", "module": "Selling"},
    {"doctype": "Block Module", "module": "Accounts"},
-   {"doctype": "Block Module", "module": "Education"}
+   {"doctype": "Block Module", "module": "Education"},
+   {"doctype": "Block Module", "module": "HR"},
+   {"doctype": "Block Module", "module": "Payroll"},
+   {"doctype": "Block Module", "module": "LMS"},
+   {"doctype": "Block Module", "module": "Website"},
+   {"doctype": "Block Module", "module": "Automation"},
+   {"doctype": "Block Module", "module": "Integrations"},
+   {"doctype": "Block Module", "module": "Setup"}
   ]
  }
 ]

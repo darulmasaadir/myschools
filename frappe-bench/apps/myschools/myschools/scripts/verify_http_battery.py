@@ -27,11 +27,16 @@ DEFAULT_HOST = "myschools.localhost"
 
 ROLE_LANDING = [
 	("ceo@mys.local", "mys-head-office"),
-	("ho.head@mys.local", "mys-head-office"),
+	("finance.head@mys.local", "mys-head-office"),
+	("academic.head@mys.local", "mys-head-office"),
+	("monitoring.head@mys.local", "mys-head-office"),
+	("admin.head@mys.local", "mys-head-office"),
+	("training.head@mys.local", "mys-head-office"),
 	("cluster.dir@mys.local", "mys-cluster"),
 	("monitor@mys.local", "mys-inspection"),
 	("audit@mys.local", "mys-inspection"),
 	("campus@mys.local", "mys-campus"),
+	("campus.admin@mys.local", "mys-campus"),
 ]
 
 

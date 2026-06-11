@@ -197,7 +197,7 @@
     "doc_status": "0",
     "update_field": "",
     "update_value": "",
-    "allow_edit": "HO Dept Head",
+    "allow_edit": "Finance Dept Head",
     "is_optional_state": 0,
     "avoid_status_override": 0,
     "send_email": 0
@@ -275,7 +275,7 @@
     "state": "Draft",
     "action": "Submit",
     "next_state": "Unpaid",
-    "allowed": "HO Dept Head",
+    "allowed": "Finance Dept Head",
     "allow_self_approval": 1
    },
    {
@@ -299,7 +299,7 @@
     "state": "Unpaid",
     "action": "Cancel",
     "next_state": "Cancelled",
-    "allowed": "HO Dept Head",
+    "allowed": "Finance Dept Head",
     "allow_self_approval": 1
    },
    {

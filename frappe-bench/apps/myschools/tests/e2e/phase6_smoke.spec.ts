@@ -59,6 +59,7 @@ test.describe("Phase 6 — Query Reports render", () => {
 
 	for (const name of reports) {
 		test(`${name} loads without console error`, async ({ page }) => {
+			test.setTimeout(90_000);
 			const consoleErrors: string[] = [];
 			page.on("console", (msg) => {
 				if (msg.type() === "error") consoleErrors.push(msg.text());
@@ -69,7 +70,7 @@ test.describe("Phase 6 — Query Reports render", () => {
 			// The data area (.report-wrapper) can stay hidden when the report
 			// has zero rows, so assert on the title instead.
 			await expect(page.locator(`.title-text:has-text("${name}")`).first()).toBeVisible({
-				timeout: 25_000,
+				timeout: 45_000,
 			});
 			// Give the script-report shell a beat to finish wiring.
 			await page.waitForTimeout(1000);

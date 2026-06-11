@@ -62,7 +62,11 @@ _DEFAULT_DESK_APP_USERS = (
 	"e2e_guardian@mys.local",
 	"e2e_director@mys.local",
 	"ceo@mys.local",
-	"ho.head@mys.local",
+	"finance.head@mys.local",
+	"academic.head@mys.local",
+	"monitoring.head@mys.local",
+	"admin.head@mys.local",
+	"training.head@mys.local",
 	"cluster.dir@mys.local",
 	"monitor@mys.local",
 	"audit@mys.local",
@@ -71,6 +75,7 @@ _DEFAULT_DESK_APP_USERS = (
 	"branch.admin@mys.local",
 	"accountant@mys.local",
 	"campus@mys.local",
+	"campus.admin@mys.local",
 )
 
 

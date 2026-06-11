@@ -32,7 +32,11 @@ EXPECTED_MODULE_PROFILES = [
 
 EXPECTED_ROLE_HOMES = {
 	"Chief Executive": "mys-head-office",
-	"HO Dept Head": "mys-head-office",
+	"Finance Dept Head": "mys-head-office",
+	"Academic Dept Head": "mys-head-office",
+	"Monitoring Dept Head": "mys-head-office",
+	"Administration Dept Head": "mys-head-office",
+	"Training Dept Head": "mys-head-office",
 	"Cluster Director": "mys-cluster",
 	"Academic Monitor": "mys-inspection",
 	"Audit Officer": "mys-inspection",
@@ -41,7 +45,9 @@ EXPECTED_ROLE_HOMES = {
 	"Branch Admin": "mys-branch",
 	"Branch Accountant": "mys-branch",
 	"Campus Incharge": "mys-campus",
+	"Campus Admin": "mys-campus",
 	"Teacher": "teacher",
+	"Student": "student",
 }
 
 
@@ -52,7 +58,14 @@ class TestWorkspaceFixtures(FrappeTestCase):
 
 	def test_workspaces_restricted_to_correct_roles(self):
 		expected_roles = {
-			"mys-head-office": {"Chief Executive", "HO Dept Head"},
+			"mys-head-office": {
+				"Chief Executive",
+				"Finance Dept Head",
+				"Academic Dept Head",
+				"Monitoring Dept Head",
+				"Administration Dept Head",
+				"Training Dept Head",
+			},
 			"mys-cluster": {"Cluster Director"},
 			"mys-branch": {
 				"Branch Director",
@@ -60,7 +73,7 @@ class TestWorkspaceFixtures(FrappeTestCase):
 				"Branch Admin",
 				"Branch Accountant",
 			},
-			"mys-campus": {"Campus Incharge"},
+			"mys-campus": {"Campus Incharge", "Campus Admin"},
 			"mys-inspection": {"Academic Monitor", "Audit Officer"},
 		}
 		for ws_name, roles in expected_roles.items():

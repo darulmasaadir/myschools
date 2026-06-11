@@ -4,10 +4,10 @@
 Creates one System User per franchise role with a known dev password so you can
 manually verify the role-aware shell (workspace landing, sidebar scoping).
 
-Branch-scoped users (Director / Principal / Admin / Accountant / Campus Incharge)
-also get an idempotent Employee row linked to the first MYS Branch on the site,
-so the same credentials work on the mobile `/branch` portal — which scopes data
-via `Employee.user_id` + `Employee.mys_branch` (see api/branch_portal.py).
+Branch-scoped users (Director / Principal / Admin / Accountant / Campus Incharge /
+Campus Admin) also get an idempotent Employee row linked to the first MYS Branch
+on the site, so the same credentials work on the mobile `/branch` portal — which
+scopes data via `Employee.user_id` + `Employee.mys_branch` (see api/branch_portal.py).
 
 Idempotent — re-running keeps existing users/Employees and resets the password.
 
@@ -17,11 +17,18 @@ DO NOT USE IN PRODUCTION. The shared password is for local development only.
 import frappe
 from frappe.utils import today
 
+from myschools.setup.install import migrate_legacy_ho_dept_head
+from myschools.setup.role_model import CAMPUS_ADMIN_ROLE, LEGACY_HO_DEPT_HEAD
+
 DEV_PASSWORD = "admin"
 
 TEST_USERS = [
 	("ceo@mys.local", "Cynthia", "Executive", "Chief Executive"),
-	("ho.head@mys.local", "Hira", "Head", "HO Dept Head"),
+	("finance.head@mys.local", "Farah", "Finance", "Finance Dept Head"),
+	("academic.head@mys.local", "Amjad", "Academic", "Academic Dept Head"),
+	("monitoring.head@mys.local", "Mona", "Monitoring", "Monitoring Dept Head"),
+	("admin.head@mys.local", "Adnan", "Administration", "Administration Dept Head"),
+	("training.head@mys.local", "Tariq", "Training", "Training Dept Head"),
 	("cluster.dir@mys.local", "Cyrus", "Director", "Cluster Director"),
 	("monitor@mys.local", "Maham", "Monitor", "Academic Monitor"),
 	("audit@mys.local", "Asad", "Auditor", "Audit Officer"),
@@ -30,20 +37,18 @@ TEST_USERS = [
 	("branch.admin@mys.local", "Adeel", "Admin", "Branch Admin"),
 	("accountant@mys.local", "Aliya", "Accountant", "Branch Accountant"),
 	("campus@mys.local", "Komal", "Incharge", "Campus Incharge"),
+	("campus.admin@mys.local", "Sana", "Admin", CAMPUS_ADMIN_ROLE),
 ]
 
-# Roles whose users get a backing Employee row linked to a MYS Branch
-# so they can land on /branch (mobile portal). Campus Incharge is included
-# because the portal's role gate (`require_branch_role`) accepts it too.
 BRANCH_SCOPED_ROLES = {
 	"Branch Director",
 	"Branch Principal",
 	"Branch Admin",
 	"Branch Accountant",
 	"Campus Incharge",
+	CAMPUS_ADMIN_ROLE,
 }
 
-# Cluster inspection roles need Employee.mys_branch for portal + permission scope.
 INSPECTION_SCOPED_ROLES = {
 	"Academic Monitor",
 	"Audit Officer",
@@ -52,9 +57,12 @@ INSPECTION_SCOPED_ROLES = {
 
 
 def run():
+	migrate_legacy_ho_dept_head()
 	for email, first_name, last_name, role in TEST_USERS:
 		if frappe.db.exists("User", email):
 			user = frappe.get_doc("User", email)
+			if LEGACY_HO_DEPT_HEAD in {r.role for r in user.roles}:
+				user.remove_roles(LEGACY_HO_DEPT_HEAD)
 			if not any(r.role == role for r in user.roles):
 				user.append("roles", {"role": role})
 				user.save(ignore_permissions=True)
@@ -84,12 +92,7 @@ def run():
 
 
 def _ensure_employee(email: str, first_name: str, last_name: str) -> str | None:
-	"""Ensure an Employee row linked to `email` exists, joined to a MYS Branch.
-
-	Returns the Employee name, or None if the site has no MYS Branch yet
-	(e.g. a fresh install before seed_demo has run — safe to skip; the user
-	can still log in, they just can't see `/branch` until a branch exists).
-	"""
+	"""Ensure an Employee row linked to `email` exists, joined to a MYS Branch."""
 	branch = frappe.db.get_value("MYS Branch", {}, "name")
 	if not branch:
 		return None
@@ -126,8 +129,8 @@ def _ensure_employee(email: str, first_name: str, last_name: str) -> str | None:
 
 def _print_summary():
 	print("\nTest users (password: admin)\n")
-	print(f"  {'Email':<30}  {'Role':<22}  {'Lands on':<22}  Module Profile")
-	print("  " + "-" * 92)
+	print(f"  {'Email':<32}  {'Role':<24}  {'Lands on':<22}  Module Profile")
+	print("  " + "-" * 96)
 
 	role_home = frappe.get_hooks("role_home_page") or {}
 	for email, _, _, role in TEST_USERS:
@@ -135,5 +138,5 @@ def _print_summary():
 		if isinstance(home, list):
 			home = home[0] if home else ""
 		profile = frappe.db.get_value("User", email, "module_profile") or "-"
-		print(f"  {email:<30}  {role:<22}  /app/{home:<17}  {profile}")
+		print(f"  {email:<32}  {role:<24}  /app/{home:<17}  {profile}")
 	print()

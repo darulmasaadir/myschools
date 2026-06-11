@@ -1,7 +1,7 @@
 # MY School ERP — Customisation Roadmap
 
-**Last updated:** 2026-06-10
-**Up next:** Staging deployment for CEO review, then Phase 17 — Reporting expansion (see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass)).
+**Last updated:** 2026-06-11
+**Up next:** Phase 17 — Role model & access governance (branch `feature/phase-17-role-model`, in flight). Staging deploy waits for this to merge.
 
 This doc is the **single source of truth** for what's been built, what's in flight, and what's planned. If you're scoping new work, start here. If the truth on disk diverges from this doc, the doc is wrong — fix it in the same PR that lands the change.
 
@@ -42,7 +42,8 @@ These bind every phase:
 | 14 | Document Mgmt | ✅ | PR [#29](https://github.com/darulmasaadir/myschools/pull/29) (`1bd2ea8`) |
 | 15 | LMS | ✅ | PR [#30](https://github.com/darulmasaadir/myschools/pull/30) (`805c5c0`) + follow-up PR [#31](https://github.com/darulmasaadir/myschools/pull/31) (`bdd42d1`) |
 | 16 | Mobile PWA | ✅ | PR [#32](https://github.com/darulmasaadir/myschools/pull/32) (`f690714`) |
-| 17+ | Reporting expansion | ⬜ | Continuous per-module reports — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
+| 17 | Role model & access governance | 🟡 | Branch `feature/phase-17-role-model` — 17a–17d in progress |
+| 18+ | Reporting expansion | ⬜ | Continuous per-module reports — see [Phase 9+ inventory](#phase-9--remaining-module-inventory-scoping-pass) |
 
 ---
 
@@ -340,6 +341,43 @@ Upgrade-safe teacher slice mirroring Phase 7 portal pattern (`www/` + `api/teach
 - **`scripts/seed_portal_teacher.py`** + `seed_e2e` teacher fixture; `tests/test_teacher_portal.py`; HTTP battery teacher paths; Playwright `phase9_teacher_portal.spec.ts`.
 
 Attendance/exam marking shipped in **Phase 10** (PR #23).
+
+---
+
+## Phase 17 — Role model & access governance 🟡
+
+**Branch:** `feature/phase-17-role-model` (in flight). Maps the Software
+Infrastructure org chart fully onto Frappe roles, adds the missing portal +
+admin roles, and makes the sidebar an enforced allow-list. **Staging deploy for
+CEO review waits for this to merge.**
+
+- **17a — HO dept split.** Generic `HO Dept Head` → five specialized roles
+  (Finance / Academic / Monitoring / Administration / Training Dept Head), each
+  with positive doctype grants (`HO_DEPT_ROLE_READS`). IT maps to built-in
+  `System Manager`; Marketing folds into Administration. New
+  [`setup/role_model.py`](../frappe-bench/apps/myschools/myschools/setup/role_model.py)
+  is the single source of truth (`FRANCHISE_ROLES`, `ROLE_SEED_USER`, read maps).
+  `after_migrate` migrates legacy role off users, mirrors its DocPerms onto the
+  five new roles, and re-syncs workspace / module-onboarding role gates
+  (idempotent, upgrade-safe).
+- **17b — Campus Admin.** New `Campus Admin` role on the `mys-campus` workspace,
+  branch-scoped like Campus Incharge; seed `campus.admin@mys.local`.
+- **17c — Student portal.** `/student` (profile / fees / attendance / timetable)
+  via `www/` Jinja + `api/student_portal.py` with own-record scoping
+  (`student_query` / `student_has_permission` resolve the login's own `Student`
+  row). Website `Student` role; PWA prefix `/student`; seed `e2e-student@mys.local`;
+  Playwright `phase17_student_portal.spec.ts` (4).
+- **17d — Sidebar governance.** Module Profiles widened to a deliberate
+  allow-list (block `Website`/`Automation`/`Integrations` everywhere; block
+  `HR`/`Payroll`/`LMS`/`Setup`/`Accounts` on non-HO tiers where out of scope) —
+  closes the Academic-Monitor HR/Payroll leak. New
+  [`verify_sidebar_surfaces.py`](../frappe-bench/apps/myschools/myschools/scripts/verify_sidebar_surfaces.py)
+  asserts required blocks + allows per profile, wired into `pr_battery.sh`.
+- **17e — Docs.** This roadmap + [`navigation-and-roles.md`](processes/navigation-and-roles.md)
+  rewritten for the 18-role model (15 desk + 3 portal) with the org-chart map.
+
+**Audit:** `verify_all_roles` 18/18 roles · `verify_sidebar_surfaces` 5 profiles
++ 15 roles · unit tests 215 · Playwright `phase17_student_portal` 4 passed.
 
 ---
 

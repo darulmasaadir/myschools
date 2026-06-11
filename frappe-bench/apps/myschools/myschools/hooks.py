@@ -97,7 +97,11 @@ doc_events = {
 # ------------------------
 role_home_page = {
 	"Chief Executive": "mys-head-office",
-	"HO Dept Head": "mys-head-office",
+	"Finance Dept Head": "mys-head-office",
+	"Academic Dept Head": "mys-head-office",
+	"Monitoring Dept Head": "mys-head-office",
+	"Administration Dept Head": "mys-head-office",
+	"Training Dept Head": "mys-head-office",
 	"Cluster Director": "mys-cluster",
 	"Academic Monitor": "mys-inspection",
 	"Audit Officer": "mys-inspection",
@@ -106,8 +110,10 @@ role_home_page = {
 	"Branch Admin": "mys-branch",
 	"Branch Accountant": "mys-branch",
 	"Campus Incharge": "mys-campus",
+	"Campus Admin": "mys-campus",
 	"Teacher": "teacher",
 	"Guardian": "guardian",
+	"Student": "student",
 }
 
 # Permission query conditions for branch-scoped data isolation
@@ -180,7 +186,11 @@ fixtures = [
 				"in",
 				[
 					"Chief Executive",
-					"HO Dept Head",
+					"Finance Dept Head",
+					"Academic Dept Head",
+					"Monitoring Dept Head",
+					"Administration Dept Head",
+					"Training Dept Head",
 					"Cluster Director",
 					"Academic Monitor",
 					"Audit Officer",
@@ -189,7 +199,9 @@ fixtures = [
 					"Branch Admin",
 					"Branch Accountant",
 					"Campus Incharge",
+					"Campus Admin",
 					"Guardian",
+					"Student",
 				],
 			]
 		],

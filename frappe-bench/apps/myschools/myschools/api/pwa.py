@@ -15,7 +15,7 @@ from werkzeug.wrappers import Response
 
 SW_ROUTE = "mys-pwa-sw.js"
 MANIFEST_PATH = "/assets/myschools/pwa/manifest.json"
-PORTAL_PREFIXES = ("/guardian", "/teacher", "/branch", "/inspection", "/portal")
+PORTAL_PREFIXES = ("/guardian", "/teacher", "/student", "/branch", "/inspection", "/portal")
 
 
 def is_portal_path(path: str | None) -> bool:

@@ -22,6 +22,8 @@ EMAIL = "e2e_teacher@mys.local"
 PASSWORD = "mys-e2e-teacher"
 GUARDIAN_EMAIL = "e2e_guardian@mys.local"
 GUARDIAN_PASSWORD = "mys-e2e-guardian"
+STUDENT_EMAIL = "e2e-student@mys.local"
+STUDENT_PASSWORD = "mys-e2e-student"
 COURSE_NAME = "E2E Portal Math"
 ROOM_NAME = "E2E Room 101"
 TEACHER_TERM_LABEL = "E2E Teacher Jun"
@@ -63,6 +65,7 @@ def main():
 	schedules = _ensure_week_schedule(group, instructor)
 	assessment_plan = _ensure_assessment_plan(group, instructor)
 	guardian = _ensure_guardian_for_students(students)
+	student_portal = _ensure_student_portal_user(students[0] if students else None)
 	transport = _ensure_transport(branch, guardian["student"] if guardian else None)
 	library = _ensure_library(branch, guardian["student"] if guardian else None)
 	document = _ensure_document(branch)
@@ -79,6 +82,7 @@ def main():
 		"assessment_plan": assessment_plan,
 		"branch": branch,
 		"guardian": guardian,
+		"student_portal": student_portal,
 		"transport": transport,
 		"library": library,
 		"document": document,
@@ -650,6 +654,27 @@ def _ensure_document(branch: str) -> dict | None:
 	)
 	doc.insert(ignore_permissions=True)
 	return {"document": doc.name, "branch": branch}
+
+
+def _ensure_student_portal_user(student_name: str | None) -> dict | None:
+	if not student_name:
+		return None
+	from myschools.setup.install import create_portal_roles
+
+	create_portal_roles()
+	_ensure_user(
+		STUDENT_EMAIL,
+		{
+			"first_name": "E2E",
+			"roles": ["Student"],
+			"password": STUDENT_PASSWORD,
+		},
+	)
+	updates = {"student_email_id": STUDENT_EMAIL}
+	if frappe.get_meta("Student").has_field("user"):
+		updates["user"] = STUDENT_EMAIL
+	frappe.db.set_value("Student", student_name, updates)
+	return {"user": STUDENT_EMAIL, "student": student_name}
 
 
 def _ensure_guardian_for_students(student_ids: list[str]) -> dict | None:

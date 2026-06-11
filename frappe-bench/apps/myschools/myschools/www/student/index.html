@@ -1,0 +1,22 @@
+{% extends "templates/pages/mys_portal_base.html" %}
+
+{% block portal_content %}
+<nav class="mys-portal__nav">
+	{% for item in nav_items %}
+	<a href="{{ item.route }}" class="mys-portal__nav-link{% if item.route == '/student' %} is-active{% endif %}">{{ item.label }}</a>
+	{% endfor %}
+</nav>
+<h1>{{ portal_title }}</h1>
+<p class="mys-portal__muted">{{ student_detail.student_name or student.name }}</p>
+
+<div class="mys-portal__card">
+	<table class="mys-portal__table">
+		<tbody>
+			<tr><th>MYS ID</th><td>{{ student_detail.mys_student_id or "—" }}</td></tr>
+			<tr><th>Campus</th><td>{{ student_detail.campus_label or student_detail.mys_campus or "—" }}</td></tr>
+			<tr><th>Email</th><td>{{ student_detail.student_email_id or "—" }}</td></tr>
+			<tr><th>Mobile</th><td>{{ student_detail.student_mobile_number or "—" }}</td></tr>
+		</tbody>
+	</table>
+</div>
+{% endblock %}
